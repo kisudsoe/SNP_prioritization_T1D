@@ -1,4 +1,4 @@
 @echo off
-: 
-:: Rscript T1D.r []
-Rscript T1D.r 
+: Prioitizing T1D SNPs
+:: Rscript roadmap.r [data/roadmap_dist.tsv]
+Rscript *.r *.tsv

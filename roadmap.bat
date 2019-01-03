@@ -8,3 +8,7 @@ Rscript roadmap_dn.r
 :: No argument in roadmap_filt.r
 :: Result BED file is generated at `db/roadmap_enh.bed`. The BED file size is 139 MB.
 Rscript roadmap_filt.r
+
+: 3. Prioritizing SNPs
+:: Rscript roadmap.r [data/roadmap_dist.tsv]
+Rscript roadmap.r data/roadmap_dist.tsv

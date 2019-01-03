@@ -10,6 +10,8 @@ This is a project for prioritization of SNPs associated with Type 1 diabetes.
 
 To download **GWAS Catalog data**, you can [search certain disease](https://www.ebi.ac.uk/gwas/). In this study, we downloaded [SNP-sets for type 1 diabetes](https://www.ebi.ac.uk/gwas/efotraits/EFO_0001359). Then you can run R code file for filtering the GWAS Catalog data as below command line:
 
+- Instead of `[ ]`, you have to put the file path or value by the options.
+
 ```cmd
 Rscript T1D_gwas.r [GWAS_file_path] [p-value_criteria]
 ```
@@ -78,18 +80,21 @@ To reduce file size and faster process, merge RoadMap enhancer information using
 
 ```BASH
 bedtools sort -i db/roadmap_enh.bed | bedtools merge -i stdin -c 1 -o count > db/roadmap_enh_merge.bed
-bedtools closest -d -a data/seedSNP_1817.bed -b db/roadmap_enh_merge.bed > data/roadmap_dist.bed
+bedtools closest -d -a data/seedSNP_1817.bed -b db/roadmap_enh_merge.bed > data/roadmap_dist.tsv
 ```
 
+To prioritize RoadMap enhancer occupied SNPs, you can run `roadmap.r` as below `CMD` command line:
 
+- `data/roadmap_dist_df.tsv` file is obtained that is for enhancer annotated file .
+- `data/snp_enh_484.bed` file is obtained that is for `BED` format file for USCS browser.
 
 ```BASH
-
+Rscript roadmap.r [data/roadmap_dist.tsv]
 ```
-
-
 
 
 
 ## 3. ENCODE ChIP-seq data download and filter
+
+The ENCODE ChIP-seq for transcription factor binding sites (TFBSs) data can downloaded <u>wgEncodeRegTfbsClusteredV3</u> data from [UCSC FTP](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/) (68 MB) or [bioconductor `data("wgEncodeTfbsV3")`](https://www.bioconductor.org/packages/devel/bioc/vignettes/ChIPpeakAnno/inst/doc/ChIPpeakAnno.html).
 
