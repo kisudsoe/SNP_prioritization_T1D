@@ -31,9 +31,17 @@ for id in snpid[0:len(snpid)-1]: # To remove empty file generation
             f.write(row)
     print('  file saved = %s\n' % path_w)
     
+<<<<<<< HEAD:T1D_ldlink_dn.py
+    if(divmod(i,10)[1]==0):
+        t1 = time.time()
+        m,s = divmod(t1-t0,60)
+        h,m = divmod(m,60)
+        print(time.strftime('> Job time= %02d:%02d:%02d\n' % (h,m,s)))
+=======
+>>>>>>> parent of 0c366a1... write: db/roadmap - core functions:T1D_ldlink.py
     if(i==len(snpid)): print("\n>> Download process completed.")
     i+=1
 t1 = time.time()
 m,s = divmod(t1-t0,60)
 h,m = divmod(m,60)
-print(time.strftime('>> Job time= %02d:%02d:%02d' % (h,m,s)))
+print(time.strftime('>> Job time= %02d:%02d:%02d\n' % (h,m,s)))
