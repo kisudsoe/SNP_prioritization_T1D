@@ -33,19 +33,19 @@ dis = as.numeric(as.character(enh$dis))
 rd.df = cbind(gwas,enh[1:2],dis)
 
 # 2. Filtering SNPs by distance of closest enhancers
-rd.df_ = subset(rd.df,dis==0)
-cat(paste0('Enhancer occupied by SNPs = ',length(unique(rd.df_$rsid)),'\n'))
+rd.df_ = unique(subset(rd.df,dis==0))
+cat(paste0('\nEnhancer occupied by SNPs = ',length(unique(rd.df_$rsid)),'\n'))
 cat(paste0('SNPs in RoadMap enhancers = ',length(unique(rd.df_$enh_pos)),'\n'))
-f.name1 = 'data/roadmap_dist_df2.tsv'
+f.name1 = 'data/roadmap_dist_df.tsv'
 write.table(rd.df_,f.name1,row.names=F,quote=F,sep='\t')
-cat(paste0('File write: ',f.name1,'\n'))
+cat(paste0('\nFile write: ',f.name1,'\n'))
 
 snp.enh = unique(rd.df_[,1:4])
 n1 = length(unique(snp.enh$rsid))
-f.name2 = paste0('data/snp_enh_',n1,'_2.bed')
+f.name2 = paste0('data/snp_enh_',n1,'.bed')
 write.table(snp.enh,f.name2,row.names=F,col.names=F,quote=F,sep='\t')
 cat(paste0('File write: ',f.name2,'\n'))
-cat(paste0('>> ',pdtime(t0,1),'\n'))
+cat(paste0('\n>> ',pdtime(t0,1),'\n'))
 ##################
 ## Function end ##
 ##################
