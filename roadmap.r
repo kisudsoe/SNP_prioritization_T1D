@@ -16,42 +16,18 @@ t0 = Sys.time()
 #########################
 ## Function start here ##
 #########################
-# 1. RoadMap data compile
+# 1. Compiling SNP data distant from RoadMap enhancers
 rd = unlist(read.table(rd.path,sep='\n'))
-n=length(rd); gwas=NULL; enh=NULL
-tmp=pblapply(rd,function(x) {
-	rdc = as.character(x)
-	rdc.v = unlist(strsplit(rdc,'\t'))
-	if(length(rdc.v)==4) gwas = rbind(gwas,rdc.v)
-	else if(length(rdc.v)==6) {
-		enh_1 = rdc.v[2:6]
-		pos   = paste0(enh_1[1],':',enh_1[2],'-',enh_1[3])
-		enh_  = c(pos,enh_1[4:5])
-		enh   = rbind(enh,enh_)
-	}
-})
+cat(paste0('>> Row number = ',length(rd)/2,'\n'))
+rd.odd  = as.character(rd[c(TRUE,FALSE)])
+rd.even = as.character(rd[c(FALSE,TRUE)])
 
-#pb = winProgressBar(title="Loop progress",
-#     label="Ready to read table..",min=0,max=n,width=500)
-#for(i in 1:n) {
-#	rdc = as.character(rd[i])
-#	if(i%%2==1) gwas = rbind(gwas,unlist(strsplit(rdc,'\t')))
-#	else {
-#		enh_1 = unlist(strsplit(rdc,'\t'))[2:6]
-#		pos   = paste0(enh_1[1],':',enh_1[2],'-',enh_1[3])
-#		enh_ = c(pos,enh_1[4:5])
-#		enh   = rbind(enh,enh_)
-#	}
-#    ## Progress time ##
-#    setWinProgressBar(pb,i,label=paste0(round(i/n*100,0),
-#              " % (",i,"/",n,") done for ",pdtime(t0,2)))
-#    ###################
-#}
-#close(pb)
+gwas = as.data.frame(do.call(rbind,strsplit(rd.odd, '\t',fixed=T)))
+enh_ = as.data.frame(do.call(rbind,strsplit(rd.even,'\t',fixed=T)))[2:6]
+pos  = unlist(apply(enh_,1,function(x) paste0(x[1],':',x[2],'-',x[3])))
+enh  = cbind(pos,enh_[,4:5])
 
-gwas = as.data.frame(gwas); print(dim(gwas))
 colnames(gwas) = c('chr','start','end','rsid')
-enh = as.data.frame(enh)  ; print(dim((enh)))
 colnames(enh)  = c('enh_pos','num','dis')
 dis = as.numeric(as.character(enh$dis))
 rd.df = cbind(gwas,enh[1:2],dis)
