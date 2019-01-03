@@ -1,4 +1,0 @@
-{
-  "traceback": "Traceback (most recent call last):\n  File \"/analysistools/public_html/apps/LDlink/app/LDlink.py\", line 323, in ldproxy\n    fp = open('./tmp/proxy'+reference+'.txt', \"r\")\nIOError: [Errno 2] No such file or directory: './tmp/proxy0505533479.txt'\n", 
-  "error": "rs75793288 is not in 1000G reference panel."
-}
