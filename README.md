@@ -73,7 +73,7 @@ To filter the RoadMap data by **Enhancers**, you can run `roadmap_filt.r` as bel
 Rscript roadmap_filt.r
 ```
 
-To reduce file size and faster process, merge RoadMap enhancer information using a `BASH` tool `bedtools`. Here is the `BASH` pipeline for `bedtools sort` and `bedtools merge`. Then, to identify T1D SNPs occupied in RoadMap enhancers, you can use `BASH` tool `bedtools intersect` as below code:
+To avoid multiple count of enhancers as well as to reduce file size and to achieve faster process, merge RoadMap enhancer information using a `BASH` tool `bedtools`. Here is the `BASH` pipeline for `bedtools sort` and `bedtools merge`. Then, to identify T1D SNPs occupied in RoadMap enhancers, you can use `BASH` tool `bedtools intersect` as below code:
 
 - Compressed file size of `roadmap_enh.bed.gz` is >139 MB.
 - Compressed file size of `roadmap_enh_merer.bed.gz` is about 3.7 MB.
@@ -82,6 +82,12 @@ To reduce file size and faster process, merge RoadMap enhancer information using
 bedtools sort -i db/roadmap_enh.bed | bedtools merge -i stdin -c 1 -o count > db/roadmap_enh_merge.bed
 bedtools closest -d -a data/seedSNP_1817.bed -b db/roadmap_enh_merge.bed > data/roadmap_dist.tsv
 ```
+
+```BASH
+bedtools sort -i db/roadmap_enh.bed | bedtools closest -d -a data/seedSNP_1817.bed -b stdin > data/roadmap_dist2.tsv
+```
+
+
 
 To prioritize RoadMap enhancer occupied SNPs, you can run `roadmap.r` as below `CMD` command line:
 
@@ -96,5 +102,6 @@ Rscript roadmap.r [data/roadmap_dist.tsv]
 
 ## 3. ENCODE ChIP-seq data download and filter
 
-The ENCODE ChIP-seq for transcription factor binding sites (TFBSs) data can downloaded <u>wgEncodeRegTfbsClusteredV3</u> data from [UCSC FTP](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/) (68 MB) or [bioconductor `data("wgEncodeTfbsV3")`](https://www.bioconductor.org/packages/devel/bioc/vignettes/ChIPpeakAnno/inst/doc/ChIPpeakAnno.html).
+The ENCODE ChIP-seq for transcription factor binding sites (TFBSs) data can downloaded <u>wgEncodeRegTfbsClusteredV3</u> data from [UCSC FTP](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/) (68 MB) or [bioconductor `data("wgEncodeTfbsV3")`](https://www.bioconductor.org/packages/devel/bioc/vignettes/ChIPpeakAnno/inst/doc/ChIPpeakAnno.html). Here, we assume having downloaded UCSC FTP file `wgEncodeRegTfbsClusteredV3.bed.gz`.
 
+To identify TFBS occupied SNPs, you can use `bedtools merge` and `bedtools closest`.
