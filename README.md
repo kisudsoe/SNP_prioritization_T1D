@@ -1,10 +1,10 @@
 # PriSNP: Prioritization of SNPs
 
-This is a project for prioritization of SNPs associated with Type 1 diabetes.
+This is an protocol for prioritization of SNPs associated certain phenotype/disease. Here is a study for prioritization of SNPs associated with Type 1 diabetes. You can follow the below analysis steps.
 
 
 
-## 1. SNP data download and filter
+## 1. Seed SNPs preparation for type 1 diabetes (T1D)
 
 ### gwas.r
 
@@ -55,7 +55,7 @@ BiocManager::install("AnnotationHub", version = "3.8")
 BiocManager::install("rtracklayer", version = "3.8")
 ```
 
-roadmap_dn.r
+### roadmap_dn.r
 
 To download **RoadMap data**, you can run `roadmap_dn.r` as below `CMD` command line:
 
@@ -119,6 +119,8 @@ The **ENCODE ChIP-seq** for regulatory transcription factor binding site (Reg-TF
 
 To identify TFBS occupied SNPs, you can use `bedtools merge` and `bedtools closest` as following code:
 
+- Merging the ENCODE TFBS data give you benefits such as avoiding multiple count of enhancers as well as reducing file size and achieving faster process
+
 ```BASH
 bedtools merge -i db/wgEncodeRegTfbsClusteredV3.bed.gz -c 1 -o count > db/encode_tfbs_merge.bed
 bedtools closest -d -a data/seedSNP_1817.bed -b db/encode_tfbs_merge.bed > data/encode_dist.tsv
@@ -140,4 +142,10 @@ Rscript src/bedtools_closest.r data/encode_dist.tsv
 
 ## 4. Regulome DB data download and filter
 
-The 
+The [Regulome DB](http://www.regulomedb.org/downloads) provides [category scores for SNPs by evidences](http://www.regulomedb.org/help) (see `Regulome score.txt`), including eQTL, TF binding, matched TF motif, matched DNase Footprint, and DNase peak. In this study, we decided high-score as `≥ 2b` SNPs.
+
+- `RegulomeDB.dbSNP132.Category1.txt.gz` (2 MB)
+- `RegulomeDB.dbSNP132.Category2.txt.gz` (39.3 MB)
+
+
+
