@@ -1,4 +1,8 @@
 @echo off
 : Prioitizing T1D SNPs
+
+: 1. 
+
+: 2. roadmap data
 :: Rscript roadmap.r [data/roadmap_dist.tsv]
-Rscript *.r *.tsv
+Rscript roadmap.r data/roadmap_dist.tsv

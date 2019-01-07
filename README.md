@@ -1,4 +1,4 @@
-# PriSNP: Prioritization of SNPs
+# Disease SNP prioritization
 
 This is an protocol for prioritization of SNPs associated certain phenotype/disease. Here is a study for prioritization of SNPs associated with Type 1 diabetes. You can follow the below analysis steps.
 
@@ -142,10 +142,28 @@ Rscript src/bedtools_closest.r data/encode_dist.tsv
 
 ## 4. Regulome DB data download and filter
 
-The [Regulome DB](http://www.regulomedb.org/downloads) provides [category scores for SNPs by evidences](http://www.regulomedb.org/help) (see `Regulome score.txt`), including eQTL, TF binding, matched TF motif, matched DNase Footprint, and DNase peak. In this study, we decided high-score as `≥ 2b` SNPs.
+The [Regulome DB](http://www.regulomedb.org/downloads) provides [category scores for SNPs by evidences](http://www.regulomedb.org/help) (see `Regulome score.txt`), including eQTL, TF binding, matched TF motif, matched DNase Footprint, and DNase peak. In this study, we stringently filtered and used high-score (`≥ 2b`) SNPs for our study.
 
 - `RegulomeDB.dbSNP132.Category1.txt.gz` (2 MB)
 - `RegulomeDB.dbSNP132.Category2.txt.gz` (39.3 MB)
+- Or you can download total dataset: `RegulomDB.` (2.8 GB)
+
+```CMD
+Rscript regulome.r data/seedSNP_1817_ldlink.tsv db/RegulomeDB.dbSNP132.Category1.txt.gz db/RegulomeDB.dbSNP132.Category2.txt.gz
+```
+
+The result files are save at `data/` folder:
+
+- `data/regulome_#.tsv`
+- `data/snp_#_regulome2b.bed`
 
 
+
+## 5. Venn analysis of functional motif SNPs
+
+Summary for SNPs with RoadMap annotation, ENCODE ChIP-seq, and RegulomeDB.
+
+```CMD
+
+```
 
