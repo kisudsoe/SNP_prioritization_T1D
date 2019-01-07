@@ -11,11 +11,11 @@ if(length(args)<1|length(args)>1) stop(hmsg)
 path = unlist(args[1])
 
 # System parameter
+library('tools')
 source('src/pdtime.r')
-source('src/fname.r')
 t0 = Sys.time()
 dir = 'data/'
-f.name = fname(path)[1]
+f.name = file_path_sans_ext(path)
 
 #########################
 ## Function start here ##
