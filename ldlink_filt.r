@@ -2,9 +2,9 @@
 # This file is for filtering LDlink data
 
 ## Command Arg Parameters ##
-# gwas.bat: Rscript ldlink_filt.r [SNP_file_path] [LDlink_download_target_dir]
+# CMD file: ldlink.bat
 args = commandArgs(trailingOnly=T)
-hmsg = 'Rscript T1D_ldlink_filt.r [SNP_file_path] [LDlink_download_target_dir]
+hmsg = 'Rscript ldlink_filt.r [SNP_file_path] [LDlink_download_target_dir]
   - Arguments [SNP_file_path] and [LDlink_download_target_dir] are mendatory.'
 if(length(args)<2|length(args)>2) stop(hmsg)
 snp.path = unlist(args[1])
@@ -18,7 +18,7 @@ t0 = Sys.time()
 #########################
 ## Function start here ##
 #########################
-snpdf = unique(read.delim(snp.path)[1:2]) # rsid, coord
+snpdf = unique(read.delim(snp.path)[,1:2]) # rsid, coord
 snpids = snpdf$rsid
 cat(paste0('Input SNP list number = ',length(snpids),'\n\n'))
 
