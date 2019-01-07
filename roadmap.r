@@ -2,6 +2,7 @@
 # This file is for identifying T1D SNPs occupied in RoadMap enhancers
 
 ## Command Arg Parameters ##
+# roadmap.bat: Rscript roadmap.r data/roadmap_dist.tsv
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript roadmap.r [bedtools_closest_result_file_path]
   - Argument [bedtools_closest_result_file_path] is a mendatory file path including SNPs distance from RoadMap enhancers.
@@ -14,7 +15,7 @@ source('src/pdtime.r')
 source('src/fname.r')
 t0 = Sys.time()
 dir = 'data/'
-f.name = fname(path)
+f.name = fname(path)[1]
 
 #########################
 ## Function start here ##
