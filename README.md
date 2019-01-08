@@ -146,7 +146,7 @@ The [Regulome DB](http://www.regulomedb.org/downloads) provides [category scores
 
 - `RegulomeDB.dbSNP132.Category1.txt.gz` (2 MB)
 - `RegulomeDB.dbSNP132.Category2.txt.gz` (39.3 MB)
-- Or you can download total dataset: `RegulomDB.` (2.8 GB)
+- Or you can download total dataset: `RegulomeDB.dbSNP141.txt.gz` (2.8 GB)
 
 ```CMD
 Rscript regulome.r data/seedSNP_1817_ldlink.tsv db/RegulomeDB.dbSNP132.Category1.txt.gz db/RegulomeDB.dbSNP132.Category2.txt.gz
@@ -159,11 +159,37 @@ The result files are save at `data/` folder:
 
 
 
-## 5. Venn analysis of functional motif SNPs
+## 5. Venn analysis for identifying core SNPs
 
-Summary for SNPs with RoadMap annotation, ENCODE ChIP-seq, and RegulomeDB.
+Summary for SNPs with RoadMap annotation, ENCODE ChIP-seq, and RegulomeDB. This R code for Venn analysis uses **Bioconductor** `limma` R package. The installation of the `limma` package as below:
 
-```CMD
-
+```R
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("limma", version = "3.8")
 ```
 
+To prioritize the SNPs, you can run `venn.r` as below `CMD` command line with these files:
+
+- `data/seedSNP_1817.bed`
+- `data/snp_484_roadmap_dist.bed`
+- `data/snp_364_encode_dist.bed`
+- `data/snp_94_regulome2b.bed`
+
+```CMD
+Rscript venn.r data/seedSNP_1817.bed data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
+```
+
+The result files are generated as below:
+
+- `venn_brch1.tsv`: binary SNP overlap table
+- `vennCounts_brch1.tsv`: overlapped SNP numbers
+- `snp_#_core.bed`
+
+The result figure is generated as below:
+
+![Venn analysis of 1817 SNPs](.\fig\venn_seedSNP_1817_snp_484_roadmap_dist.png)
+
+## 6. GTEx eQTL data download and filter
+
+The [GTEx eQTL data](https://gtexportal.org/home/datasets) can downloaded and filtered by statistical criteria p < 3e-04. 
