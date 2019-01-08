@@ -69,7 +69,6 @@ f.name3 = paste0('data/vennCounts.tsv')
 write.table(venn.li[[2]],f.name3,row.names=F,col.names=T,quote=F,sep='\t')
 cat(paste0('File write: ',f.name3,'\n'))
 
-
 core.df = union.out[(union.out[,5]==TRUE&
 					 union.out[,6]==TRUE&
 					 union.out[,7]==TRUE),c(2:4,1)]
