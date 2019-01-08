@@ -11,7 +11,7 @@ if(length(args)<1|length(args)>1) stop(hmsg)
 path = unlist(args[1])
 
 # System parameter
-library('tools')
+library(tools)
 source('src/pdtime.r')
 t0 = Sys.time()
 dir = 'data/'
