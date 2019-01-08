@@ -31,7 +31,7 @@ pb = winProgressBar(title="Loop progress",
 for(i in 1:n) {
     tb1 = try(read.table(as.character(snptb[i,2]),header=T))
     if("try-error" %in% class(tb1)) ldlink.li[[i]] = NULL # get error from empty file
-    else { # No errors then,
+    else { # If no errors,
         tb2 = data.frame(SNPid=rep(snptb[i,1],nrow(tb1)),tb1)
         ldlink.li[[i]] = tb2
     }
@@ -41,7 +41,7 @@ for(i in 1:n) {
     ###################
 }
 close(pb)
-ldlink.df = ldply(ldlink.li, data.frame) # plyr
+ldlink.df= ldply(ldlink.li, data.frame) # plyr
 ldlink_1 = subset(ldlink.df,R2>0.6 & Dprime==1)
 ldlink_2 = unique(data.frame(gwasSNPs=ldlink_1$`SNPid`,
                              ldSNPs  =ldlink_1$`RS_Number`))
