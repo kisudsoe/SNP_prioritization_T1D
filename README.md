@@ -192,4 +192,13 @@ The result figure is generated as below:
 
 ## 6. GTEx eQTL data download and filter
 
-The [GTEx eQTL data](https://gtexportal.org/home/datasets) can downloaded and filtered by statistical criteria p < 3e-04. 
+The [GTEx eQTL data](https://gtexportal.org/home/datasets) `GTEx_Analysis_v7_eQTL.tar.gz` (915 MB) can downloaded and filtered by statistical criteria `p < 3e-04`. The `GTEx_Analysis_v7_eQTL.tar.gz` compressed file includes:
+
+- 48 files with `*.egenes.txt` extensions
+- 48 files with `*.signif_variant_gene_pairs.txt` extensions
+
+```CMD
+Rscript gtex_dn.r
+Rscript gtex_filt.r
+```
+
