@@ -199,6 +199,6 @@ The [GTEx eQTL data](https://gtexportal.org/home/datasets) `GTEx_Analysis_v7_eQT
 
 ```CMD
 Rscript gtex_dn.r
-Rscript gtex_filt.r
+Rscript gtex_filt.r 3e-04
 ```
 
