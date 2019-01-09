@@ -194,8 +194,12 @@ The result figure is generated as below:
 
 The [GTEx eQTL data](https://gtexportal.org/home/datasets) `GTEx_Analysis_v7_eQTL.tar.gz` (915 MB) can downloaded and filtered by statistical criteria `p < 3e-04`. The `GTEx_Analysis_v7_eQTL.tar.gz` compressed file includes:
 
-- 48 files with `*.egenes.txt` extensions
-- 48 files with `*.signif_variant_gene_pairs.txt` extensions
+- 48 files with `db/GTEx_Analysis_v7_eQTL/*.egenes.txt` extensions
+- 48 files with `db/GTEx_Analysis_v7_eQTL/*.signif_variant_gene_pairs.txt` extensions
+
+And we need SNP annotations to achieve rsid
+
+- `db/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.lookup_table.txt.gz` (440 MB)
 
 ```CMD
 Rscript gtex_dn.r
