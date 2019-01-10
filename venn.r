@@ -2,7 +2,8 @@
 # This file is for venn analysis of SNP lists
 
 ## Command Arg Parameters ##
-# CMD command: Rscript venn.r data/seedSNP_1817.bed data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
+# CMD command1: Rscript venn.r data/seedSNP_1817.bed data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
+# CMD command2: Rscript venn.r data/seedSNP_1817.bed data/snp_140_roadmap_encode.bed data/snp_26_core.bed data/snp_745_gtex.bed
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript regulome.r [SNP_BED_file_1] [SNP_BED_file_2] [SNP_BED_file_3] [...]
   - Arguments [SNP_BED_file_1], [SNP_BED_file_2], and so on are needed.'
