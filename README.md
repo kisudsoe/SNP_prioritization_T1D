@@ -159,7 +159,7 @@ The result files are save at `data/` folder:
 
 
 
-## 5. Venn analysis for identifying core SNPs
+### Venn analysis to identify core SNPs
 
 Summary for SNPs with RoadMap annotation, ENCODE ChIP-seq, and RegulomeDB. This R code for Venn analysis uses **Bioconductor** `limma` R package. The installation of the `limma` package as below:
 
@@ -190,7 +190,7 @@ The result figure is generated as below:
 
 ![Venn analysis of 1817 SNPs](.\fig\venn_seedSNP_1817_snp_484_roadmap_dist.png)
 
-## 6. GTEx eQTL data download and filter
+## 5. GTEx eQTL data download and filter
 
 The [Genotype-Tissue Expression (GTEx)](https://gtexportal.org/home/) project is a public resource to study tissue-specific gene expression and their regulation by SNPs. GTEx version 7 includes 11,688 samples, 53 tissues and 714 donors. You can download [GTEx eQTL data](https://gtexportal.org/home/datasets) `GTEx_Analysis_v7_eQTL.tar.gz` (915 MB) and filter by statistical criteria `p < 3e-04`. The `GTEx_Analysis_v7_eQTL.tar.gz` compressed file includes:
 
@@ -204,23 +204,42 @@ And we need SNP annotations to achieve Rsid for GTEx ids.
 
 ```CMD
 Rscript gtex_dn.r
-Rscript gtex_filt.r 0.0003 # don't use '3e-04'
+Rscript gtex_filt.r 0.00000005 # don't use '5e-08'
 ```
 
 The result file size are huge and the process takes long time (~50 min)
 
-- `gtex_signif.tsv.gz` (252 MB)
+- `gtex_signif.tsv.gz` (252 MB) > `gtex_signif_3e-4.tsv.gz`
 
-To identify 
+To identify T1D SNPs 
 
 ```CMD
 Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif.tsv.gz
 ```
 
-The result files are here:
+The result files of criteria 3e-04 are here:
 
-- `gtex_3e-04_1278.tsv`
-- `gtex_3e-04_511.tsv`
+- `gtex_3e-04_1346.tsv`
+- `snp_1346_gtex.bed`
+
+The result files of criteria 5e-08 are here:
+
+- `gtex_5e-08_745.tsv`
+- `snp_745_gtex.bed`
+
+
+
+## 6. lncRNASNP2 data download and filter
+
+Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASNP2 database**](http://bioinfo.life.hust.edu.cn/lncRNASNP#!/). You can download these data at the [download page](http://bioinfo.life.hust.edu.cn/lncRNASNP#!/download):
+
+- `lncRNASNP2_snplist.txt.gz` - **SNP list** includes the list of human SNPs in lncRNASNP database.
+- `lncrnas.txt.gz` - **lncRNA list** includes the list of human lncRNAs in lncRNASNP database.
+- `lncrna-diseases_experiment.txt.gz` - **Experimental validated lncRNA-associated diseases** includes all experiment validated lncRNA-associated diseases.
+
+```CMD
+
+```
 
 
 

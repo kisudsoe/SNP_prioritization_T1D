@@ -2,7 +2,8 @@
 # This file is for filtering RoadMap data
 
 ## Command Arg Parameters ##
-# Usage: Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif.tsv.gz
+# Usage: Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif_3e-4.tsv.gz
+# Usage: Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif_5e-8.tsv.gz
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript gtex_filt.r [SNP_file_path] [GTEx_download_target_dir]
   - Arguments [SNP_file_path] and [GTEx_download_target_dir] are needed.'
@@ -25,8 +26,8 @@ snpids = gsub('(.*)_.*','\\1',snp[,4])
 len.snpids = prettyNum(length(snpids),big.mark=',',preserve.width='none')
 cat(paste0('Input SNPs number = ',len.snpids,'\n'))
 
-# 1. Loading GTEx annotation file
-cat("\n(1/3) Loading GTEx annotation file\n")
+# 1. Loading GTEx significant file
+cat("\n(1/3) Loading GTEx significant file\n")
 if(file_ext(gte.path)=='gz') gte = read.delim(gzfile(gte.path),header=T)
 colnames(gte)[9] = 'rsid'
 dim.gte = prettyNum(dim(gte),big.mark=',',preserve.width='none')
@@ -42,7 +43,7 @@ len.gte.rsid = prettyNum(length(unique(gte_$rsid)),big.mark=',',preserve.width='
 cat(paste0('  - eQTL SNPs = ',len.gte.rsid,'\n'))
 len.gte.gene = prettyNum(length(unique(gte_$gene_id)),big.mark=',',preserve.width='none')
 cat(paste0('  - Associated genes = ',len.gte.gene,'\n'))
-f.name1 = paste0('data/gtex_3e-04_',length(unique(gte_$rsid)),'.tsv')
+f.name1 = paste0('data/gtex_5e-08_',length(unique(gte_$rsid)),'.tsv')
 write.table(gte_,f.name1,row.names=F,col.names=T,quote=T,sep='\t')
 cat(paste0('  >> File write: ',f.name1,'\n'))
 
