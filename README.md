@@ -204,23 +204,18 @@ And we need SNP annotations to achieve Rsid for GTEx ids.
 
 ```CMD
 Rscript gtex_dn.r
-Rscript gtex_filt.r 0.00000005 # don't use '5e-08'
+Rscript gtex_filt.r 5e-08
 ```
 
 The result file size are huge and the process takes long time (~50 min)
 
-- `gtex_signif.tsv.gz` (252 MB) > `gtex_signif_3e-4.tsv.gz`
+- `gtex_signif.tsv.gz` (268 MB) > `gtex_signif_5e-8.tsv.gz`
 
 To identify T1D SNPs 
 
 ```CMD
 Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif.tsv.gz
 ```
-
-The result files of criteria 3e-04 are here:
-
-- `gtex_3e-04_1346.tsv`
-- `snp_1346_gtex.bed`
 
 The result files of criteria 5e-08 are here:
 
