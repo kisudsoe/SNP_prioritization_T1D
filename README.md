@@ -188,7 +188,7 @@ The result files are generated as below:
 
 The result figure is generated as below:
 
-![Venn analysis of 1817 SNPs](.\fig\venn_seedSNP_1817_snp_484_roadmap_dist.png)
+![Venn analysis of 1817 SNPs](./fig/venn_seedSNP_1817_snp_484_roadmap_dist.png)
 
 ## 5. GTEx eQTL data download and filter
 
