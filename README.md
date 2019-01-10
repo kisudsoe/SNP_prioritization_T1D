@@ -192,17 +192,35 @@ The result figure is generated as below:
 
 ## 6. GTEx eQTL data download and filter
 
-The [GTEx eQTL data](https://gtexportal.org/home/datasets) `GTEx_Analysis_v7_eQTL.tar.gz` (915 MB) can downloaded and filtered by statistical criteria `p < 3e-04`. The `GTEx_Analysis_v7_eQTL.tar.gz` compressed file includes:
+The [Genotype-Tissue Expression (GTEx)](https://gtexportal.org/home/) project is a public resource to study tissue-specific gene expression and their regulation by SNPs. GTEx version 7 includes 11,688 samples, 53 tissues and 714 donors. You can download [GTEx eQTL data](https://gtexportal.org/home/datasets) `GTEx_Analysis_v7_eQTL.tar.gz` (915 MB) and filter by statistical criteria `p < 3e-04`. The `GTEx_Analysis_v7_eQTL.tar.gz` compressed file includes:
 
 - 48 files with `db/GTEx_Analysis_v7_eQTL/*.egenes.txt` extensions
 - 48 files with `db/GTEx_Analysis_v7_eQTL/*.signif_variant_gene_pairs.txt` extensions
 
-And we need SNP annotations to achieve rsid
+And we need SNP annotations to achieve Rsid for GTEx ids.
 
 - `db/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.lookup_table.txt.gz` (440 MB)
+- [Nominal p-values](https://gtexportal.org/home/documentationPage) from GTEx data were generated for each variant-gene pair by testing the alternative hypothesis that the slope of a linear regression model between genotype and expression deviates from 0.
 
 ```CMD
 Rscript gtex_dn.r
-Rscript gtex_filt.r 3e-04
+Rscript gtex_filt.r 0.0003 # don't use '3e-04'
 ```
+
+The result file size are huge and the process takes long time (~50 min)
+
+- `gtex_signif.tsv.gz` (252 MB)
+
+To identify 
+
+```CMD
+Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif.tsv.gz
+```
+
+The result files are here:
+
+- `gtex_3e-04_1278.tsv`
+- `gtex_3e-04_511.tsv`
+
+
 
