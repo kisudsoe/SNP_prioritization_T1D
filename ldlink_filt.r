@@ -2,7 +2,7 @@
 # This file is for filtering LDlink data
 
 ## Command Arg Parameters ##
-# CMD file: ldlink.bat
+# ldlink.bat; Rscript ldlink_filt.r data/gwas_5e-08_129.tsv db/ldlink
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript ldlink_filt.r [SNP_file_path] [LDlink_download_target_dir]
   - Arguments [SNP_file_path] and [LDlink_download_target_dir] are mendatory.'
