@@ -2,8 +2,8 @@
 # This file is for filtering RoadMap data
 
 ## Command Arg Parameters ##
-# CMD Usage: Rscript gtex_filt.r 0.0003
-# CMD Usage: Rscript gtex_filt.r 0.00000005
+# CMD Usage 1: Rscript gtex_filt.r 0.0003
+# CMD Usage 2: Rscript gtex_filt.r 5e-08
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript gtex_filt.r [p-value_criteria]
   - An argument [p-value_criteria] is needed no argument.
