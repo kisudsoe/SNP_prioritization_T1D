@@ -182,8 +182,8 @@ Rscript venn.r data/seedSNP_1817.bed data/snp_484_roadmap_dist.bed data/snp_364_
 
 The result files are generated as below:
 
-- `venn_brch1.tsv`: binary SNP overlap table
-- `vennCounts_brch1.tsv`: overlapped SNP numbers
+- `venn_tfbs.tsv`: binary SNP overlap table
+- `vennCounts_tfbs.tsv`: overlapped SNP numbers
 - `snp_#_core.bed`
 
 The result figure is generated as below:
@@ -221,6 +221,48 @@ The result files of criteria 5e-08 are here:
 
 - `gtex_5e-08_745.tsv`
 - `snp_745_gtex.bed`
+
+### Venn analysis and overlap SNPs
+
+To prioritize the eQTL SNPs among the 26 high-probability causal enhancer SNPs, you can run `venn.r` as below `CMD` command line with these files:
+
+- `data/seedSNP_1817.bed` - Total T1D SNP list
+- `data/snp_140_roadmap_encode.bed` - Enhancer occupied SNP list
+- `data/snp_26_core.bed` - High-probability causal enhancer SNP list
+- `data/snp_745_gtex.bed` - eQTL SNP list
+
+```CMD
+Rscript venn.r data/seedSNP_1817.bed data/snp_140_roadmap_encode.bed data/snp_26_core.bed data/snp_745_gtex.bed
+```
+
+The result files are generated as below:
+
+- `venn.tsv`->`venn_gtex.tsv`: binary SNP overlap table
+- `vennCounts.tsv`->`vennCounts_gtex.tsv`: overlapped SNP numbers
+- `snp_#_core.bed`
+
+The result figure is generated as below:
+
+![](./fig/venn_seedSNP_1817_snp_140_roadmap_encode.png)
+
+To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r` as below `CMD` command line:
+
+```R
+> Rscript src/gtex_overlap.r
+(1/2) Read files..
+ - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
+ - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
+ - data/gtex_5e-08_745.tsv, SNPs= 745 Genes= 159
+
+(2/2) Overlap these two files..
+ - TFBS overlap, rows= 5301 cols= 9
+ - TFBS overlap, SNPs= 74 Genes= 94
+
+ - Whole_Blood, rows= 202 cols= 9
+ - Whole_Blood, SNPs= 52 Genes= 29
+
+>> File write: data/snp_74_gtex_enh.bed
+```
 
 
 
