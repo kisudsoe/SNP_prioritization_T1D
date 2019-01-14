@@ -1,16 +1,24 @@
 #!/usr/bin/python
+# This file is for downloading LDlink data from risk SNP list.
+
+## Command Arg Parameters ##
+# Usage: Python ldlink_dn.py [SNP_list_file_path]
+path = sys.argv[1]
+print('Load SNP file: %s' % path)
+
+# System parameter
 import requests
 import time
 import sys
 import csv
 import pandas as pd
-#from datetime import date
-
 t0 = time.time()
 dir = 'db/ldlink'
 #f = 'data/gwas_5e-08_129.tsv'
-path = sys.argv[1]
-print('Load SNP file: %s' % path)
+
+#########################
+## Function start here ##
+#########################
 snpdf = pd.read_csv(path,sep='\t')
 snpid = list(set(snpdf['rsid'])) # unique IDs
 print('SNP rsid number = %d' % len(snpid))
@@ -46,3 +54,6 @@ t1 = time.time()
 m,s = divmod(t1-t0,60)
 h,m = divmod(m,60)
 print(time.strftime('>> Job time= %02d:%02d:%02d\n' % (h,m,s)))
+##################
+## Function end ##
+##################
