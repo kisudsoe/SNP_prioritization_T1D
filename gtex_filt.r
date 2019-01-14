@@ -2,8 +2,8 @@
 # This file is for filtering RoadMap data
 
 ## Command Arg Parameters ##
-# CMD Usage 1: Rscript gtex_filt.r 0.0003
-# CMD Usage 2: Rscript gtex_filt.r 5e-08
+# CMD usage 1: Rscript gtex_filt.r 0.0003
+# CMD usage 2: Rscript gtex_filt.r 5e-08
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript gtex_filt.r [p-value_criteria]
   - An argument [p-value_criteria] is needed no argument.
@@ -39,15 +39,13 @@ pb = winProgressBar(title="Loop progress",
 cat('  - File reading...\n')
 for(i in 1:n) {
 	tissue = sub('.*/(.*).v7..*','\\1',f.sig[i])
-	cat(paste0('  (',i,'/',n,') ',tissue,'\n'))
 	if(file.exists(f.sig[i])) {
 		#gte.li[[i]] = read.delim(gzfile(f.sig[i]),header=T)
 		tb1 = read.delim(gzfile(f.sig[i]),header=T)
 		tb2 = data.frame(tb1,tissue=rep(tissue,nrow(tb1)))
 		gte.li[[i]] = tb2
-	} else {
-		cat(paste0('No such file: ',f.sig[i]))
-	}
+	} else { cat(paste0('No such file: ',f.sig[i]))	}
+	cat(paste0('  (',i,'/',n,') ',tissue,'\n'))
 	## Progress time ##
     setWinProgressBar(pb,i,label=paste0(round(i/n*100,0),
               " % (",i,"/",n,") done for ",pdtime(t0,2)))
