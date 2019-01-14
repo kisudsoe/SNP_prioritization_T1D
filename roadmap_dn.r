@@ -7,6 +7,10 @@ args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript roadmap_dn.r is needed no argument.'
 if(length(args)>0) stop(hmsg)
 
+# System parameter
+source('src/pdtime.r')
+t0 = Sys.time()
+
 # mkdir db/roadmap
 dir = 'db/roadmap/'
 if(file.exists(dir)) { cat(paste0('Directory exists: ',dir,'\n'))
@@ -14,10 +18,6 @@ if(file.exists(dir)) { cat(paste0('Directory exists: ',dir,'\n'))
 	dir.create(file.path(dir))
 	cat(paste0('Directory generated: ',dir,'\n'))
 }
-
-# System parameter
-source('src/pdtime.r')
-t0 = Sys.time()
 
 #########################
 ## Function start here ##

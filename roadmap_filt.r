@@ -24,7 +24,7 @@ road.li=list(); n=length(path)
 pb = winProgressBar(title='Loading files',
 	 label='Ready to read BED files..',min=0,max=n,width=500)
 for(i in 1:n) {
-	tb1 = try(import(path[i],format='bed'))
+	tb1 = try(import(path[i],format='bed')) # rtracklayer
 	if('try-error' %in% class(tb1)) road.li[[i]] = NULL # get error from no file
 	else road.li[[i]] = tb1 # No errors
 	## Progress time ##
