@@ -84,28 +84,28 @@ To avoid multiple count of enhancers as well as to reduce file size and to achie
 - Compressed file size of `roadmap_enh.bed.gz` is >139 MB.
 - Compressed file size of `roadmap_enh_merer.bed.gz` is about 3.7 MB.
 
-```BASH
+```SHELL
 bedtools sort -i db/roadmap_enh.bed | bedtools merge -i stdin -c 1 -o count > db/roadmap_enh_merge.bed
 bedtools closest -d -a data/seedSNP_1817.bed -b db/roadmap_enh_merge.bed > data/roadmap_dist.tsv
 ```
 
 ### src/bedtools_closest.r
 
-To prioritize RoadMap enhancer occupied SNPs, you can run `roadmap.r` as below `CMD` command line:
+To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestroadmap.r` as below `CMD` command line:
 
 - `data/roadmap_dist_df.tsv` file is obtained that is for enhancer annotated file .
 - `data/snp_484_roadmap_dist.bed` file is obtained that is for `BED` format file for USCS browser.
 
-```BASH
-::Usage: Rscript src/bedtools_closest.r [bedtools_closest_result_file_path]
-Rscript src/bedtools_closest.r data/roadmap_dist.tsv
+```CMD
+::Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]
+Rscript src/bedtools_closest_roadmap.r data/roadmap_dist.tsv
 ```
 
 ### Q2. How about just use not merged roadmap_enh.bed file?
 
 Instead of merge file, when you use original `db/roadmap_enh.bed` file, you can find a lot of duplicated enhancers regions.
 
-```BASH
+```SHELL
 bedtools sort -i db/roadmap_enh.bed | bedtools closest -d -a data/seedSNP_1817.bed -b stdin > data/roadmap_dist2.tsv
 ```
 
@@ -121,21 +121,21 @@ To identify TFBS occupied SNPs, you can use `bedtools merge` and `bedtools close
 
 - Merging the ENCODE TFBS data give you benefits such as avoiding multiple count of enhancers as well as reducing file size and achieving faster process
 
-```BASH
+```SHELL
 bedtools merge -i db/wgEncodeRegTfbsClusteredV3.bed.gz -c 1 -o count > db/encode_tfbs_merge.bed
 bedtools closest -d -a data/seedSNP_1817.bed -b db/encode_tfbs_merge.bed > data/encode_dist.tsv
 ```
 
 ### src/bedtools_closest.r
 
-To prioritize RoadMap enhancer occupied SNPs, you can run `roadmap.r` as below `CMD` command line:
+To prioritize ENCODE Reg-TFBS occupied SNPs, you can run `src/bedtools_closestroadmap.r` as below `CMD` command line:
 
 - `data/roadmap_dist_df.tsv` file is obtained that is for enhancer annotated file .
 - `data/snp_enh_484.bed` file is obtained that is for `BED` format file for USCS browser.
 
 ```CMD
-::Usage: Rscript src/bedtools_closest.r [bedtools_closest_result_file_path]
-Rscript src/bedtools_closest.r data/encode_dist.tsv
+::Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]
+Rscript src/bedtools_closest_roadmap.r data/encode_dist.tsv
 ```
 
 
@@ -245,10 +245,13 @@ The result figure is generated as below:
 
 ![](./fig/venn_seedSNP_1817_snp_140_roadmap_encode.png)
 
+### src/gtex_overlap.r
+
 To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r` as below `CMD` command line:
 
 ```R
 > Rscript src/gtex_overlap.r
+
 (1/2) Read files..
  - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
  - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
@@ -264,6 +267,46 @@ To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r
 >> File write: data/snp_74_gtex_enh.bed
 ```
 
+### downloading Ensembl gene location data
+
+To identify nearest genes from the eQTL SNPs, firstly you need to download gene location data from Ensembl database biomart (version=Grch37). 
+
+```CMD
+> Rscript src/biomart_gene.r
+
+Ensembl table, rows= 63677 cols= 5
+File write: db/ensembl_gene_ann.tsv
+
+Filter result, rows= 57736 cols= 5
+File write: db/ensembl_gene.bed
+```
+
+
+
+### bedtools closest
+
+To identify nearest genes from the eQTL SNPs, you can use `bedtools merge` and `bedtools closest` as following code:
+
+```SHELL
+bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/seedSNP_1817.bed -b stdin > data/gtex_nearest.tsv
+```
+
+### src/bedtools_closest.r
+
+To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestroadmap.r` as below `CMD` command line:
+
+```CMD
+::Rscript src/bedtools_closest_gtex.r [bedtools_closest_result_file_path]
+> Rscript src/bedtools_closest_gtex.r data/gtex_nearest.tsv
+
+Row number = 2114
+T1D SNPs = 1817
+Nearest genes = 175
+>> File write: data/gtex_nearest_df.tsv
+```
+
+작성중..
+
 
 
 ## 6. lncRNASNP2 data download and filter
@@ -278,5 +321,11 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 
 ```
 
+작성중...
 
+
+
+## 7. Monte Carlo permutation for random SNP set
+
+To 
 
