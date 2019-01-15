@@ -1,19 +1,22 @@
 #!/usr/bin/env Rscript
-# CMD: src/gtex_overlap.r
+# CMD: Rscript src/gtex_overlap.r
 path1 = 'data/snp_140_roadmap_encode.bed'
 path2 = 'data/gtex_5e-08_745.tsv'
+path3 = 'data/gtex_nearest_df.tsv'
 
-cat(paste0('(1/2) Read files..\n'))
-snp_140  = read.delim(path1,head=F)
-snpids   = gsub('(.*)_.*','\\1',snp_140[,4])
-snp_140_ = data.frame(snp_140,rsid=snpids)
+cat(paste0('(1/3) Read files..\n'))
+snp_140   = read.delim(path1,head=F)
+snpids    = gsub('(.*)_.*','\\1',snp_140[,4])
+snp_140_  = data.frame(snp_140,rsid=snpids)
 cat(paste0(' - ',path1,', rows= ',dim(snp_140)[1],' cols= ',dim(snp_140)[2],'\n'))
-gtex     = read.delim(path2)
+gtex      = read.delim(path2)
 cat(paste0(' - ',path2,', rows= ',dim(gtex)[1],' cols= ',dim(gtex)[2],'\n'))
-gtex_rsid= length(levels(gtex$rsid)); gtex_gid = length(levels(gtex$gene_id))
+gtex_rsid = length(levels(gtex$rsid)); gtex_gid = length(levels(gtex$gene_id))
 cat(paste0(' - ',path2,', SNPs= ',gtex_rsid,' Genes= ',gtex_gid,'\n'))
+gtex_nearest = read.delim(path3)
+작성중..
 
-cat(paste0('\n(2/2) Overlap these two files..\n'))
+cat(paste0('\n(2/3) Overlap these two files..\n'))
 gtex_ = subset(gtex,rsid%in%snpids)
 cat(paste0(' - TFBS overlap, rows= ',dim(gtex_)[1],' cols= ',dim(gtex_)[2],'\n'))
 gtex_rsid_ = length(unique(gtex_$rsid)); gtex_gid_ = length(unique(gtex_$gene_id))
