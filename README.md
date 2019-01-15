@@ -210,11 +210,30 @@ Rscript gtex_filt.r 5e-08
 The result file size are huge and the process takes long time (~50 min)
 
 - `gtex_signif.tsv.gz` (268 MB) > `gtex_signif_5e-8.tsv.gz`
+- This file was compressed by `zip` as three separated <100 MB files.
+- `gtex_signif_5e-8.tsv.gz.zip`, `gtex_signif_5e-8.tsv.gz.z01`, and `gtex_signif_5e-8.tsv.gz.z02`
 
 To identify T1D SNPs 
 
 ```CMD
-Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif.tsv.gz
+> Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif_5e-8.tsv.gz
+
+Input SNPs number = 1,817
+
+(1/3) Loading GTEx significant file
+  - gtex_signif_5e-8.tsv.gz: rows= 17,113,536 cols= 9
+  - Job process: 2.7 min
+
+(2/3) eQTL SNP annotation
+  - Overlapped table, rows= 29,785 cols= 9
+  - eQTL SNPs = 745
+  - Associated genes = 159
+  >> File write: data/gtex_5e-08_745.tsv
+
+(3/3) eQTL SNP BED file generation
+  - GTEx SNP BED, rows= 745 cols= 4
+  - eQTL SNPs = 745
+  >> File write: data/snp_745_gtex.bed
 ```
 
 The result files of criteria 5e-08 are here:
@@ -288,7 +307,11 @@ File write: db/ensembl_gene.bed
 To identify nearest genes from the eQTL SNPs, you can use `bedtools merge` and `bedtools closest` as following code:
 
 ```SHELL
-bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/seedSNP_1817.bed -b stdin > data/gtex_nearest.tsv
+$ bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/seedSNP_1817.bed -b stdin > data/seedSNP_nearest.tsv
+```
+
+```SHELL
+$ bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/snp_745_gtex.bed -b stdin > data/gtex_nearest.tsv
 ```
 
 ### src/bedtools_closest.r
@@ -297,15 +320,47 @@ To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestr
 
 ```CMD
 ::Rscript src/bedtools_closest_gtex.r [bedtools_closest_result_file_path]
-> Rscript src/bedtools_closest_gtex.r data/gtex_nearest.tsv
+> Rscript src/bedtools_closest_gtex.r data/seedSNP_nearest.tsv
 
 Row number = 2114
 T1D SNPs = 1817
 Nearest genes = 175
+>> File write: data/seedSNP_nearest_df.tsv
+```
+
+```CMD
+> Rscript src/bedtools_closest_gtex.r data/gtex_nearest.tsv
+
+Row number = 788
+T1D SNPs = 745
+Nearest genes = 113
 >> File write: data/gtex_nearest_df.tsv
 ```
 
-작성중..
+### src/gtex_overlap.r
+
+To identify the eQTL SNPs occupied on TFBS binding enhancers, you can run `src/gtex_overlap.r` as below `CMD` command line:
+
+```CMD
+> Rscript src/gtex_overlap.r
+
+(1/2) Read files..
+ - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
+ - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
+ - data/gtex_nearest_df.tsv, rows= 788 cols= 7
+ >> SNPs= 745 Genes= 159 (Nearest= 32)
+
+(2/2) Overlap these two files..
+ - TFBS overlap, rows= 5301 cols= 10
+ >> SNPs= 74 Genes= 94 (Nearest= 20)
+
+ - Whole_Blood, rows= 202 cols= 10
+ >> SNPs= 52 Genes= 29 (Nearest= 7)
+
+>> File write: data/snp_74_gtex_enh.bed
+```
+
+
 
 
 
