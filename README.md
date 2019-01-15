@@ -55,7 +55,7 @@ BiocManager::install("AnnotationHub", version = "3.8")
 BiocManager::install("rtracklayer", version = "3.8")
 ```
 
-### roadmap_dn.r
+### > roadmap_dn.r
 
 To download **RoadMap data**, you can run `roadmap_dn.r` as below `CMD` command line:
 
@@ -66,7 +66,7 @@ To download **RoadMap data**, you can run `roadmap_dn.r` as below `CMD` command 
 Rscript roadmap_dn.r
 ```
 
-### roadmap_filt.r
+### > roadmap_filt.r
 
 To filter the RoadMap data by **Enhancers**, you can run `roadmap_filt.r` as below `CMD` command line:
 
@@ -77,7 +77,7 @@ To filter the RoadMap data by **Enhancers**, you can run `roadmap_filt.r` as bel
 Rscript roadmap_filt.r
 ```
 
-### bedtools merge/ bedtools closest
+### $ bedtools merge/ bedtools closest
 
 To avoid multiple count of enhancers as well as to reduce file size and to achieve faster process, merge RoadMap enhancer information using a `BASH` tool `bedtools`. Here is the `BASH` pipeline for `bedtools sort` and `bedtools merge`. Then, to identify T1D SNPs occupied in RoadMap enhancers, you can use `BASH` tool `bedtools intersect` as below code:
 
@@ -89,7 +89,7 @@ bedtools sort -i db/roadmap_enh.bed | bedtools merge -i stdin -c 1 -o count > db
 bedtools closest -d -a data/seedSNP_1817.bed -b db/roadmap_enh_merge.bed > data/roadmap_dist.tsv
 ```
 
-### src/bedtools_closest.r
+### > src/bedtools_closest.r
 
 To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestroadmap.r` as below `CMD` command line:
 
@@ -115,7 +115,7 @@ bedtools sort -i db/roadmap_enh.bed | bedtools closest -d -a data/seedSNP_1817.b
 
 The **ENCODE ChIP-seq** for regulatory transcription factor binding site (Reg-TFBS) cluster data can downloaded <u>wgEncodeRegTfbsClusteredV3</u> data from [UCSC FTP](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/) (68 MB) or [bioconductor `data("wgEncodeTfbsV3")`](https://www.bioconductor.org/packages/devel/bioc/vignettes/ChIPpeakAnno/inst/doc/ChIPpeakAnno.html). Here, we assume having downloaded UCSC FTP file `wgEncodeRegTfbsClusteredV3.bed.gz` (81 MB).
 
-### bedtools merge/ bedtools closest
+### $ bedtools merge | bedtools closest
 
 To identify TFBS occupied SNPs, you can use `bedtools merge` and `bedtools closest` as following code:
 
@@ -126,7 +126,7 @@ bedtools merge -i db/wgEncodeRegTfbsClusteredV3.bed.gz -c 1 -o count > db/encode
 bedtools closest -d -a data/seedSNP_1817.bed -b db/encode_tfbs_merge.bed > data/encode_dist.tsv
 ```
 
-### src/bedtools_closest.r
+### > src/bedtools_closest.r
 
 To prioritize ENCODE Reg-TFBS occupied SNPs, you can run `src/bedtools_closestroadmap.r` as below `CMD` command line:
 
@@ -176,6 +176,8 @@ To prioritize the SNPs, you can run `venn.r` as below `CMD` command line with th
 - `data/snp_364_encode_dist.bed`
 - `data/snp_94_regulome2b.bed`
 
+### > venn.r
+
 ```CMD
 Rscript venn.r data/seedSNP_1817.bed data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
 ```
@@ -201,6 +203,8 @@ And we need SNP annotations to achieve Rsid for GTEx ids.
 
 - `db/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.lookup_table.txt.gz` (440 MB)
 - [Nominal p-values](https://gtexportal.org/home/documentationPage) from GTEx data were generated for each variant-gene pair by testing the alternative hypothesis that the slope of a linear regression model between genotype and expression deviates from 0.
+
+### > gtex_dn.r | gtex_filt.r
 
 ```CMD
 Rscript gtex_dn.r
@@ -250,6 +254,8 @@ To prioritize the eQTL SNPs among the 26 high-probability causal enhancer SNPs, 
 - `data/snp_26_core.bed` - High-probability causal enhancer SNP list
 - `data/snp_745_gtex.bed` - eQTL SNP list
 
+### > venn.r
+
 ```CMD
 Rscript venn.r data/seedSNP_1817.bed data/snp_140_roadmap_encode.bed data/snp_26_core.bed data/snp_745_gtex.bed
 ```
@@ -264,7 +270,7 @@ The result figure is generated as below:
 
 ![](./fig/venn_seedSNP_1817_snp_140_roadmap_encode.png)
 
-### src/gtex_overlap.r
+### > src/gtex_overlap.r
 
 To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r` as below `CMD` command line:
 
@@ -300,9 +306,7 @@ Filter result, rows= 57736 cols= 5
 File write: db/ensembl_gene.bed
 ```
 
-
-
-### bedtools closest
+### $ bedtools closest
 
 To identify nearest genes from the eQTL SNPs, you can use `bedtools merge` and `bedtools closest` as following code:
 
@@ -314,7 +318,7 @@ $ bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/seedSNP_181
 $ bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/snp_745_gtex.bed -b stdin > data/gtex_nearest.tsv
 ```
 
-### src/bedtools_closest.r
+### > src/bedtools_closest.r
 
 To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestroadmap.r` as below `CMD` command line:
 
@@ -337,7 +341,7 @@ Nearest genes = 113
 >> File write: data/gtex_nearest_df.tsv
 ```
 
-### src/gtex_overlap.r
+### > src/gtex_overlap.r
 
 To identify the eQTL SNPs occupied on TFBS binding enhancers, you can run `src/gtex_overlap.r` as below `CMD` command line:
 
@@ -362,8 +366,6 @@ To identify the eQTL SNPs occupied on TFBS binding enhancers, you can run `src/g
 
 
 
-
-
 ## 6. lncRNASNP2 data download and filter
 
 Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASNP2 database**](http://bioinfo.life.hust.edu.cn/lncRNASNP#!/). You can download these data at the [download page](http://bioinfo.life.hust.edu.cn/lncRNASNP#!/download):
@@ -376,11 +378,17 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 
 ```
 
-작성중...
+- ...
 
 
 
 ## 7. Monte Carlo permutation for random SNP set
 
-To 
+To calculate SNP backgrounds for this pipeline, we generate 10,000 random control SNP sets from [dbSNP database (version 151, GRCh37p13)](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/). To calculate their distributions, you can run `*.r` as below `CMD` command line:
+
+```CMD
+
+```
+
+
 
