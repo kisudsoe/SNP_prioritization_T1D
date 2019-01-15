@@ -2,7 +2,7 @@
 # This file is for annotating SNPs using Ensembl biomaRt
 
 ## Command Arg Parameters ##
-# T1D.bat: Rscript snp_biomart.r
+# T1D.bat: Rscript src/biomart_snp.r
 args = commandArgs(trailingOnly=T)
 if(length(args)>0) stop("Rscript snp_biomart.r, no argument is needed.")
 
