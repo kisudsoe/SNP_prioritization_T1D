@@ -379,15 +379,12 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.gz db/lncrnas.txt.gz db/lncrna-diseases_experiment.txt.gz
 ```
 
-| Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
-| -----------: | ----------: | -----------: | ----------: | :------ |
-|          5.1 |         3.5 |          1.4 |         0.2 | setosa  |
-|          4.9 |         3.0 |          1.4 |         0.2 | setosa  |
-|          4.7 |         3.2 |          1.3 |         0.2 | setosa  |
-|          4.6 |         3.1 |          1.5 |         0.2 | setosa  |
-|          5.0 |         3.6 |          1.4 |         0.2 | setosa  |
-
-- ...
+| path                         | nrow     | ncol |
+| :--------------------------- | :------- | :--- |
+| data/seedSNP_1817.bed        | 1817     | 4    |
+| db/lncRNASNP2_snplist.txt.gz | 10205295 | 2    |
+| db/lncrnas.txt.gz            | 141271   | 4    |
+| NA                           | 753      | 3    |
 
 
 
