@@ -2,15 +2,17 @@
 # This file is for annotating SNPs using Ensembl biomaRt
 
 ## Command Arg Parameters ##
-# T1D.bat: Rscript src/biomart_snp.r
+# T1D.bat: Rscript src/biomart_snp.r [rsid_list_file_path]
 args = commandArgs(trailingOnly=T)
-if(length(args)>0) stop("Rscript biomart_snp.r, no argument is needed.")
+msg  = 'Rscript biomart_snp.r [rsid_list_file_path]
+  - [rsid_list_file_path] is a mendatory argument for your custom rsid list.'
+if(length(args)<1|length(args)>1) stop(msg)
+path = args[1]
 
 # system parameters
 library(biomaRt)
 source('src/pdtime.r') # pdtime(time,1/2); 1= Job done, 2= Job process
 t0 = Sys.time(); cat(paste0('>> Process initiate at ',t0,'\n\n'))
-
 
 #########################
 ## Function start here ##
