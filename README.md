@@ -375,8 +375,17 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 - `lncrna-diseases_experiment.txt.gz` - **Experimental validated lncRNA-associated diseases** includes all experiment validated lncRNA-associated diseases.
 
 ```CMD
-
+: Rscript lncrnasnp.r [SNP_BED_file_path] [lncRNAsnp2_SNP_list_file_path] [lncRNAsnp2_lncRNA_list_file_path] [lncRNAsnp2_diseases_list_file_path]
+Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.gz db/lncrnas.txt.gz db/lncrna-diseases_experiment.txt.gz
 ```
+
+| Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
+| -----------: | ----------: | -----------: | ----------: | :------ |
+|          5.1 |         3.5 |          1.4 |         0.2 | setosa  |
+|          4.9 |         3.0 |          1.4 |         0.2 | setosa  |
+|          4.7 |         3.2 |          1.3 |         0.2 | setosa  |
+|          4.6 |         3.1 |          1.5 |         0.2 | setosa  |
+|          5.0 |         3.6 |          1.4 |         0.2 | setosa  |
 
 - ...
 
@@ -389,6 +398,8 @@ To calculate SNP backgrounds for this pipeline, we generate 10,000 random contro
 ```CMD
 
 ```
+
+
 
 
 
