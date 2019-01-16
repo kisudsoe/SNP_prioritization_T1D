@@ -14,10 +14,8 @@ snp_path    = args[1]
 snplnc_path = args[2]
 ann_path    = args[3]
 if(length(args)>3) dis_path = args[4]
-if(length(args)>3) print(paste0('>> ',dis_path))
 
 # System parameter
-source('src/data_table.r') # data_table(df)
 source('src/pdtime.r')
 t0 = Sys.time()
 
@@ -28,31 +26,54 @@ t0 = Sys.time()
 cat("\n(1/3) Read files..\n")
 snp = read.delim(snp_path,header=F)
 colnames(snp) = c('chr','start','end','snp_id')
-rsid = gsub('(.*)_.*','\\1',snp[,4])
-snp.df = cbind(snp,rsid)
-cat(paste0('  - ',snp_path,';\t',pdtime(t0,2),'\n'))
+dbsnp = gsub('(.*)_.*','\\1',snp[,4])
+snp.df = cbind(snp,dbsnp)
+
+for(i in 1:n) {
+	
+}
+cat(paste0('  - ',snp_path,'; ',pdtime(t0,2),'\n'))
 snplnc = read.delim(gzfile(snplnc_path),header=T)
 cat(paste0('  - ',snplnc_path,';\t',pdtime(t0,2),'\n'))
 ann = read.delim(gzfile(ann_path),header=T)
+colnames(ann)[1] = 'lncRNA'
 cat(paste0('  - ',ann_path,';\t',pdtime(t0,2),'\n'))
 df = data.frame(path=c(snp_path,   snplnc_path,   ann_path),
 				nrow=c(dim(snp)[1],dim(snplnc)[1],dim(ann)[1]),
 				ncol=c(dim(snp)[2],dim(snplnc)[2],dim(ann)[2]))
 
-if(length(args)>3) {
+if(length(args)>3) { # Disease option
 	dis = read.delim(gzfile(dis_path),header=T)
 	cat(paste0('  - ',dis_path,';\t',pdtime(t0,2),'\n'))
-	df = rbind(df,c(dis_path,dim(dis)[1],dim(dis)[2]))
+	df_dis= data.frame(path=dis_path,nrow=dim(dis)[1],ncol=dim(dis)[2])
+	df = rbind(df,df_dis)
 }
 knitr::kable(df)
+cat(paste0('\n  - ',pdtime(t0,2),'\n'))
 
 # 2. Overlapping lncRNA to my SNP list and binding annotation..
 cat("\n(2/3) Overlapping lncRNA to my SNP list and binding annotation..\n")
+snp_lnc = merge(snp.df,snplnc,by='dbsnp'); print(dim(snp_lnc))
+df2 = data.frame(lncRNA=c(length(unique(snp_lnc$lncRNA))),
+				 SNPs  =c(length(unique(snp_lnc$snp_id ))))
+knitr::kable(df2)
+f_name1 = paste0('data/snp_',length(unique(snp_lnc)),'_lncrnasnp.bed')
+write.table(snp_lnc[,2:5],f_name1,row.names=F,col.names=F,quote=T,sep='\t')
+cat(paste0('\n>> File write: ',f_name1,'\n'))
 
-
-
-# 3. 
-cat("\n(3/3) ..\n")
+# 3. Annotating SNPs in lncRNAs
+cat("\n(3/3) Annotating SNPs in lncRNAs\n")
+#knitr::kable(head(ann))
+#knitr::kable(head(snp_lnc))
+snp_lnc_ann = merge(snp_lnc[,c(1,6)],ann,by='lncRNA')
+if(length(args)>3) { # Disease option
+	snp_lnc_ann_dis = merge(snp_lnc_ann,dis,by='lncRNA')
+	f_name2 = paste0('data/lncrnasnp_',length(unique(snp_lnc_ann_dis$dbsnp)),'.tsv')
+	write.table(snp_lnc[,2:5],f_name2,row.names=F,col.names=F,quote=T,sep='\t')
+	cat(paste0('\n>> File write: ',f_name2,'\n'))
+} else {
+	cat("\n>> Disease associated SNP option does not processed.\n")
+}
 
 cat(paste0(pdtime(t0,1),'\n'))
 ##################
