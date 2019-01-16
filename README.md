@@ -11,9 +11,10 @@ This is an protocol for prioritization of SNPs associated certain phenotype/dise
 To download **GWAS Catalog data**, you can [search certain disease](https://www.ebi.ac.uk/gwas/). In this study, we downloaded [SNP-sets for type 1 diabetes](https://www.ebi.ac.uk/gwas/efotraits/EFO_0001359). Then you can run R code file for filtering the GWAS Catalog data as below command line:
 
 - Instead of `[ ]`, you have to put the arguments `file path` or `value` by the options.
+- Usage: `Rscript gwas.r [GWAS_file_path] [p-value_criteria]`
 
 ```cmd
-Rscript gwas.r [GWAS_file_path] [p-value_criteria]
+Rscript T1D_gwas.r db/GWAS_EFO0001359.tsv 5e-08
 ```
 
 ### ldlink.py/ ldlink.r
@@ -21,23 +22,26 @@ Rscript gwas.r [GWAS_file_path] [p-value_criteria]
 To download **LDlink data**, you can run `T1D_ldlink.py` as below `CMD` command line:
 
 - To run the code, you need list of SNP RS IDs of dbSNP database as txt file
+- Usage: `python ldlink.py [SNP_file_path.txt]`
 
 ```CMD
-python ldlink.py [SNP_file_path.txt]
+python ldlink_dn.py data/gwas_5e-08_129.tsv
 ```
 
 To Filter the LDlink data, you can run `T1D_ldlink.r` as below `CMD` command line:
 
+- Usage: `Rscript ldlink.r [SNP_file_path.txt] [LDlink_data_folder_path]`
+
 ```CMD
-Rscript ldlink.r [SNP_file_path.txt] [LDlink_data_folder_path]
+Rscript ldlink_filt.r data/gwas_5e-08_129.tsv db/ldlink
 ```
 
 ### Q1. How to make private SNP list BED file?
 
-To use bedtools later, you have to prepare SNP list as [bed format](https://genome.ucsc.edu/FAQ/FAQformat.html). If you have simple dbSNP rsid list, you can run `src/snp_biomart.r` for generate bed file. But you should check `NA` values and fill it manually.
+To use bedtools later, you have to prepare SNP list as [bed format](https://genome.ucsc.edu/FAQ/FAQformat.html). If you have simple dbSNP rsid list, you can run `src/biomart_snp.r` for generate bed file. But you should check `NA` values and fill it manually.
 
 ```CMD
-Rscript src/snp_bed.r
+Rscript src/biomart_snp.r [rsid_list_file_path]
 ```
 
 
@@ -59,7 +63,7 @@ BiocManager::install("rtracklayer", version = "3.8")
 
 To download **RoadMap data**, you can run `roadmap_dn.r` as below `CMD` command line:
 
-- The RoadMap BED files will download at `db/roadmap` folder
+- The 127 cell type-specific RoadMap BED files will download at `db/roadmap` folder
 - This process takes about ~10 min that depends on your download speed.
 
 ```CMD
@@ -262,9 +266,9 @@ Rscript venn.r data/seedSNP_1817.bed data/snp_140_roadmap_encode.bed data/snp_26
 
 The result files are generated as below:
 
-- `venn.tsv`->`venn_gtex.tsv`: binary SNP overlap table
-- `vennCounts.tsv`->`vennCounts_gtex.tsv`: overlapped SNP numbers
-- `snp_#_core.bed`
+- `venn.tsv` > `venn_gtex.tsv`: binary SNP overlap table
+- `vennCounts.tsv` > `vennCounts_gtex.tsv`: overlapped SNP numbers
+- `snp_26_core.bed` > `snp_26_core_tfbs.bed`: SNP `BED` format file
 
 The result figure is generated as below:
 
@@ -373,18 +377,48 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 - `lncRNASNP2_snplist.txt.gz` - **SNP list** includes the list of human SNPs in lncRNASNP database.
 - `lncrnas.txt.gz` - **lncRNA list** includes the list of human lncRNAs in lncRNASNP database.
 - `lncrna-diseases_experiment.txt.gz` - **Experimental validated lncRNA-associated diseases** includes all experiment validated lncRNA-associated diseases.
+- `Rscript lncrnasnp.r [SNP_BED_file_path] [lncRNAsnp2_SNP_list_file_path] [lncRNAsnp2_lncRNA_list_file_path] [lncRNAsnp2_diseases_list_file_path]`
 
 ```CMD
-: Rscript lncrnasnp.r [SNP_BED_file_path] [lncRNAsnp2_SNP_list_file_path] [lncRNAsnp2_lncRNA_list_file_path] [lncRNAsnp2_diseases_list_file_path]
-Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.gz db/lncrnas.txt.gz db/lncrna-diseases_experiment.txt.gz
+> Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.rds db/lncrnas.txt.rds db/lncrna-diseases_experiment.txt.rds
+
+(1/3) Read files..
+  - data/seedSNP_1817.bed; Job process: 0 sec
+  - db/lncRNASNP2_snplist.txt.rds; Job process: 16 sec
+  - db/lncrnas.txt.rds; Job process: 16.2 sec
+  - db/lncrna-diseases_experiment.txt.rds; Job process: 16.2 sec
+|path                                  |     nrow| ncol|
+|:-------------------------------------|--------:|----:|
+|data/seedSNP_1817.bed                 |     1817|    4|
+|db/lncRNASNP2_snplist.txt.rds         | 10205295|    2|
+|db/lncrnas.txt.rds                    |   141271|    4|
+|db/lncrna-diseases_experiment.txt.rds |      753|    3|
+  - Job process: 16.3 sec
+
+(2/3) Overlapping lncRNA to my SNP list and binding annotation..
+| lncRNA| SNPs|
+|------:|----:|
+|     42|   78|
+>> File write: data/snp_78_lncrnasnp.bed
+
+(3/3) Annotating SNPs in lncRNAs
+>> File write: data/lncrnasnp_78.tsv
 ```
 
-| path                         | nrow     | ncol |
-| :--------------------------- | :------- | :--- |
-| data/seedSNP_1817.bed        | 1817     | 4    |
-| db/lncRNASNP2_snplist.txt.gz | 10205295 | 2    |
-| db/lncrnas.txt.gz            | 141271   | 4    |
-| NA                           | 753      | 3    |
+- `data/snp_78_lncrnasnp.bed` - 78 SNPs `BED` file
+- `data/lncrnasnp_78.tsv` - 78 SNPs associated with 42 lncRNAs
+
+### > venn.r
+
+```CMD
+Rscript venn.r data/seedSNP_1817.bed data/snp_26_core.bed data/snp_74_gtex_enh.bed data/snp_78_lncrnasnp.bed
+```
+
+- `venn.tsv` > `venn_lncrnasnp.tsv`: binary SNP overlap table
+- `vennCounts.tsv` > `vennCounts_lncrnasnp.tsv`: overlapped SNP numbers
+- `snp_2_core.bed` > `snp_2_core_lncrnasnp.bed`: SNP `BED` format file
+
+![](fig/venn_seedSNP_1817_snp_26_core.png)
 
 
 
