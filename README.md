@@ -349,17 +349,17 @@ To identify the eQTL SNPs occupied on TFBS binding enhancers, you can run `src/g
 > Rscript src/gtex_overlap.r
 
 (1/2) Read files..
- - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
- - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
- - data/gtex_nearest_df.tsv, rows= 788 cols= 7
- >> SNPs= 745 Genes= 159 (Nearest= 32)
+  - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
+  - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
+  - data/gtex_nearest_df.tsv, rows= 788 cols= 7
+ >> SNPs= 745 Genes= 159 (Nearest= 44)
 
 (2/2) Overlap these two files..
- - TFBS overlap, rows= 5301 cols= 10
- >> SNPs= 74 Genes= 94 (Nearest= 20)
+  - TFBS overlap, rows= 5301 cols= 10
+ >> SNPs= 74 Genes= 94 (Nearest= 25)
 
- - Whole_Blood, rows= 202 cols= 10
- >> SNPs= 52 Genes= 29 (Nearest= 7)
+  - Whole_Blood, rows= 202 cols= 10
+ >> SNPs= 52 Genes= 29 (Nearest= 8)
 
 >> File write: data/snp_74_gtex_enh.bed
 ```
