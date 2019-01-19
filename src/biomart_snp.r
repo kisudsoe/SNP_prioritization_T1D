@@ -10,7 +10,7 @@ if(length(args)<1|length(args)>1) stop(msg)
 path = args[1]
 
 # system parameters
-library(biomaRt)
+suppressMessages(library(biomaRt))
 source('src/pdtime.r') # pdtime(time,1/2); 1= Job done, 2= Job process
 t0 = Sys.time(); cat(paste0('>> Process initiate at ',t0,'\n\n'))
 

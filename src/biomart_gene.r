@@ -7,7 +7,7 @@ args = commandArgs(trailingOnly=T)
 if(length(args)>0) stop('Rscript biomart_gene.r, no argument is needed.')
 
 # system parameters
-library(biomaRt)
+suppressMessages(library(biomaRt))
 source('src/pdtime.r') # pdtime(time,1/2); 1= Job done, 2= Job process
 t0 = Sys.time(); cat(paste0('Process initiate at ',t0,'\n\n'))
 
