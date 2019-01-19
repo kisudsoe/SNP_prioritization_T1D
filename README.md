@@ -64,7 +64,7 @@ BiocManager::install("rtracklayer", version = "3.8")
 To download **RoadMap data**, you can run `roadmap_dn.r` as below `CMD` command line:
 
 - The 127 cell type-specific RoadMap BED files will download at `db/roadmap` folder
-- This process takes about ~10 min that depends on your download speed.
+- This process takes about ~30 min that depends on your download speed.
 
 ```CMD
 Rscript roadmap_dn.r
@@ -75,7 +75,7 @@ Rscript roadmap_dn.r
 To filter the RoadMap data by **Enhancers**, you can run `roadmap_filt.r` as below `CMD` command line:
 
 - The result file would be saved as `data/roadmap_enh.bed`
-- This process takes >12 min that depends on your hard drive read speed.
+- This process takes ~3 min that depends on your computer processor speed.
 
 ```CMD
 Rscript roadmap_filt.r
@@ -424,10 +424,10 @@ Rscript venn.r data/seedSNP_1817.bed data/snp_26_core.bed data/snp_74_gtex_enh.b
 
 ## 7. Monte Carlo permutation for random SNP set
 
-To calculate SNP backgrounds for this pipeline, we generate 10,000 random control SNP sets from [dbSNP database (version 151, GRCh37p13)](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/). To calculate their distributions, you can run `*.r` as below `CMD` command line:
+To calculate SNP backgrounds for this pipeline, we generate 10,000 random control SNP sets from [dbSNP database (version 151, GRCh37p13)](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/). To calculate their distributions, you can run `src/rsid_random.r.r` as below `CMD` command line:
 
 ```CMD
-
+Rscript src/rsid_random.r 1817 10000
 ```
 
 
