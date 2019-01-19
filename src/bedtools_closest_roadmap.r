@@ -11,7 +11,7 @@ if(length(args)<1|length(args)>1) stop(hmsg)
 path = unlist(args[1])
 
 # System parameter
-library(tools)
+suppressMessages(library(tools))
 source('src/pdtime.r')
 t0 = Sys.time()
 dir = 'data/'
@@ -38,8 +38,8 @@ rd.df = cbind(gwas,enh[1:2],dis)
 
 # 2. Filtering SNPs by distance of closest enhancers
 rd.df_ = unique(subset(rd.df,dis==0))
-cat(paste0('Enhancer occupied by SNPs = ',length(unique(rd.df_$rsid)),'\n'))
-cat(paste0('SNPs in RoadMap enhancers = ',length(unique(rd.df_$enh_pos)),'\n'))
+cat(paste0('Enhancer occupied by SNPs = ',length(unique(rd.df_$enh_pos)),'\n'))
+cat(paste0('SNPs in RoadMap enhancers = ',length(unique(rd.df_$rsid)),'\n'))
 f.path1 = paste0(dir,f.name,'_df.tsv')
 write.table(rd.df_,f.path1,row.names=F,quote=F,sep='\t')
 cat(paste0('\nFile write: ',f.path1,'\n'))
