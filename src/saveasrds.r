@@ -1,6 +1,6 @@
 # Read file and save as rds file
-library(data.table)
-library(tools)
+suppressMessages(library(data.table))
+suppressMessages(library(tools))
 saveasrds = function(f_path) {
     df = fread(f_path,sep='\t',header=T,stringsAsFactors=F)
     f_name = paste0(f_path,'.rds')
@@ -8,9 +8,9 @@ saveasrds = function(f_path) {
     cat(paste0('>> File write: ',f_name,'\n'))
 }
 
-library(rtracklayer)
+suppressMessages(library(rtracklayer))
 bedasrds = function(f_path) {
-    df = import(f_path,format='bed')
+    df = as.data.frame(import(f_path,format='bed'))
     f_name = paste0(f_path,'.rds')
     saveRDS(df,file=f_name)
     cat(paste0('>> File write: ',f_name,'\n'))
