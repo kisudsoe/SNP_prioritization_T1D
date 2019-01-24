@@ -2,7 +2,8 @@
 # This file is for filtering Regulome data
 
 ## Command Arg Parameters ##
-# CMD command: Rscript regulome.r data/seedSNP_1817.bed db/RegulomeDB.dbSNP132.Category1.txt.gz db/RegulomeDB.dbSNP132.Category2.txt.gz
+# CMD command1: Rscript regulome.r data/seedSNP_1817.bed db/RegulomeDB.dbSNP132.Category1.txt.rds db/RegulomeDB.dbSNP132.Category2.txt.rds
+# CMD command2: Rscript regulome.r random/seeds/seedSNP_1817.bed db/RegulomeDB.dbSNP132.Category1.txt.rds db/RegulomeDB.dbSNP132.Category2.txt.rds
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript regulome.r [SNP_BED_file_path] [regulome_file_path_1] [regulome_file_path_2] [regulome_file_path_3]
   - Argument [SNP_file_path] is mendatory.
@@ -34,6 +35,7 @@ reg.li = list()
 for(i in 1:n) {
 	cat(paste0('\nRead input file ',i,': ',f.path[i],'\n'))
 	if(file_ext(f.path[i])=='gz') reg.li[[i]] = try(read.delim(gzfile(f.path[i]),header=F))
+    else if(file_ext(f.path[i])=='rds') reg.li[[i]] = try(readRDS(f.path[i]))
 	else reg.li[[i]] = try(read.delim(f.path[i],header=F))
 	colnames(reg.li[[i]]) = c('chr','id','rsid','description','level')
 	cat(paste0('Table row = ',dim(reg.li[[i]])[1],', col = ',dim(reg.li[[i]])[2],'\n'))
@@ -49,7 +51,7 @@ snpids.1f_only = subset(reg_1f_only,rsid%in%snpids)
 snpids.2b      = subset(reg_2b,     rsid%in%snpids)
 cat(paste0('  - Regulome >=2b SNPs = ',nrow(snpids.2b),'\n'))
 cat(paste0('  - SNPs with functional motifs (1f_only-2b) = ',
-			nrow(snpids.2b)-nrow(snpids.1f_only),'\n'))
+                nrow(snpids.2b)-nrow(snpids.1f_only),'\n'))
 f.name1 = paste0('data/regulome_',nrow(snpids.2b),'.tsv')
 write.table(snpids.2b,f.name1,row.names=F,col.names=T,quote=T,sep='\t')
 cat(paste0('\n>> File write: ',f.name1,'\n'))
