@@ -12,7 +12,7 @@ saveasrds = function(f_paths) {
             return(fread(f_paths[i],sep='\t',header=T,stringsAsFactors=F))
         }
     })
-    df = ldply(df.li) # plyr
+    df = rbindlist(df.li) # data.table
     f_name = paste0(f_path,'.rds')
     saveRDS(df,file=f_name)
     cat(paste0('>> File write: ',f_name,'\n'))
