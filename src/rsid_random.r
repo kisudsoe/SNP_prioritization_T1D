@@ -2,7 +2,9 @@
 # This file is for selecting random SNP sets from dbSNP database.
 
 ## Command Arg Parameters ##
-# CMD usage: Rscript src/rsid_random.r 1817 10000
+#'''CMD
+#> Rscript src/rsid_random.r 1817 10000
+#'''
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript src/rsid_random.r [SNP_number] [SNP_set_number]
   - [SNP_number] is a mendatory numeric argument for a number of SNPs.
@@ -33,15 +35,15 @@ cat('\n(1/3) Downloading dbSNP data..\n')
 chr = c(1:22,'X','Y','MT')
 urls = paste0('ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/bed_chr_',chr,'.bed.gz')
 t=lapply(urls,function(url) {
-	#f_name1 = paste0(dir,basename(url))
-	#cat(paste0('  - ',f_name1))
-	#tb = try(download.file(url,destfile=f_name1,quiet=T))
-	#if('try-error' %in% class(tb)) stop('dbSNP151 data address seems to be changed.')
-    #cat(paste0(' > unzipping..'))
-    #try(R.utils::gunzip(f_name1))
-    #cat(paste0(' > converting into RDS..\n'))
-    #f_name1_= tools::file_path_sans_ext(f_name1)
-    #try(bedasrds(f_name1_))
+	f_name1 = paste0(dir,basename(url))
+	cat(paste0('  - ',f_name1))
+	tb = try(download.file(url,destfile=f_name1,quiet=T))
+	if('try-error' %in% class(tb)) stop('dbSNP151 data address seems to be changed.')
+    cat(paste0(' > unzipping..'))
+    try(R.utils::gunzip(f_name1))
+    cat(paste0(' > converting into RDS..\n'))
+    f_name1_= tools::file_path_sans_ext(f_name1)
+    try(bedasrds(f_name1_))
 })
 cat(paste0('\n >> ',pdtime(t0,2),'\n'))
 
@@ -70,19 +72,9 @@ cat(paste0('  - SNP_number = ',n_snp,'\n  - SNP_set_number = ',n_snp_set,'\n'))
 t=lapply(c(1:n_snp_set),function(i) {
 	rd.row = sample(nrow(snp.df),n_snp)
 	rd.df  = snp.df[rd.row,]
-    #rd.df  = rd.df[sort(rownames(rd.df)),]
-    m=nrow(rd.df)
-    rd.li=lapply(c(1:m),function(j) {
-        row   = t(unname(rd.df[j,]))
-        row_2 = as.numeric(row[2])
-        row_3 = as.numeric(row[3])
-        if(row_3-row_2<0) row_ = row[c(1,3,2,4)]
-        else row_ = row
-        return(t(row_))
-    })
-    rd.df_ = ldply(rd.li,data.frame)
     f_name = paste0(dir2,'rsid',i,'.bed')
-	write.table(rd.df_,f_name,row.names=F,col.names=F,quote=F,sep='\t')
+	write.table(rd.df,f_name,row.names=F,col.names=F,quote=F,sep='\t')
+    if(i%%1000==0) cat(paste0('  - ',pdtime(t0,2),'\n'))
     #cat(paste0(' >> File write: ',f_name,'\n'))
 })
 cat(paste0('\n >> ',pdtime(t0,1),'\n'))

@@ -15,13 +15,15 @@ suppressMessages(library(data.table))
 suppressMessages(library(plyr))
 source('src/pdtime.r')
 t0 = Sys.time()
-rsid = c(1:10)
+rsid = c(1:10000)
 if(args[1]=='roadmap') {
     dir = 'random/roadmap/'
     path = paste0(dir,'roadmap_rsid',rsid,'.tsv')
+    f_path = paste0('random/roadmap_dist.tsv')
 } else if(args[1]=='encode') {
     dir = 'random/encode/'
     path = paste0(dir,'encode_rsid',rsid,'.tsv')
+    f_path = paste0('random/encode_dist.tsv')
 } else stop(hmsg)
 
 #########################
@@ -31,9 +33,9 @@ rd.li=list(); n=length(path)
 rd.li = lapply(c(1:n),function(i) {
     # 1. Compiling SNP data distant from RoadMap enhancers
     rd = as.data.frame(fread(path[i])) # data.table
-    cat(paste0(' (',i,'/',n,')',path[i],'\n'))
-    pos  = unlist(apply(rd,1,function(x) paste0(x[6],':',x[7],'-',x[8])))
-    rd_  = cbind(rd[1:4],pos,rd[,9:10])
+    #cat(paste0(' (',i,'/',n,')',path[i],'\n'))
+    pos  = unlist(apply(rd,1,function(x) paste0(x[5],':',x[6],'-',x[7])))
+    rd_  = cbind(rd[1:4],pos,rd[,8:9])
     colnames(rd_) = c('chr','start','end','rsid','enh_pos','num','dist')
     dis = as.numeric(as.character(rd_$dist))
     rd.df = cbind(rd_[1:6],dis); head(rd.df)
@@ -44,14 +46,14 @@ rd.li = lapply(c(1:n),function(i) {
     rd.df_enh = length(unique(rd.df_$enh_pos))
     
     rd.row = c(basename(path[i]),rd.df_snp,rd.df_enh)
+    if(i%%1000==0) cat(paste0('  - ',round((i/n)*100,1),'% Working process\n'))
     return(t(rd.row))
 })
 rd.df_ = ldply(rd.li,data.frame) # plyr
 colnames(rd.df_) = c('random','SNP_n','Enh_n')
                   
-f.path = paste0(dir,'random_dist.tsv')
-write.table(rd.df_,f.path,row.names=F,quote=F,sep='\t')
-cat(paste0('\nFile write: ',f.path,'\n'))
+write.table(rd.df_,f_path,row.names=F,quote=F,sep='\t')
+cat(paste0('\nFile write: ',f_path,'\n'))
 cat(paste0('\n>> ',pdtime(t0,1),'\n'))
 ##################
 ## Function end ##
