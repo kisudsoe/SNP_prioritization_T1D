@@ -8,7 +8,7 @@ This is an protocol for prioritization of SNPs associated certain phenotype/dise
 
 ### gwas.r
 
-To download **GWAS Catalog data**, you can [search certain disease](https://www.ebi.ac.uk/gwas/). In this study, we downloaded [SNP-sets for type 1 diabetes](https://www.ebi.ac.uk/gwas/efotraits/EFO_0001359). Then you can run R code file for filtering the GWAS Catalog data as below command line:
+To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research, pmid 27899670), you can [search certain disease](https://www.ebi.ac.uk/gwas/). In this study, we downloaded [SNP-sets for type 1 diabetes](https://www.ebi.ac.uk/gwas/efotraits/EFO_0001359). Then you can run R code file for filtering the GWAS Catalog data as below command line:
 
 - Instead of `[ ]`, you have to put the arguments `file path` or `value` by the options.
 - Usage: `Rscript gwas.r [GWAS_file_path] [p-value_criteria]`
@@ -19,7 +19,7 @@ Rscript T1D_gwas.r db/GWAS_EFO0001359.tsv 5e-08
 
 ### ldlink.py/ ldlink.r
 
-To download **LDlink data**, you can run `T1D_ldlink.py` as below `CMD` command line:
+To download **LDlink data** (version 3.3.0 12/24/2018) (Machiela et al, 2015, Bioinformatics, pmid 26139635), you can run `T1D_ldlink.py` as below `CMD` command line:
 
 - To run the code, you need list of SNP RS IDs of dbSNP database as txt file
 - Usage: `python ldlink.py [SNP_file_path.txt]`
@@ -146,14 +146,16 @@ Rscript src/bedtools_closest_roadmap.r data/encode_dist.tsv
 
 ## 4. Regulome DB data download and filter
 
-The [Regulome DB](http://www.regulomedb.org/downloads) provides [category scores for SNPs by evidences](http://www.regulomedb.org/help) (see `Regulome score.txt`), including eQTL, TF binding, matched TF motif, matched DNase Footprint, and DNase peak. In this study, we stringently filtered and used high-score (`≥ 2b`) SNPs for our study.
+The [**RegulomeDB**](http://www.regulomedb.org/index) provides [category scores for SNPs by evidences](http://www.regulomedb.org/help) (see `Regulome score.txt`), including eQTL, TF binding, matched TF motif, matched DNase Footprint, and DNase peak. In this study, we stringently filtered and used high-score (`≥ 2b`) SNPs for our study. Before you start, you can download the files from [Regulome DB download page](http://www.regulomedb.org/downloads). To make this process faster, you can convert the downloaded files to RDS format.
 
 - `RegulomeDB.dbSNP132.Category1.txt.gz` (2 MB)
 - `RegulomeDB.dbSNP132.Category2.txt.gz` (39.3 MB)
 - Or you can download total dataset: `RegulomeDB.dbSNP141.txt.gz` (2.8 GB)
 
+Here we converted the download files to RDS format files to achieve fast loading speed. Use the RegulomeDB RDS files, you can filter and analyze the dataset by using `regulome.r` as following command line:
+
 ```CMD
-Rscript regulome.r data/seedSNP_1817_ldlink.tsv db/RegulomeDB.dbSNP132.Category1.txt.gz db/RegulomeDB.dbSNP132.Category2.txt.gz
+Rscript regulome.r data/seedSNP_1817_ldlink.tsv db/RegulomeDB.dbSNP132.Category1.txt.rds db/RegulomeDB.dbSNP132.Category2.txt.rds
 ```
 
 The result files are save at `data/` folder:
@@ -225,7 +227,9 @@ To identify T1D SNPs
 
 ```CMD
 > Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif_5e-8.tsv.gz
+```
 
+```CMD
 Input SNPs number = 1,817
 
 (1/3) Loading GTEx significant file
@@ -280,7 +284,9 @@ To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r
 
 ```R
 > Rscript src/gtex_overlap.r
+```
 
+```CMD
 (1/2) Read files..
  - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
  - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
@@ -302,13 +308,17 @@ To identify nearest genes from the eQTL SNPs, firstly you need to download gene 
 
 ```CMD
 > Rscript src/biomart_gene.r
+```
 
+```CMD
 Ensembl table, rows= 63677 cols= 5
 File write: db/ensembl_gene_ann.tsv
 
 Filter result, rows= 57736 cols= 5
 File write: db/ensembl_gene.bed
 ```
+
+
 
 ### $ bedtools closest
 
@@ -329,7 +339,9 @@ To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestr
 ```CMD
 ::Rscript src/bedtools_closest_gtex.r [bedtools_closest_result_file_path]
 > Rscript src/bedtools_closest_gtex.r data/seedSNP_nearest.tsv
+```
 
+```CMD
 Row number = 2114
 T1D SNPs = 1817
 Nearest genes = 175
@@ -338,7 +350,9 @@ Nearest genes = 175
 
 ```CMD
 > Rscript src/bedtools_closest_gtex.r data/gtex_nearest.tsv
+```
 
+```CMD
 Row number = 788
 T1D SNPs = 745
 Nearest genes = 113
@@ -351,7 +365,9 @@ To identify the eQTL SNPs occupied on TFBS binding enhancers, you can run `src/g
 
 ```CMD
 > Rscript src/gtex_overlap.r
+```
 
+```CMD
 (1/2) Read files..
   - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
   - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
@@ -381,7 +397,9 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 
 ```CMD
 > Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.rds db/lncrnas.txt.rds db/lncrna-diseases_experiment.txt.rds
+```
 
+```ouput
 (1/3) Read files..
   - data/seedSNP_1817.bed; Job process: 0 sec
   - db/lncRNASNP2_snplist.txt.rds; Job process: 16 sec
@@ -420,17 +438,65 @@ Rscript venn.r data/seedSNP_1817.bed data/snp_26_core.bed data/snp_74_gtex_enh.b
 
 ![](fig/venn_seedSNP_1817_snp_26_core.png)
 
+## 7. Monte Carlo permutation for random SNP sets
 
+### Generation of random SNP sets
 
-## 7. Monte Carlo permutation for random SNP set
+To calculate SNP backgrounds for this pipeline, we generate 10,000 random control SNP sets from [dbSNP database (version 151, GRCh37p13)](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/). To generate the random controls, you can run `src/rsid_random.r` as below `CMD` command line:
 
-To calculate SNP backgrounds for this pipeline, we generate 10,000 random control SNP sets from [dbSNP database (version 151, GRCh37p13)](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/). To calculate their distributions, you can run `src/rsid_random.r.r` as below `CMD` command line:
+- This code takes very long time to complete (>hours)
 
 ```CMD
 Rscript src/rsid_random.r 1817 10000
 ```
 
+To use the generated random SNP sets, you should sort the contents by using `bedtools sort` function as below `SHELL` command line:
 
+- `bedtools sort -i random/rsid1.bed > random/seeds/rsid1_sort.bed`
+- `bedtools sort -i random/rsid2.bed > random/seeds/rsid2_sort.bed`
+- ...
+
+```SHELL
+$ bash random_startend.sh
+```
+
+### $ roadmap_random.sh
+
+To run iterations of `bedtools closest` function for **RoadMap enhancers** to the random SNP sets, you can use below `SHELL` script:
+
+- The `SHELL` script includes iterations of this code: `bedtools closest -d -a random/seeds/rsid1_sort.bed -b db/roadmap_enh_merge.bed > random/roadmap/roadmap_rsid1.tsv`
+
+```SHELL
+$ bash roadmap_random.sh
+```
+
+### $ src/bedtools_closest_random.r
+
+To archive the random distribution, you can use `src/bedtools_closest_random.r` as below `CMD` command line:
+
+```CMD
+: Rscript src/bedtools_closest_random.r [roadmap/encode]
+> Rscript src/bedtools_closest_random.r roadmap
+```
+
+- Result file is `random/roadmap_dist.tsv`
+
+### $ encode_random.sh
+
+To run iterations of `bedtools cloest` function for **Encode TFBS** to the random SNP sets, you can use below `SHELL` script:
+
+```SHELL
+$ bash encode_random.sh
+```
+
+To compile the random distribution, you can use `src/bedtools_closest_random.r` as below `CMD` command line:
+
+```CMD
+: Rscript src/bedtools_closest_random.r [roadmap/encode]
+> Rscript src/bedtools_closest_random.r encode
+```
+
+### Monte Carlo simulation
 
 
 
