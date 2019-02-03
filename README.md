@@ -6,7 +6,7 @@ This is an protocol for prioritization of SNPs associated certain phenotype/dise
 
 ## 1. Seed SNPs preparation for type 1 diabetes (T1D)
 
-### gwas.r
+### > gwas.r
 
 To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research, pmid 27899670), you can [search certain disease](https://www.ebi.ac.uk/gwas/). In this study, we downloaded [SNP-sets for type 1 diabetes](https://www.ebi.ac.uk/gwas/efotraits/EFO_0001359). Then you can run R code file for filtering the GWAS Catalog data as below command line:
 
@@ -17,7 +17,7 @@ To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research
 Rscript T1D_gwas.r db/GWAS_EFO0001359.tsv 5e-08
 ```
 
-### ldlink.py/ ldlink.r
+### > ldlink_dn.py / link_filt.r
 
 To download **LDlink data** (version 3.3.0 12/24/2018) (Machiela et al, 2015, Bioinformatics, pmid 26139635), you can run `T1D_ldlink.py` as below `CMD` command line:
 
@@ -28,7 +28,7 @@ To download **LDlink data** (version 3.3.0 12/24/2018) (Machiela et al, 2015, Bi
 python ldlink_dn.py data/gwas_5e-08_129.tsv
 ```
 
-To Filter the LDlink data, you can run `T1D_ldlink.r` as below `CMD` command line:
+To filter the LDlink data by statistical criteria, both r<sup>2</sup> >0.6 and D'=1, you can run `T1D_ldlink.r` as below `CMD` command line:
 
 - Usage: `Rscript ldlink.r [SNP_file_path.txt] [LDlink_data_folder_path]`
 
@@ -36,7 +36,7 @@ To Filter the LDlink data, you can run `T1D_ldlink.r` as below `CMD` command lin
 Rscript ldlink_filt.r data/gwas_5e-08_129.tsv db/ldlink
 ```
 
-### Q1. How to make private SNP list BED file?
+### Q1. Generation of private SNP list (rsids) to BED file format?
 
 To use bedtools later, you have to prepare SNP list as [bed format](https://genome.ucsc.edu/FAQ/FAQformat.html). If you have simple dbSNP rsid list, you can run `src/biomart_snp.r` for generate bed file. But you should check `NA` values and fill it manually.
 
@@ -48,7 +48,7 @@ Rscript src/biomart_snp.r [rsid_list_file_path]
 
 ## 2. RoadMap data download and filter
 
-The [RoadMAP project](https://egg2.wustl.edu/roadmap/web_portal/imputed.html) provides epigenome annotations such as [12-mark/127-reference epigenome/25-state Imputation Based Chromatin State Model](https://egg2.wustl.edu/roadmap/data/byFileType/chromhmmSegmentations/ChmmModels/imputed12marks/jointModel/final/). We downloaded the 127 files by their [cell types](https://github.com/mdozmorov/genomerunner_web/wiki/Roadmap-cell-types) (e.g., `E001_25_imputed12marks_hg38lift_dense.bed.gz` and etc) using R code (`T1D_roadmap.r`). And then we filtered the data by [annotation code](https://egg2.wustl.edu/roadmap/web_portal/imputed.html) (see db/[roadmap] ) including 13_EnhA1, 14_EnhA2, 15_EnhAF, 16_EnhW1, 17_EnhW2, 18_EnhAc.
+The [RoadMAP project](https://egg2.wustl.edu/roadmap/web_portal/imputed.html) provides epigenome annotations such as [12-mark/127-reference epigenome/25-state Imputation Based Chromatin State Model](https://egg2.wustl.edu/roadmap/data/byFileType/chromhmmSegmentations/ChmmModels/imputed12marks/jointModel/final/) by using ChromHMM algorithm (Ernst and Kellis, 2012, Nature Methods, pmid 22373907). We downloaded the 127 files by their [cell types](https://github.com/mdozmorov/genomerunner_web/wiki/Roadmap-cell-types) (e.g., `E001_25_imputed12marks_hg38lift_dense.bed.gz` and etc) using R code (`T1D_roadmap.r`). And then we filtered the data by [annotation code](https://egg2.wustl.edu/roadmap/web_portal/imputed.html) (see db/[roadmap] ) including 13_EnhA1, 14_EnhA2, 15_EnhAF, 16_EnhW1, 17_EnhW2, 18_EnhAc.
 
 To download RoadMap data, you need to install `AnnotationHub` and `rtracklayer` in `BiocManaer` as below R code:
 
@@ -442,7 +442,7 @@ Rscript venn.r data/seedSNP_1817.bed data/snp_26_core.bed data/snp_74_gtex_enh.b
 
 ### Generation of random SNP sets
 
-To calculate SNP backgrounds for this pipeline, we generate 10,000 random control SNP sets from [dbSNP database (version 151, GRCh37p13)](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/). To generate the random controls, you can run `src/rsid_random.r` as below `CMD` command line:
+To calculate SNP backgrounds for this pipeline, we generated 10,000 random control SNP sets from [dbSNP database (version 151, GRCh37p13)](ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh37p13/BED/). To generate the random controls, you can run `src/rsid_random.r` as below `CMD` command line:
 
 - This code takes very long time to complete (>hours)
 
@@ -496,7 +496,11 @@ To compile the random distribution, you can use `src/bedtools_closest_random.r` 
 > Rscript src/bedtools_closest_random.r encode
 ```
 
+### > 
+
+
+
 ### Monte Carlo simulation
 
-
+We used a Monte Carlo method to test for an enrichment for T1D SNPs occupied in enhancers. T1D SNPs were identified in 10,000 sets of 1,817 SNPs that were randomly selected from the [Single Nucleotide Polymorphism database](https://www.ncbi.nlm.nih.gov/projects/SNP/snp_summary.cgi) (dbSNP build 151, 10/06/2017). 
 

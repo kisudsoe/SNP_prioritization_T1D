@@ -1,9 +1,10 @@
 #!/usr/bin/env Rscript
-# This file is for identifying T1D SNPs occupied in RoadMap enhancers
+# This file is for identifying T1D SNPs occupied in RoadMap enhancers/ENCODE TFBS
 
 ## Command Arg Parameters ##
-# Rscript src/bedtools_closest_random.r roadmap
-# Rscript src/bedtools_closest_random.r encode
+# Usage 1: Rscript src/bedtools_closest_random.r roadmap
+# Usage 2: Rscript src/bedtools_closest_random.r encode
+# Usage 3: Rscript src/bedtools_closest_random.r overlap
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript src/bedtools_closest_random.r [roadmap/encode]
   - Argument [roadmap/encode] is mendatory.
