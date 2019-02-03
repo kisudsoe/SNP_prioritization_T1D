@@ -34,8 +34,8 @@ dim.gte = prettyNum(dim(gte),big.mark=',',preserve.width='none')
 cat(paste0('  - ',basename(gte.path),': rows= ',dim.gte[1],' cols= ',dim.gte[2],'\n'))
 cat(paste0('  - ',pdtime(t0,2),'\n'))
 
-# 2. eQTL SNP annotation
-cat("\n(2/3) eQTL SNP annotation\n")
+# 2. eQTL SNP filteration
+cat("\n(2/3) eQTL SNP filteration\n")
 gte_ = subset(gte,rsid%in%snpids)
 dim.gte_ = prettyNum(dim(gte_),big.mark=',',preserve.width='none')
 cat(paste0('  - Overlapped table, rows= ',dim.gte_[1],' cols= ',dim.gte_[2],'\n'))
