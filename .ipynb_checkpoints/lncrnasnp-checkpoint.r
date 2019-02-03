@@ -2,7 +2,7 @@
 # This file is for filtering RoadMap data
 
 ## Command Arg Parameters ##
-# CMD command: Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.gz db/lncrnas.txt.gz db/lncrna-diseases_experiment.txt.gz
+# CMD command: Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.rds db/lncrnas.txt.rds db/lncrna-diseases_experiment.txt.rds
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript lncrnasnp.r [SNP_BED_file_path] [lncRNAsnp2_SNP_list_file_path] [lncRNAsnp2_lncRNA_list_file_path] [lncRNAsnp2_diseases_list_file_path]
   - [SNP_BED_file_path] is a mendatory argument for your SNP list with BED format.
@@ -65,12 +65,12 @@ snp_lnc_ann = merge(snp_lnc[,c(1,6)],ann,by='lncRNA')
 if(length(args)>3) { # Disease option
 	snp_lnc_ann_dis = merge(snp_lnc_ann,dis,by='lncRNA',all.x=T)
 	f_name2 = paste0('data/lncrnasnp_',length(unique(snp_lnc_ann_dis$dbsnp)),'.tsv')
-	write.table(snp_lnc_ann_dis,f_name2,row.names=F,col.names=T,quote=T,sep='\t')
+	write.table(snp_lnc_ann_dis,f_name2,row.names=F,col.names=T,quote=F,sep='\t')
 	cat(paste0('\n>> File write: ',f_name2,'\n'))
 } else {
 	cat("\n>> Disease associated SNP option does not processed.\n")
     f_name2 = paste0('data/lncrnasnp_',length(unique(snp_lnc_ann$dbsnp)),'.tsv')
-	write.table(snp_lnc_ann,f_name2,row.names=F,col.names=T,quote=T,sep='\t')
+	write.table(snp_lnc_ann,f_name2,row.names=F,col.names=T,quote=F,sep='\t')
 }
 cat(paste0('\n',pdtime(t0,1),'\n'))
 ##################
