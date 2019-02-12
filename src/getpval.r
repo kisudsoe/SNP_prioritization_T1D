@@ -1,7 +1,7 @@
 getpval = function(dist,mu,method='t.test') {
     if(method=='t.test') pval = t.test(dist,mu=mu)$p.value
     else if(method=='z.test') {
-        z.score = z.test(dist,var=var(dist),mu=mu)
+        z.score = (mean(dist)-mu)/(var(dist)/sqrt(length(dist)))
         pval = pnorm(abs(z.score),lower.tail=F)*2 # two-tailed
     } else if(method=='approxfun') {
         d = density(dist)#; df = approxfun(d)
@@ -9,6 +9,12 @@ getpval = function(dist,mu,method='t.test') {
         #print(paste0('density= ',df(mu)))
         #print(paste0('pval= ',pval))
         if('try-error'%in% class(pval)) pval=0
+        if(!is.na(pval)&pval>0.5) pval = 1-pval
+    } else if(method=='rank') {
+        m = length(which(dist>mu))
+        if(m>length(dist)/2) rank_n = length(dist)- m
+        else rank_n = m
+        pval = (rank_n+1)/(length(dist)+1)
         if(!is.na(pval)&pval>0.5) pval = 1-pval
     }
     return(pval)
