@@ -46,6 +46,6 @@ cat(paste0(' - GTEx annotation, rows= ',dim(gte.ann)[1],' cols= ',dim(gte.ann)[2
 cat(paste0(' > ',pdtime(t0,2),'\n'))
 
 cat(paste0(' - Saving as RDS file..'))
-saveRDS(gte.df,'db/Gtex_Analysis_v7_eQTL_rsid.rds')
+saveRDS(gte.ann,'db/Gtex_Analysis_v7_eQTL_rsid.rds')
 cat(paste0(' > ',pdtime(t0,2),'\n'))
 cat(paste0('\n ',pdtime(t0,1),'\n'))
