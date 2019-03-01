@@ -10,6 +10,7 @@ name   = file_path_sans_ext(file_path_sans_ext(path))
 surfix = sub('.*/.*.v7.','',name)
 f.df   = data.frame(path=paste0('db/',path),surfix)
 f.sig  = subset(f.df,surfix=='signif_variant_gene_pairs')$path
+#f.sig  = subset(f.df,surfix=='egenes')$path # 1:1 match of eGene and the most significant SNP
 f.sig  = as.character(unlist(f.sig))
 
 gte.li=list(); n=length(f.sig)
@@ -33,6 +34,7 @@ for(i in 1:n) {
 close(pb)
 gte.df = ldply(gte.li,data.frame) # plyr
 print(summary(data.frame(gte.df$pval_nominal)))
+#print(summary(data.frame(gte.df$pval_beta)))
 cat(paste0(' - GTEx table, rows= ',dim(gte.df)[1],' cols= ',dim(gte.df)[2],'\n'))
 cat(paste0(' - BED file read complete. ',pdtime(t0,2),'\n'))
 
