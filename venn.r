@@ -5,8 +5,9 @@
 # CMD command1: Rscript venn.r data/seedSNP_1817.bed data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
 # CMD command2: Rscript venn.r data/seedSNP_1817.bed data/snp_140_roadmap_encode.bed data/snp_26_core_tfbs.bed data/snp_745_gtex.bed
 args = commandArgs(trailingOnly=T)
-hmsg = 'Rscript regulome.r [SNP_BED_file_1] [SNP_BED_file_2] [SNP_BED_file_3] [...]
-  - Arguments [SNP_BED_file_1], [SNP_BED_file_2], and so on are needed.'
+hmsg = 'Rscript regulome.r [SNP_BED_file_1] [SNP_BED_file_2] [SNP_BED_file_3] or [SNP_BED_file_4]
+  - Arguments [SNP_BED_file_1], [SNP_BED_file_2], and [SNP_BED_file_3] are needed.
+  - Argument [SNP_BED_file_4] is optional.'
 n = length(args)
 if(n < 1) stop(hmsg)
 f.path = NULL
@@ -15,9 +16,9 @@ for(i in 1:n) {
 }
 
 # System parameter
-library(tools)
-library(limma)
-library(eulerr)
+suppressMessages(library(tools))
+suppressMessages(library(limma))
+suppressMessages(library(eulerr))
 source('src/pdtime.r')
 t0 = Sys.time()
 
@@ -50,19 +51,20 @@ union = as.data.frame(union)	# Make 'union' to data.frame from
 colnames(union) = subtitle			# Names attach to venn diagram
 
 # Draw Venn Diagram
-f.name1a= paste0('venn_',names[1],'_',names[2],'.png')
-f.name1 = paste0('fig/',f.name1a)
-title1 = paste0('Venn analysis of ',nrow(union),' SNPs')
-png(f.name1,width=10,height=10,units='in',res=100)
-vennDiagram(union[2:4], main=title1, circle.col=rainbow(length(subtitle))) # limma
-dev.off()
-cat(paste0('\nFigure draw: ',f.name1,'\n'))
+if(n>3) {
+	f.name1 = paste0('fig/venn_',names[1],'_',names[2],'.png')
+	title1 = paste0('Venn analysis of ',nrow(union),' SNPs')
+	png(f.name1,width=10,height=10,units='in',res=100)
+	vennDiagram(union, main=title1, circle.col=rainbow(length(subtitle))) # limma
+	dev.off()
+	cat(paste0('\nFigure draw: ',f.name1,'\n'))
+}
 
 # Write files
 colnames(union) = names
-union.df = cbind(union[2:4],ann=rownames(union))
+union.df = cbind(union,ann=rownames(union))
 union.out= merge(snp.li[[1]],union.df,by="ann")
-venn.li  = list(list=union.out, vennCounts=vennCounts(union[2:4]))
+venn.li  = list(list=union.out, vennCounts=vennCounts(union))
 f.name2  = paste0('data/venn.tsv')
 write.table(venn.li[[1]],f.name2,row.names=F,col.names=T,quote=F,sep='\t')
 cat(paste0('File write: ',f.name2,'\n'))
@@ -70,7 +72,7 @@ cat(paste0('File write: ',f.name2,'\n'))
 f.name3 = paste0('data/vennCounts.tsv')
 write.table(venn.li[[2]],f.name3,row.names=F,col.names=T,quote=F,sep='\t')
 cat(paste0('File write: ',f.name3,'\n'))
-f.name3a= paste0('fig/','euler_',names[1],'_',names[2],'.png')
+f.name3a= paste0('fig/euler_',names[1],'_',names[2],'.png')
 
 # Draw Euler plot
 if(n==3) {

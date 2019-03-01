@@ -185,7 +185,7 @@ To prioritize the SNPs, you can run `venn.r` as below `CMD` command line with th
 ### > venn.r
 
 ```CMD
-Rscript venn.r data/seedSNP_1817.bed data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
+Rscript venn.r data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
 ```
 
 The result files are generated as below:
@@ -196,7 +196,7 @@ The result files are generated as below:
 
 The result figure is generated as below:
 
-![Venn analysis of 1817 SNPs](./fig/venn_seedSNP_1817_snp_484_roadmap_dist.png)
+![Venn analysis of 1817 SNPs](./fig/euler_seedSNP_1817_snp_484_roadmap_dist.png)
 
 ## 5. GTEx eQTL data download and filter
 
@@ -265,7 +265,7 @@ To prioritize the eQTL SNPs among the 26 high-probability causal enhancer SNPs, 
 ### > venn.r
 
 ```CMD
-Rscript venn.r data/seedSNP_1817.bed data/snp_140_roadmap_encode.bed data/snp_26_core.bed data/snp_745_gtex.bed
+Rscript venn.r data/snp_140_roadmap_encode.bed data/snp_26_core.bed data/snp_745_gtex.bed
 ```
 
 The result files are generated as below:
@@ -276,7 +276,7 @@ The result files are generated as below:
 
 The result figure is generated as below:
 
-![](./fig/venn_seedSNP_1817_snp_140_roadmap_encode.png)
+![](./fig/euler_seedSNP_1817_snp_140_roadmap_encode.png)
 
 ### > src/gtex_overlap.r
 
@@ -429,11 +429,11 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 ### > venn.r
 
 ```CMD
-Rscript venn.r data/seedSNP_1817.bed data/snp_26_core.bed data/snp_74_gtex_enh.bed data/snp_78_lncrnasnp.bed
+Rscript venn.r data/snp_26_core_tfbs.bed data/snp_74_gtex_enh.bed data/snp_78_lncrnasnp.bed
 ```
 
 - `venn.tsv` > `venn_lncrnasnp.tsv`: binary SNP overlap table
 - `vennCounts.tsv` > `vennCounts_lncrnasnp.tsv`: overlapped SNP numbers
 - `snp_2_core.bed` > `snp_2_core_lncrnasnp.bed`: SNP `BED` format file
 
-![](fig/venn_seedSNP_1817_snp_26_core.png)
+![](fig/euler_snp_26_core_tfbs_snp_74_gtex_enh.png)
