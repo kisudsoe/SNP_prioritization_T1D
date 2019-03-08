@@ -22,22 +22,30 @@ To use the generated random SNP sets, you should sort the contents by using `bed
 $ bash random_startend.sh
 ```
 
+
+
+## 2. Achieving random distribution
+
+To archive the random distribution, you can use below R scripts and BASH commands:
+
+- `$ roadmap_random.sh`
+- `$ encode_random.sh`
+- `src/bedtools_closest_random.r`
+- `regulome_random.r`
+- `gtex_random.r`
+- `lncrnasnp_random.r`
+
 ### $ roadmap_random.sh
 
-To run iterations of `bedtools closest` function for **RoadMap enhancers** to the random SNP sets, you can use below `SHELL` script:
-
-- The `SHELL` script includes iterations of this code: `bedtools closest -d -a random/seeds/rsid1_sort.bed -b db/roadmap_enh_merge.bed > random/roadmap/roadmap_rsid1.tsv`
+The `SHELL` script includes iterations of this code: `bedtools closest -d -a random/seeds/rsid1_sort.bed -b db/roadmap_enh_merge.bed > random/roadmap/roadmap_rsid1.tsv`
 
 ```SHELL
 $ bash roadmap_random.sh
 ```
 
-### $ src/bedtools_closest_random.r
-
-To archive the random distribution, you can use `src/bedtools_closest_random.r` as below `CMD` command line:
+### > src/bedtools_closest_random.r
 
 ```CMD
-: Rscript src/bedtools_closest_random.r [roadmap/encode]
 > Rscript src/bedtools_closest_random.r roadmap
 ```
 
@@ -45,23 +53,36 @@ To archive the random distribution, you can use `src/bedtools_closest_random.r` 
 
 ### $ encode_random.sh
 
-To run iterations of `bedtools cloest` function for **Encode TFBS** to the random SNP sets, you can use below `SHELL` script:
-
 ```SHELL
 $ bash encode_random.sh
 ```
 
-To compile the random distribution, you can use `src/bedtools_closest_random.r` as below `CMD` command line:
+### > src/bedtools_closest_random.r
 
 ```CMD
-: Rscript src/bedtools_closest_random.r [roadmap/encode]
 > Rscript src/bedtools_closest_random.r encode
 ```
 
-### > ??
+### > regulome_random.r
+
+```CMD
+Rscript regulome_random.r db/RegulomeDB.dbSNP132.Category1.txt.rds db/RegulomeDB.dbSNP132.Category2.txt.rds
+```
+
+### > gtex_random.r
+
+```CMD
+Rscript gtex_random.r
+```
+
+### > lncrnasnp_random.r
+
+```CMD
+Rscript lncrnasnp_random.r
+```
 
 
 
-## 2. Monte Carlo simulation
+## 3. Monte Carlo simulation
 
-We used a Monte Carlo method to test for an enrichment for T1D SNPs occupied in enhancers. T1D SNPs were identified in 10,000 sets of 1,817 SNPs that were randomly selected from the [Single Nucleotide Polymorphism database](https://www.ncbi.nlm.nih.gov/projects/SNP/snp_summary.cgi) (dbSNP build 151, 10/06/2017). 
+We used a Monte Carlo method to test for an enrichment for T1D SNPs occupied in enhancers. T1D SNPs were identified in 10,000 sets of 1,817 SNPs that were randomly selected from the [Single Nucleotide Polymorphism database](https://www.ncbi.nlm.nih.gov/projects/SNP/snp_summary.cgi) (dbSNP build 151, 10/06/2017).
