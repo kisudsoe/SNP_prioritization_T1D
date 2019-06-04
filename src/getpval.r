@@ -1,8 +1,11 @@
-getpval = function(dist,mu,method='t.test') {
-    if(method=='t.test') pval = t.test(dist,mu=mu)$p.value
-    else if(method=='z.test') {
-        z.score = (mean(dist)-mu)/(var(dist)/sqrt(length(dist)))
-        pval = pnorm(abs(z.score),lower.tail=F)*2 # two-tailed
+suppressMessages(library(BSDA))
+getpval = function(dist,mu,method='t_test') {
+    if(method=='t_test') pval = t.test(dist,mu=mu)$p.value
+    else if(method=='z_test') {
+    	#z.score = (mu-mean(dist))/sd(dist)
+        #z.score = (mean(dist)-mu)/(var(dist)/sqrt(length(dist)))
+        #pval = pnorm(abs(z.score),lower.tail=F) # two-tailed
+        pval = z.test(x=dist,sigma.x=sd(dist),mu=mu)$p.value
     } else if(method=='approxfun') {
         d = density(dist)#; df = approxfun(d)
         pval = try(integrate(approxfun(d),lower=min(d$x),upper=mu)$value)
