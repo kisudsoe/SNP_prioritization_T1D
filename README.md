@@ -8,8 +8,9 @@ This is an protocol for prioritization of SNPs associated certain phenotype/dise
 
 ### > gwas.r
 
-To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research, pmid 27899670), you can [search certain disease](https://www.ebi.ac.uk/gwas/). In this study, we downloaded [SNP-sets for type 1 diabetes](https://www.ebi.ac.uk/gwas/efotraits/EFO_0001359). Then you can run R code file for filtering the GWAS Catalog data as below command line:
+To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research, pmid 27899670), you can [search certain disease](https://www.ebi.ac.uk/gwas/). In this study, we downloaded [SNP-sets for type 1 diabetes](https://www.ebi.ac.uk/gwas/efotraits/EFO_0001359). Then you can run R code file for filtering the GWAS Catalog data as below `CMD` command line:
 
+- Bellow functions are run under the windows or linux command console environment.
 - Instead of `[ ]`, you have to put the arguments `file path` or `value` by the options.
 - Usage: `Rscript gwas.r [GWAS_file_path] [p-value_criteria]`
 
