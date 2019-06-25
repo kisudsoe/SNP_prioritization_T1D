@@ -2,7 +2,7 @@
 # This file is for downloading gene location data from Ensembl biomaRt
 
 ## Command Arg Parameters ##
-# Rscript src/biomart_gene.r
+# Rscript src/biomart_gene_ann.r []
 args = commandArgs(trailingOnly=T)
 if(length(args)>0) stop('Rscript biomart_gene.r, no argument is needed.')
 

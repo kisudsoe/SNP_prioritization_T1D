@@ -32,9 +32,9 @@ snps_[,3] = snps_[,3]
 colnames(snps_) = c('rsid','chr','pos')
 snp_bed = merge(snps,snps_,by='rsid',all.x=TRUE)
 snp_bed_= data.frame(
-	chr  =snp_bed$chr
-	start=as.numeric(as.character(snp_bed$pos))-1
-	end  =snp_bed$pos
+	chr  =snp_bed$chr,
+	start=as.numeric(as.character(snp_bed$pos))-1,
+	end  =snp_bed$pos,
 	rsid =snp_bed$rsid
 )
 

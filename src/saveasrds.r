@@ -13,6 +13,7 @@ saveasrds = function(f_paths) {
         }
     })
     df = rbindlist(df.li) # data.table
+    if(n==1) f_path = f_paths
     f_name = paste0(f_path,'.rds')
     saveRDS(df,file=f_name)
     cat(paste0('>> File write: ',f_name,'\n'))
