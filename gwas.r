@@ -32,13 +32,14 @@ if(!is.na(path)) {
     snp_   = subset(snp,`P.VALUE`<pval)
     cat(paste0('  - Subset;   rows= ',dim(snp_)[1],', cols= ',dim(snp_)[2],'\n'))
     coord  = paste0('chr',snp_$`CHR_ID`,':',snp_$`CHR_POS`); head(coord)
-    snp_df = data.frame(rsid=snp_$`SNPS`,coord=coord,pval=snp_$`P.VALUE`)
+    snp_df = data.frame(rsid=snp_$`SNPS`,coord=coord,pval=snp_$`P.VALUE`,cytoband=snp_$`REGION`)
     snp_df = unique(snp_df)
     snp_n  = length(unique(snp_df$rsid))
     cat(paste0('  - IDs (p < 5e-8)= ',snp_n,'\n\n'))
     
-    write.table(snp_df,paste0('data/gwas_',pval,'_',snp_n,'.tsv'),
-                sep='\t',quote=F,row.names=F) #,col.names=F
+    f_name = paste0('data/gwas_',pval,'_',snp_n,'.tsv')
+    write.table(snp_df,f_name,sep='\t',quote=F,row.names=F) #,col.names=F
+    cat(paste0(' >> Write tsv file: ',f_name,' <<\n'))
     cat(paste0(pdtime(t0,1),'\n'))
 } else { print("path parameter doesn't exist.") }
 ##################
