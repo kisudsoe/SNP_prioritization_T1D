@@ -100,9 +100,9 @@ To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestr
 
 - `data/roadmap_dist_df.tsv` file is obtained that is for enhancer annotated file .
 - `data/snp_484_roadmap_dist.bed` file is obtained that is for `BED` format file for USCS browser.
+- Usage: `Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]`
 
 ```CMD
-::Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]
 Rscript src/bedtools_closest_roadmap.r data/roadmap_dist.tsv
 ```
 
@@ -119,6 +119,24 @@ bedtools sort -i db/roadmap_enh.bed | bedtools closest -d -a data/seedSNP_1817.b
 ## 3. ENCODE ChIP-seq data download and filter
 
 The **ENCODE ChIP-seq** for regulatory transcription factor binding site (Reg-TFBS) cluster data can downloaded <u>wgEncodeRegTfbsClusteredV3</u> data from [UCSC FTP](http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/) (68 MB) or [bioconductor `data("wgEncodeTfbsV3")`](https://www.bioconductor.org/packages/devel/bioc/vignettes/ChIPpeakAnno/inst/doc/ChIPpeakAnno.html). Here, we assume having downloaded UCSC FTP file `wgEncodeRegTfbsClusteredV3.bed.gz` (81 MB).
+
+```CMD
+Rsciprt encode_dn.r
+-----
+Warning messages:
+1: package 'data.table' was built under R version 3.5.2
+2: package 'GenomeInfoDb' was built under R version 3.5.2
+Directory generated: db/encode/
+trying URL 'http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredV3.bed.gz'
+Content type 'application/x-gzip' length 84986946 bytes (81.0 MB)
+==================================================
+downloaded 81.0 MB
+
+
+>> db/encode/wgEncodeRegTfbsClusteredV3.bed.gz
+
+>> Job done for 1.8 min
+```
 
 ### $ bedtools merge | bedtools closest
 
@@ -137,9 +155,9 @@ To prioritize ENCODE Reg-TFBS occupied SNPs, you can run `src/bedtools_closestro
 
 - `data/roadmap_dist_df.tsv` file is obtained that is for enhancer annotated file .
 - `data/snp_enh_484.bed` file is obtained that is for `BED` format file for USCS browser.
+- Usage: `Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]`
 
 ```CMD
-::Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]
 Rscript src/bedtools_closest_roadmap.r data/encode_dist.tsv
 ```
 
@@ -152,6 +170,31 @@ The [**RegulomeDB**](http://www.regulomedb.org/index) provides [category scores 
 - `RegulomeDB.dbSNP132.Category1.txt.gz` (2 MB)
 - `RegulomeDB.dbSNP132.Category2.txt.gz` (39.3 MB)
 - Or you can download total dataset: `RegulomeDB.dbSNP141.txt.gz` (2.8 GB)
+
+```CMD
+Rscript regulome_dn.r
+-----
+Warning messages:
+1: package 'data.table' was built under R version 3.5.2
+2: package 'GenomeInfoDb' was built under R version 3.5.2
+Directory generated: db/regulome/
+Warning message:
+In dir.create(file.path(dir)) : 'db\regulome' already exists
+trying URL 'http://www.regulomedb.org/downloads/RegulomeDB.dbSNP132.Category1.txt.gz'
+Content type 'application/gzip' length 2096454 bytes (2.0 MB)
+==================================================
+downloaded 2.0 MB
+
+trying URL 'http://www.regulomedb.org/downloads/RegulomeDB.dbSNP132.Category2.txt.gz'
+Content type 'application/gzip' length 41253483 bytes (39.3 MB)
+==================================================
+downloaded 39.3 MB
+
+>> Job process: 52.2 sec
+>> File write: db/regulome/RegulomeDB.dbSNP132.Category1.txt.gz.rds
+>> File write: db/regulome/RegulomeDB.dbSNP132.Category2.txt.gz.rds
+>> Job done for 1.2 min
+```
 
 Here we converted the download files to RDS format files to achieve fast loading speed. Use the RegulomeDB RDS files, you can filter and analyze the dataset by using `regulome.r` as following command line:
 
@@ -215,7 +258,82 @@ And we need SNP annotations to achieve Rsid for GTEx ids.
 
 ```CMD
 Rscript gtex_dn.r
+-----
+(1/2) Download eQTL data
+trying URL 'https://storage.googleapis.com/gtex_analysis_v7/single_tissue_eqtl_data/GTEx_Analysis_v7_eQTL.tar.gz'
+Content type 'application/x-tar' length 959746583 bytes (915.3 MB)
+==================================================
+downloaded 915.3 MB
+
+File write: db/gtex_files.txt
+
+(2/2) Download SNPid annotation file
+trying URL 'https://storage.googleapis.com/gtex_analysis_v7/reference/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.lookup_table.txt.gz'
+Content type 'application/gzip' length 461926948 bytes (440.5 MB)
+==================================================
+downloaded 440.5 MB
+
+>> Job done for 1.2 min
+```
+
+`> 50 min` The downloaded files were converted to RDS files.
+
+```CMD
+Rscript gtex_rds.r
+-----
+Warning message:
+package 'plyr' was built under R version 3.5.3
+
+ - Loading GTEx BED files
+ - File reading...
+  (1/48) Adipose_Subcutaneous
+  ...
+  (48/48) Whole_Blood
+NULL
+ gte.df.pval_nominal
+ Min.   :0.000e+00
+ 1st Qu.:0.000e+00
+ Median :1.111e-07
+ Mean   :7.398e-06
+ 3rd Qu.:5.219e-06
+ Max.   :8.005e-04
+ - GTEx table, rows= 36781356 cols= 13
+ - BED file read complete. Job process: 9.3 min
+ - Loading annotation file - Annotation file read complete. Job process: 35.5 min
+ - Annotation file, rows= 40738696 cols= 7
+ - GTEx annotation, rows= 36781356 cols= 9
+ > Job process: 50.7 min
+ - Saving as RDS file.. > Job process: 52 min
+
+ Job done for 52 min
+```
+
+To filter the GTEx data by p <5e-08, I executed following code:
+
+```CMD
 Rscript gtex_filt.r 5e-08
+-----
+p-value threshold = 5e-08
+Warning message:
+package 'plyr' was built under R version 3.5.3
+
+(1/3) Loading GTEx RDS file
+ - GTEx table, rows= 36781356 cols= 9
+ - BED file read complete. Job process: 53.3 sec
+
+(2/3) Filtering by nominal p-value
+ gte.sig.pval_nominal
+ Min.   :0.000e+00
+ 1st Qu.:0.000e+00
+ Median :3.120e-12
+ Mean   :3.897e-09
+ 3rd Qu.:1.429e-09
+ Max.   :5.000e-08
+ - GTEx significant, rows= 17113536 cols= 9
+ - Job process: 1.1 min
+
+>> File write: db/gtex_signif.tsv
+>> Job done for 3.8 min
 ```
 
 The result file size are huge and the process takes long time (~50 min)
@@ -228,9 +346,7 @@ To identify T1D SNPs
 
 ```CMD
 > Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif_5e-8.tsv.gz
-```
-
-```CMD
+-----
 Input SNPs number = 1,817
 
 (1/3) Loading GTEx significant file
@@ -303,6 +419,10 @@ To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r
 >> File write: data/snp_74_gtex_enh.bed
 ```
 
+
+
+## 5-1. Nearest gene approach
+
 ### downloading Ensembl gene location data
 
 To identify nearest genes from the eQTL SNPs, firstly you need to download gene location data from Ensembl database biomart (version=Grch37). 
@@ -337,12 +457,11 @@ $ bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/snp_745_gte
 
 To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestroadmap.r` as below `CMD` command line:
 
-```CMD
-::Rscript src/bedtools_closest_gtex.r [bedtools_closest_result_file_path]
-> Rscript src/bedtools_closest_gtex.r data/seedSNP_nearest.tsv
-```
+- Usage: `Rscript src/bedtools_closest_gtex.r [bedtools_closest_result_file_path]`
 
 ```CMD
+> Rscript src/bedtools_closest_gtex.r data/seedSNP_nearest.tsv
+-----
 Row number = 2114
 T1D SNPs = 1817
 Nearest genes = 175
@@ -351,9 +470,7 @@ Nearest genes = 175
 
 ```CMD
 > Rscript src/bedtools_closest_gtex.r data/gtex_nearest.tsv
-```
-
-```CMD
+-----
 Row number = 788
 T1D SNPs = 745
 Nearest genes = 113
@@ -366,9 +483,7 @@ To identify the eQTL SNPs occupied on TFBS binding enhancers, you can run `src/g
 
 ```CMD
 > Rscript src/gtex_overlap.r
-```
-
-```CMD
+-----
 (1/2) Read files..
   - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
   - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
@@ -397,10 +512,37 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 - `Rscript lncrnasnp.r [SNP_BED_file_path] [lncRNAsnp2_SNP_list_file_path] [lncRNAsnp2_lncRNA_list_file_path] [lncRNAsnp2_diseases_list_file_path]`
 
 ```CMD
-> Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.rds db/lncrnas.txt.rds db/lncrna-diseases_experiment.txt.rds
+Rscript lncrnasnp_dn.r
+-----
+1: package 'data.table' was built under R version 3.5.2
+2: package 'GenomeInfoDb' was built under R version 3.5.2
+trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/snps_mod.txt'
+Content type 'text/plain; charset=GBK' length 477785336 bytes (455.7 MB)
+==================================================
+downloaded 455.7 MB
+
+trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncrnas.txt'
+Content type 'text/plain; charset=GBK' length 7005411 bytes (6.7 MB)
+==================================================
+downloaded 6.7 MB
+
+trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncRNA_associated_disease_experiment.txt'
+Content type 'text/plain; charset=GBK' length 31542 bytes (30 KB)
+==================================================
+downloaded 30 KB
+
+>> Job process: 1.4 min
+>> File write: db/lncRNASNP2_snplist.txt.rds
+>> File write: db/lncrnas.txt.rds
+>> File write: db/lncrna-diseases_experiment.txt.rds
+>> Job done for 2.2 min
 ```
 
-```ouput
+To identify lncRNA overlapped longevity SNPs:
+
+```CMD
+> Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.rds db/lncrnas.txt.rds db/lncrna-diseases_experiment.txt.rds
+-----
 (1/3) Read files..
   - data/seedSNP_1817.bed; Job process: 0 sec
   - db/lncRNASNP2_snplist.txt.rds; Job process: 16 sec
