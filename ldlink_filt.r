@@ -4,11 +4,18 @@
 ## Command Arg Parameters ##
 # ldlink.bat; Rscript ldlink_filt.r data/gwas_5e-08_129.tsv db/ldlink
 args = commandArgs(trailingOnly=T)
-hmsg = 'Rscript ldlink_filt.r [SNP_file_path] [LDlink_download_target_dir]
-  - Arguments [SNP_file_path] and [LDlink_download_target_dir] are mendatory.'
-if(length(args)<2|length(args)>2) stop(hmsg)
-snp.path = unlist(args[1])
-ld.path = unlist(args[2])
+hmsg = 'Rscript ldlink_filt.r [SNP_file_path] [LDlink_download_target_dir] [LDlink_filter_option]
+  - Argument [SNP_file_path] is a mendatory for indicating root GWAS data file path.
+  - Argument [LDlink_download_target_dir] is a mendatory for indicating LDlink data folder path.
+  - Argument [LDlink_filter_option] is a mendatory. Choose one of the following option numbers.
+    1) "r2>0.6 or Dprime=1": This is usual choice to get LD associated SNPs.
+    2) "r2>0.6"
+    3) "Dprime=1"
+    4) "r2>0.6 and Dprime=1": This is the most stringent criteria.'
+if(length(args)<3|length(args)>3) stop(hmsg)
+snp_path    = unlist(args[1])
+ld_path     = unlist(args[2])
+filt_option = unlist(args[3])
 
 # System parameter
 library(plyr)
@@ -18,11 +25,11 @@ t0 = Sys.time()
 #########################
 ## Function start here ##
 #########################
-snpdf = unique(read.delim(snp.path)[,1:2]) # rsid, coord
+snpdf = unique(read.delim(snp_path)[,1:2]) # rsid, coord
 snpids = snpdf$rsid
 cat(paste0('Input SNP list number = ',length(snpids),'\n\n'))
 
-ldlink = unlist(lapply(snpids, function(x) { paste0(ld.path,'/',x,'.tsv') }))
+ldlink = unlist(lapply(snpids, function(x) { paste0(ld_path,'/',x,'.tsv') }))
 snptb  = data.frame(snpids=snpids, ldlink=ldlink)
 
 n=nrow(snptb); ldlink.li=NULL # List variable for ldlink data
@@ -42,10 +49,24 @@ for(i in 1:n) {
 }
 close(pb)
 ldlink.df= ldply(ldlink.li, data.frame) # plyr
-ldlink_1 = subset(ldlink.df,R2>0.6 & Dprime==1)
-ldlink_2 = unique(data.frame(gwasSNPs=ldlink_1$`SNPid`,
-                             ldSNPs  =ldlink_1$`RS_Number`))
-                             #coord   =ldlink_1$`Coord`))
+if(filt_option==1) {
+	cat('Filtering option, r2 > 0.6 or Dprime = 1 was chosen.\n')
+	ldlink_1 = subset(ldlink.df,R2>0.6 | Dprime==1) # r2 > 0.6 or D' = 1
+} else if(filt_option==2) {
+	cat('Filtering option, r2 > 0.6 was chosen.\n')
+	ldlink_1 = subset(ldlink.df,R2>0.6) # r2 > 0.6
+} else if(filt_option==3) {
+	cat('Filtering option, Dprime = 1 was chosen.\n')
+	ldlink_1 = subset(ldlink.df,Dprime==1) # D' = 1
+} else if(filt_option==4) {
+	cat('Filtering option, r2 > 0.6 and Dprime = 1 was chosen.\n')
+	ldlink_1 = subset(ldlink.df,R2>0.6 & Dprime==1) # r2 > 0.6 and D' = 1
+}
+ldlink_2 = unique(data.frame(
+	gwasSNPs=ldlink_1$`SNPid`,
+    ldSNPs  =ldlink_1$`RS_Number`
+    #coord   =ldlink_1$`Coord`
+))
 ldlink_ = ldlink_2[!ldlink_2$`ldSNPs` %in% c("."),] # Exclude no rsid elements
 ex = nrow(ldlink_2[ldlink_2$`ldSNPs` %in% c("."),])
 cat(paste0('::Expluded no rsid elements = ',ex,'\n'))
@@ -79,7 +100,7 @@ snp_bed = data.frame(chr  =coord.df$chr,
 	                 start=start,
 	                 end  =coord.df$pos,
 	                 rsid =snp.seed_$ldSNPs)
-unique(snp_bed)
+snp_bed = unique(snp_bed)
 cat(paste0('Table, rows= ',dim(snp_bed)[1],' cols= ',dim(snp_bed)[2],'\n'))
 f.name2 = paste0('data/seedSNP_',n2,'.bed')
 write.table(snp_bed,f.name2,row.names=F,col.names=F,quote=F,sep='\t')
