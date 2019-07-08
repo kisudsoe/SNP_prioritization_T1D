@@ -82,6 +82,14 @@ To filter the RoadMap data by **Enhancers**, you can run `roadmap_filt.r` as bel
 Rscript roadmap_filt.r
 ```
 
+### Q2. If you have memory problem..
+
+When running the `roadmap_filt.r` function, it stop with not enough memory error, You can use `roadmap_filt_dtr.r` function for limited memory usage (~3.8 GB).
+
+```CMD
+Rscript roadmap_filt_dtr.r
+```
+
 ### $ bedtools merge/ bedtools closest
 
 To avoid multiple count of enhancers as well as to reduce file size and to achieve faster process, merge RoadMap enhancer information using a `BASH` tool `bedtools`. Here is the `BASH` pipeline for `bedtools sort` and `bedtools merge`. Then, to identify T1D SNPs occupied in RoadMap enhancers, you can use `BASH` tool `bedtools intersect` as below code:
@@ -106,7 +114,7 @@ To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestr
 Rscript src/bedtools_closest_roadmap.r data/roadmap_dist.tsv
 ```
 
-### Q2. How about just use not merged roadmap_enh.bed file?
+### Q3. How about just use not merged roadmap_enh.bed file?
 
 Instead of merge file, when you use original `db/roadmap_enh.bed` file, you can find a lot of duplicated enhancers regions.
 
