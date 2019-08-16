@@ -1,0 +1,3 @@
+codes3d.py -i seedSNP_1817_rsid.txt -l
+
+produce_summary.py -e eqtls.txt

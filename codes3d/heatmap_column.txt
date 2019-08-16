@@ -1,0 +1,52 @@
+Adipose_1	Adipose - Subcutaneous
+Adipose_2	Adipose - Visceral (Omentum)
+Adrenal_Gland	Adrenal Gland
+Artery_1	Artery - Aorta
+Artery_2	Artery - Coronary
+Artery_3	Artery - Tibial
+Bladder	Bladder
+Brain_1	Brain - Amygdala
+Brain_2	Brain - Anterior cingulate cortex (BA24)
+Brain_3	Brain - Caudate (basal ganglia)
+Brain_4	Brain - Cerebellar Hemisphere
+Brain_5	Brain - Cerebellum
+Brain_6	Brain - Cortex
+Brain_7	Brain - Frontal Cortex (BA9)
+Brain_8	Brain - Hippocampus
+Brain_9	Brain - Hypothalamus
+Brain_10	Brain - Nucleus accumbens (basal ganglia)
+Brain_11	Brain - Putamen (basal ganglia)
+Brain_12	Brain - Spinal cord (cervical c-1)
+Brain_13	Brain - Substantia nigra
+Breast	Breast - Mammary Tissue
+Cells_1	Cells - EBV-transformed lymphocytes
+Cells_2	Cells - Transformed fibroblasts
+Cervix_1	Cervix - Ectocervix
+Cervix_2	Cervix - Endocervix
+Colon_1	Colon - Sigmoid
+Colon_2	Colon - Transverse
+Esophagus_1	Esophagus - Gastroesophageal Junction
+Esophagus_2	Esophagus - Mucosa
+Esophagus_3	Esophagus - Muscularis
+Fallopian_Tube	Fallopian Tube
+Heart_1	Heart - Atrial Appendage
+Heart_2	Heart - Left Ventricle
+Kidney	Kidney - Cortex
+Liver	Liver
+Lung	Lung
+Salivary_Gland	Minor Salivary Gland
+Muscle	Muscle - Skeletal
+Nerve	Nerve - Tibial
+Ovary	Ovary
+Pancreas	Pancreas
+Pituitary	Pituitary
+Prostate	Prostate
+Skin_1	Skin - Not Sun Exposed (Suprapubic)
+Skin_2	Skin - Sun Exposed (Lower leg)
+Small_Intestine	Small Intestine - Terminal Ileum
+Spleen	Spleen
+Stomach	Stomach
+Testis	Testis
+Thyroid	Thyroid
+Uterus	Uterus
+Vagina	Vagina
