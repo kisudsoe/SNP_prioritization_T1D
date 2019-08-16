@@ -29,21 +29,69 @@ To download **LDlink data** (version 3.3.0 12/24/2018) (Machiela et al, 2015, Bi
 python ldlink_dn.py data/gwas_5e-08_129.tsv
 ```
 
+> ...
+> 129/129 = rs11580078
+>   status_code = 200
+>   line number = 950
+>   file saved = db/ldlink/rs11580078.tsv
+>
+> Download process completed.
+> Job time= 00:42:49
+
 To filter the LDlink data by statistical criteria, both r<sup>2</sup> >0.6 and D'=1, you can run `T1D_ldlink.r` as below `CMD` command line:
 
-- Usage: `Rscript ldlink.r [SNP_file_path.txt] [LDlink_data_folder_path]`
+- Usage: `Rscript ldlink.r [SNP_file_path.txt] [LDlink_data_folder_path] [LDlink_filter_option]`
+- The `LDlink_filter_option` is a mandatory. Choose one of the following option numbers.
+  1. `r2>0.6 or Dprime=1`
+  2. `r2>0.6`
+  3. `Dprime=1`
+  4. `r2>0.6 and Dprime=1`
 
 ```CMD
-Rscript ldlink_filt.r data/gwas_5e-08_129.tsv db/ldlink
+Rscript ldlink_filt.r data/gwas_5e-08_129.tsv db/ldlink 2
 ```
+
+> Input SNP list number = 129
+>
+> Error in read.table(as.character(snptb[i, 2]), header = T) :
+>   more columns than column names
+> In addition: Warning message:
+> In read.table(as.character(snptb[i, 2]), header = T) :
+>   incomplete final line found by readTableHeader on 'db/ldlink/rs75793288.tsv'
+> NULL
+> Filtering option, r2 > 0.6 was chosen.
+> ::Expluded no rsid elements = 31
+>
+> 1/3. Numbers of SNPs
+> SNP Tier1 = 129
+> SNP Tier2 = 5116
+> SNP seed  = 5245
+>
+> 2/3. Generation of a result TSV file
+> File write: data/seedSNP_5245_ldlink.tsv
+>
+> 3/3. Generation of a result BED file
+> Table, rows= 5245 cols= 4
+> File write: data/seedSNP_5245.bed
+> Job done for 7.9 sec
+
+* `data/seedSNP_5245_ldlink.tsv` -> **Supplementary Table 1** and **Supplementary Table 2**
 
 ### Q1. Generation of private SNP list (rsids) to BED file format?
 
 To use bedtools later, you have to prepare SNP list as [bed format](https://genome.ucsc.edu/FAQ/FAQformat.html). If you have simple dbSNP rsid list, you can run `src/biomart_snp.r` for generate bed file. But you should check `NA` values and fill it manually.
 
 ```CMD
-Rscript src/biomart_snp.r [rsid_list_file_path]
+#Rscript src/biomart_snp.r [rsid_list_file_path]
+Rscript src/biomart_snp.r data/seedSNP_5245_biomart.txt
 ```
+
+> Input contents, rows= 5244 cols= 1
+> Table, rows= 10280 cols= 4
+>
+> Job done for 12.7 sec
+
+**[IMPORTANT]** Before you move to next step, we make sure that your `seedSNP_#.bed` file has no NA values.
 
 
 
@@ -96,10 +144,11 @@ To avoid multiple count of enhancers as well as to reduce file size and to achie
 
 - Compressed file size of `roadmap_enh.bed.gz` is >139 MB.
 - Compressed file size of `roadmap_enh_merer.bed.gz` is about 3.7 MB.
+- Removing NA values, `data/seedSNP_5245_bm.bed` file is updated version from the `data/seedSNP_5245.bed` file.
 
 ```SHELL
 bedtools sort -i db/roadmap_enh.bed | bedtools merge -i stdin -c 1 -o count > db/roadmap_enh_merge.bed
-bedtools closest -d -a data/seedSNP_1817.bed -b db/roadmap_enh_merge.bed > data/roadmap_dist.tsv
+bedtools sort -i data/seedSNP_5245_bm.bed | bedtools closest -d -a stdin -b db/roadmap_enh_merge.bed > data/roadmap_dist.tsv
 ```
 
 ### > src/bedtools_closest.r
@@ -108,11 +157,22 @@ To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestr
 
 - `data/roadmap_dist_df.tsv` file is obtained that is for enhancer annotated file .
 - `data/snp_484_roadmap_dist.bed` file is obtained that is for `BED` format file for USCS browser.
-- Usage: `Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]`
+- Usage: `Rscript src/bedtools_closest.r [bedtools_closest_result_file_path] [double_line_result]`
 
 ```CMD
-Rscript src/bedtools_closest_roadmap.r data/roadmap_dist.tsv
+Rscript src/bedtools_closest.r data/roadmap_dist.tsv False
 ```
+
+> Row number = 5245
+> Enhancer occupied by SNPs = 589
+> SNPs in RoadMap enhancers = 1688
+>
+> File write: data/roadmap_dist_df.tsv
+> File write: data/snp_1688_roadmap_dist.bed
+>
+> Job done for 0.2 sec
+
+* `data/roadmap_dist_df.tsv` -> **Supplementary Table 2**
 
 ### Q3. How about just use not merged roadmap_enh.bed file?
 
@@ -130,21 +190,17 @@ The **ENCODE ChIP-seq** for regulatory transcription factor binding site (Reg-TF
 
 ```CMD
 Rsciprt encode_dn.r
------
-Warning messages:
-1: package 'data.table' was built under R version 3.5.2
-2: package 'GenomeInfoDb' was built under R version 3.5.2
-Directory generated: db/encode/
-trying URL 'http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredV3.bed.gz'
-Content type 'application/x-gzip' length 84986946 bytes (81.0 MB)
-==================================================
-downloaded 81.0 MB
-
-
->> db/encode/wgEncodeRegTfbsClusteredV3.bed.gz
-
->> Job done for 1.8 min
 ```
+
+> Directory generated: db/encode/
+> trying URL 'http://hgdownload.cse.ucsc.edu/goldenpath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredV3.bed.gz'
+> Content type 'application/x-gzip' length 84986946 bytes (81.0 MB)
+>
+> downloaded 81.0 MB
+>
+> db/encode/wgEncodeRegTfbsClusteredV3.bed.gz
+>
+> Job done for 1.8 min
 
 ### $ bedtools merge | bedtools closest
 
@@ -154,7 +210,7 @@ To identify TFBS occupied SNPs, you can use `bedtools merge` and `bedtools close
 
 ```SHELL
 bedtools merge -i db/wgEncodeRegTfbsClusteredV3.bed.gz -c 1 -o count > db/encode_tfbs_merge.bed
-bedtools closest -d -a data/seedSNP_1817.bed -b db/encode_tfbs_merge.bed > data/encode_dist.tsv
+bedtools sort -i data/seedSNP_5245_bm.bed | bedtools closest -d -a stdin -b db/encode_tfbs_merge.bed > data/encode_dist.tsv
 ```
 
 ### > src/bedtools_closest.r
@@ -163,11 +219,22 @@ To prioritize ENCODE Reg-TFBS occupied SNPs, you can run `src/bedtools_closestro
 
 - `data/roadmap_dist_df.tsv` file is obtained that is for enhancer annotated file .
 - `data/snp_enh_484.bed` file is obtained that is for `BED` format file for USCS browser.
-- Usage: `Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path]`
+- Usage: `Rscript src/bedtools_closest_roadmap.r [bedtools_closest_result_file_path] [double_line_result]`
 
 ```CMD
-Rscript src/bedtools_closest_roadmap.r data/encode_dist.tsv
+Rscript src/bedtools_closest.r data/encode_dist.tsv False
 ```
+
+> Row number = 5245
+> Enhancer occupied by SNPs = 653
+> SNPs in RoadMap enhancers = 1253
+>
+> File write: data/encode_dist_df.tsv
+> File write: data/snp_1253_encode_dist.bed
+>
+> Job done for 0.2 sec
+
+* `data/encode_dist_df.tsv` -> **Supplementary Table 2**
 
 
 
@@ -181,39 +248,54 @@ The [**RegulomeDB**](http://www.regulomedb.org/index) provides [category scores 
 
 ```CMD
 Rscript regulome_dn.r
------
-Warning messages:
-1: package 'data.table' was built under R version 3.5.2
-2: package 'GenomeInfoDb' was built under R version 3.5.2
-Directory generated: db/regulome/
-Warning message:
-In dir.create(file.path(dir)) : 'db\regulome' already exists
-trying URL 'http://www.regulomedb.org/downloads/RegulomeDB.dbSNP132.Category1.txt.gz'
-Content type 'application/gzip' length 2096454 bytes (2.0 MB)
-==================================================
-downloaded 2.0 MB
-
-trying URL 'http://www.regulomedb.org/downloads/RegulomeDB.dbSNP132.Category2.txt.gz'
-Content type 'application/gzip' length 41253483 bytes (39.3 MB)
-==================================================
-downloaded 39.3 MB
-
->> Job process: 52.2 sec
->> File write: db/regulome/RegulomeDB.dbSNP132.Category1.txt.gz.rds
->> File write: db/regulome/RegulomeDB.dbSNP132.Category2.txt.gz.rds
->> Job done for 1.2 min
 ```
+
+> In dir.create(file.path(dir)) : 'db\regulome' already exists
+> trying URL 'http://www.regulomedb.org/downloads/RegulomeDB.dbSNP132.Category1.txt.gz'
+> Content type 'application/gzip' length 2096454 bytes (2.0 MB)
+>
+> downloaded 2.0 MB
+>
+> trying URL 'http://www.regulomedb.org/downloads/RegulomeDB.dbSNP132.Category2.txt.gz'
+> Content type 'application/gzip' length 41253483 bytes (39.3 MB)
+>
+> downloaded 39.3 MB
+>
+> Job process: 52.2 sec
+> File write: db/regulome/RegulomeDB.dbSNP132.Category1.txt.gz.rds
+> File write: db/regulome/RegulomeDB.dbSNP132.Category2.txt.gz.rds
+> Job done for 1.2 min
 
 Here we converted the download files to RDS format files to achieve fast loading speed. Use the RegulomeDB RDS files, you can filter and analyze the dataset by using `regulome.r` as following command line:
 
 ```CMD
-Rscript regulome.r data/seedSNP_1817_ldlink.tsv db/RegulomeDB.dbSNP132.Category1.txt.rds db/RegulomeDB.dbSNP132.Category2.txt.rds
+Rscript regulome.r data/seedSNP_5245_bm.bed db/RegulomeDB.dbSNP132.Category1.txt.rds db/RegulomeDB.dbSNP132.Category2.txt.rds
 ```
+
+> Input SNPs number = 5245
+> Input regulome files = 2
+>
+> Read input file 1: db/RegulomeDB.dbSNP132.Category1.txt.rds
+> Table row = 39432, col = 5
+> Job process: 0.3 sec
+>
+> Read input file 2: db/RegulomeDB.dbSNP132.Category2.txt.rds
+> Table row = 407796, col = 5
+> Job process: 6.1 sec
+>
+> Regulome score >=2b, SNPs = 430528
+> Functional motifs (1f_only-2b) = 395823
+>   - Regulome >=2b SNPs = 301
+>   - SNPs with functional motifs (1f_only-2b) = 138
+>
+> File write: data/regulome_301.tsv
+> File write: data/snp_301_regulome2b.bed
+> Job done: 2019-08-15 17:43:22 for 6.4 sec
 
 The result files are save at `data/` folder:
 
-- `data/regulome_#.tsv`
-- `data/snp_#_regulome2b.bed`
+- `data/regulome_301.tsv` -> **Supplementary Table 2**
+- `data/snp_301_regulome2b.bed`
 
 
 
@@ -229,26 +311,37 @@ BiocManager::install("limma", version = "3.8")
 
 To prioritize the SNPs, you can run `venn.r` as below `CMD` command line with these files:
 
-- `data/seedSNP_1817.bed`
-- `data/snp_484_roadmap_dist.bed`
-- `data/snp_364_encode_dist.bed`
-- `data/snp_94_regulome2b.bed`
+- `data/snp_1688_roadmap_dist.bed`
+- `data/snp_1253_encode_dist.bed`
+- `data/snp_301_regulome2b.bed`
 
 ### > venn.r
 
 ```CMD
-Rscript venn.r data/snp_484_roadmap_dist.bed data/snp_364_encode_dist.bed data/snp_94_regulome2b.bed
+Rscript venn.r data/snp_1688_roadmap_dist.bed data/snp_1253_encode_dist.bed data/snp_301_regulome2b.bed
 ```
+
+> [1] "snp_1688_roadmap_dist"
+> [1] "snp_1253_encode_dist"
+> [1] "snp_301_regulome2b"
+> File write: data/venn.tsv
+> File write: data/vennCounts.tsv
+>
+> Euler fit is done.
+> Figure draw: fig/euler_snp_1688_roadmap_dist_snp_1253_encode_dist.png
+> File write: data/snp_79_core.bed
+>
+> Job done for 0.5 sec
 
 The result files are generated as below:
 
 - `venn_tfbs.tsv`: binary SNP overlap table
 - `vennCounts_tfbs.tsv`: overlapped SNP numbers
-- `snp_#_core.bed`
+- `snp_79_core.bed`
 
 The result figure is generated as below:
 
-![Venn analysis of 1817 SNPs](./fig/euler_seedSNP_1817_snp_484_roadmap_dist.png)
+![Venn analysis of 1817 SNPs](./fig/euler_snp_1688_roadmap_dist_snp_1253_encode_dist.png)
 
 ## 5. GTEx eQTL data download and filter
 
@@ -262,170 +355,150 @@ And we need SNP annotations to achieve Rsid for GTEx ids.
 - `db/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.lookup_table.txt.gz` (440 MB)
 - [Nominal p-values](https://gtexportal.org/home/documentationPage) from GTEx data were generated for each variant-gene pair by testing the alternative hypothesis that the slope of a linear regression model between genotype and expression deviates from 0.
 
-### > gtex_dn.r | gtex_filt.r
+### > gtex_dn.r [and] gtex_filt.r
 
 ```CMD
 Rscript gtex_dn.r
------
-(1/2) Download eQTL data
-trying URL 'https://storage.googleapis.com/gtex_analysis_v7/single_tissue_eqtl_data/GTEx_Analysis_v7_eQTL.tar.gz'
-Content type 'application/x-tar' length 959746583 bytes (915.3 MB)
-==================================================
-downloaded 915.3 MB
-
-File write: db/gtex_files.txt
-
-(2/2) Download SNPid annotation file
-trying URL 'https://storage.googleapis.com/gtex_analysis_v7/reference/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.lookup_table.txt.gz'
-Content type 'application/gzip' length 461926948 bytes (440.5 MB)
-==================================================
-downloaded 440.5 MB
-
->> Job done for 1.2 min
 ```
+
+> (1/2) Download eQTL data
+> trying URL 'https://storage.googleapis.com/gtex_analysis_v7/single_tissue_eqtl_data/GTEx_Analysis_v7_eQTL.tar.gz'
+> Content type 'application/x-tar' length 959746583 bytes (915.3 MB)
+>
+> downloaded 915.3 MB
+>
+> File write: db/gtex_files.txt
+>
+> (2/2) Download SNPid annotation file
+> trying URL 'https://storage.googleapis.com/gtex_analysis_v7/reference/GTEx_Analysis_2016-01-15_v7_WholeGenomeSeq_635Ind_PASS_AB02_GQ20_HETX_MISS15_PLINKQC.lookup_table.txt.gz'
+> Content type 'application/gzip' length 461926948 bytes (440.5 MB)
+>
+> downloaded 440.5 MB
+>
+> Job done for 1.2 min
 
 `> 50 min` The downloaded files were converted to RDS files.
 
 ```CMD
 Rscript gtex_rds.r
------
-Warning message:
-package 'plyr' was built under R version 3.5.3
-
- - Loading GTEx BED files
- - File reading...
-  (1/48) Adipose_Subcutaneous
-  ...
-  (48/48) Whole_Blood
-NULL
- gte.df.pval_nominal
- Min.   :0.000e+00
- 1st Qu.:0.000e+00
- Median :1.111e-07
- Mean   :7.398e-06
- 3rd Qu.:5.219e-06
- Max.   :8.005e-04
- - GTEx table, rows= 36781356 cols= 13
- - BED file read complete. Job process: 9.3 min
- - Loading annotation file - Annotation file read complete. Job process: 35.5 min
- - Annotation file, rows= 40738696 cols= 7
- - GTEx annotation, rows= 36781356 cols= 9
- > Job process: 50.7 min
- - Saving as RDS file.. > Job process: 52 min
-
- Job done for 52 min
 ```
+
+>  - Loading GTEx BED files
+>  - File reading...
+>     (1/48) Adipose_Subcutaneous
+>     ...
+>   (48/48) Whole_Blood
+> NULL
+>  gte.df.pval_nominal
+>  Min.   :0.000e+00
+>  1st Qu.:0.000e+00
+>  Median :1.111e-07
+>  Mean   :7.398e-06
+>  3rd Qu.:5.219e-06
+>  Max.   :8.005e-04
+>  - GTEx table, rows= 36781356 cols= 13
+>  - BED file read complete. Job process: 9.3 min
+>  - Loading annotation file - Annotation file read complete. Job process: 35.5 min
+>  - Annotation file, rows= 40738696 cols= 7
+>  - GTEx annotation, rows= 36781356 cols= 9
+>
+> Job process: 50.7 min
+>
+>  - Saving as RDS file..
+>
+> Job process: 52 min
+>
+> Job done for 52 min
 
 To filter the GTEx data by p <5e-08, I executed following code:
 
 ```CMD
 Rscript gtex_filt.r 5e-08
------
-p-value threshold = 5e-08
-Warning message:
-package 'plyr' was built under R version 3.5.3
-
-(1/3) Loading GTEx RDS file
- - GTEx table, rows= 36781356 cols= 9
- - BED file read complete. Job process: 53.3 sec
-
-(2/3) Filtering by nominal p-value
- gte.sig.pval_nominal
- Min.   :0.000e+00
- 1st Qu.:0.000e+00
- Median :3.120e-12
- Mean   :3.897e-09
- 3rd Qu.:1.429e-09
- Max.   :5.000e-08
- - GTEx significant, rows= 17113536 cols= 9
- - Job process: 1.1 min
-
->> File write: db/gtex_signif.tsv
->> Job done for 3.8 min
 ```
+
+> p-value threshold = 5e-08
+>
+> (1/3) Loading GTEx RDS file
+>  - GTEx table, rows= 36781356 cols= 9
+>  - BED file read complete. Job process: 53.3 sec
+>
+> (2/3) Filtering by nominal p-value
+>  gte.sig.pval_nominal
+>  Min.   :0.000e+00
+>  1st Qu.:0.000e+00
+>  Median :3.120e-12
+>  Mean   :3.897e-09
+>  3rd Qu.:1.429e-09
+>  Max.   :5.000e-08
+>  - GTEx significant, rows= 17113536 cols= 9
+>  - Job process: 1.1 min
+>
+> File write: db/gtex_signif.tsv
+> Job done for 3.8 min
 
 The result file size are huge and the process takes long time (~50 min)
 
-- `gtex_signif.tsv.gz` (268 MB) > `gtex_signif_5e-8.tsv.gz`
+- `gtex_signif_5e-8.tsv.rds` (322 MB)
 - This file was compressed by `zip` as three separated <100 MB files.
-- `gtex_signif_5e-8.tsv.gz.zip`, `gtex_signif_5e-8.tsv.gz.z01`, and `gtex_signif_5e-8.tsv.gz.z02`
+  1. `gtex_signif_5e-8.tsv.zip`
+  2. `gtex_signif_5e-8.tsv.z01`
+  3. `gtex_signif_5e-8.tsv.gz.z02`
 
 To identify T1D SNPs 
 
 ```CMD
-> Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif_5e-8.tsv.gz
------
-Input SNPs number = 1,817
-
-(1/3) Loading GTEx significant file
-  - gtex_signif_5e-8.tsv.gz: rows= 17,113,536 cols= 9
-  - Job process: 2.7 min
-
-(2/3) eQTL SNP annotation
-  - Overlapped table, rows= 29,785 cols= 9
-  - eQTL SNPs = 745
-  - Associated genes = 159
-  >> File write: data/gtex_5e-08_745.tsv
-
-(3/3) eQTL SNP BED file generation
-  - GTEx SNP BED, rows= 745 cols= 4
-  - eQTL SNPs = 745
-  >> File write: data/snp_745_gtex.bed
+Rscript gtex.r data/seedSNP_5245_bm.bed db/gtex_signif_5e-8.tsv.rds
 ```
+
+> Input SNPs number = 5,245
+>
+> (1/3) Loading GTEx significant file
+>   - gtex_signif_5e-8.tsv.rds: rows= 17,113,536 cols= 9
+>   - Job process: 29.3 sec
+>
+> (2/3) eQTL SNP filteration
+>   - Overlapped table, rows= 137,762 cols= 9
+>   - eQTL SNPs = 2,676
+>   - Associated genes = 192
+>
+> File write: data/gtex_5e-08_2676.tsv
+>
+> (3/3) eQTL SNP BED file generation
+>   - GTEx SNP BED, rows= 2,676 cols= 4
+>   - eQTL SNPs = 2,676
+>
+> File write: data/snp_2676_gtex.bed
+>
+> Job done for 33.8 sec
 
 The result files of criteria 5e-08 are here:
 
-- `gtex_5e-08_745.tsv`
-- `snp_745_gtex.bed`
+- `gtex_5e-08_2676.tsv` -> **Supplementary Table 3**
+- `snp_2676_gtex.bed`
 
 ### Venn analysis and overlap SNPs
 
 To prioritize the eQTL SNPs among the 26 high-probability causal enhancer SNPs, you can run `venn.r` as below `CMD` command line with these files:
 
-- `data/seedSNP_1817.bed` - Total T1D SNP list
-- `data/snp_140_roadmap_encode.bed` - Enhancer occupied SNP list
-- `data/snp_26_core.bed` - High-probability causal enhancer SNP list
-- `data/snp_745_gtex.bed` - eQTL SNP list
+- `data/snp_570_roadmap_encode.bed` - Enhancer occupied SNP list **<- manually generated**
+- `data/snp_79_core.bed` - High-probability causal enhancer SNP list
+- `data/snp_2676_gtex.bed` - eQTL SNP list
 
 ### > venn.r
 
 ```CMD
-Rscript venn.r data/snp_140_roadmap_encode.bed data/snp_26_core.bed data/snp_745_gtex.bed
+Rscript venn.r data/snp_570_roadmap_encode.bed data/snp_79_core.bed data/snp_2676_gtex.bed
 ```
 
 The result files are generated as below:
 
 - `venn.tsv` > `venn_gtex.tsv`: binary SNP overlap table
 - `vennCounts.tsv` > `vennCounts_gtex.tsv`: overlapped SNP numbers
-- `snp_26_core.bed` > `snp_26_core_tfbs.bed`: SNP `BED` format file
+- `snp_79_core.bed` > `snp_79_core_tfbs.bed`: SNP `BED` format file
 
 The result figure is generated as below:
 
-![](./fig/euler_seedSNP_1817_snp_140_roadmap_encode.png)
-
-### > src/gtex_overlap.r
-
-To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r` as below `CMD` command line:
-
-```R
-> Rscript src/gtex_overlap.r
-```
-
-```CMD
-(1/2) Read files..
- - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
- - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
- - data/gtex_5e-08_745.tsv, SNPs= 745 Genes= 159
-
-(2/2) Overlap these two files..
- - TFBS overlap, rows= 5301 cols= 9
- - TFBS overlap, SNPs= 74 Genes= 94
-
- - Whole_Blood, rows= 202 cols= 9
- - Whole_Blood, SNPs= 52 Genes= 29
-
->> File write: data/snp_74_gtex_enh.bed
-```
+![](./fig/euler_snp_570_roadmap_encode_snp_79_core.png)
 
 
 
@@ -436,29 +509,27 @@ To identify the eQTL SNPs occupied on enhancers, you can run `src/gtex_overlap.r
 To identify nearest genes from the eQTL SNPs, firstly you need to download gene location data from Ensembl database biomart (version=Grch37). 
 
 ```CMD
-> Rscript src/biomart_gene.r
+Rscript src/biomart_gene.r
 ```
 
-```CMD
-Ensembl table, rows= 63677 cols= 5
-File write: db/ensembl_gene_ann.tsv
-
-Filter result, rows= 57736 cols= 5
-File write: db/ensembl_gene.bed
-```
-
-
+>  - Ensembl table, rows= 63677 cols= 5
+>  - File write: db/ensembl_gene_ann.tsv
+>
+>  - Filter result, rows= 57736 cols= 5
+>  - File write: db/ensembl_gene.bed
+>
+> Job done for 17.1 sec
 
 ### $ bedtools closest
 
-To identify nearest genes from the eQTL SNPs, you can use `bedtools merge` and `bedtools closest` as following code:
+To identify nearest genes from the eQTL SNPs, you can use `bedtools merge` and `bedtools closest` as following `BASH` codes:
 
 ```SHELL
-$ bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/seedSNP_1817.bed -b stdin > data/seedSNP_nearest.tsv
+bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/seedSNP_5245_bm.bed -b stdin > data/seedSNP_nearest.tsv
 ```
 
 ```SHELL
-$ bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/snp_745_gtex.bed -b stdin > data/gtex_nearest.tsv
+bedtools sort -i db/ensembl_gene.bed | bedtools closest -d -a data/snp_2676_gtex.bed -b stdin > data/gtex_nearest.tsv
 ```
 
 ### > src/bedtools_closest.r
@@ -468,45 +539,52 @@ To prioritize RoadMap enhancer occupied SNPs, you can run `src/bedtools_closestr
 - Usage: `Rscript src/bedtools_closest_gtex.r [bedtools_closest_result_file_path]`
 
 ```CMD
-> Rscript src/bedtools_closest_gtex.r data/seedSNP_nearest.tsv
------
-Row number = 2114
-T1D SNPs = 1817
-Nearest genes = 175
->> File write: data/seedSNP_nearest_df.tsv
+Rscript src/bedtools_closest_gtex.r data/seedSNP_nearest.tsv
 ```
+> Row number = 5861
+> Input SNPs = 5245
+> Nearest genes = 374
+>
+> File write: data/seedSNP_nearest_df.tsv
+>
+> Job done for 0.4 sec
+
 
 ```CMD
-> Rscript src/bedtools_closest_gtex.r data/gtex_nearest.tsv
------
-Row number = 788
-T1D SNPs = 745
-Nearest genes = 113
->> File write: data/gtex_nearest_df.tsv
+Rscript src/bedtools_closest_gtex.r data/gtex_nearest.tsv
 ```
+
+> Row number = 2909
+> Input SNPs = 2676
+> Nearest genes = 308
+>
+> File write: data/gtex_nearest_df.tsv
+>
+> Job done for 0.2 sec
+
+* `data/gtex_nearest_df.tsv` -> **Supplementary Table 4**
 
 ### > src/gtex_overlap.r
 
 To identify the eQTL SNPs occupied on TFBS binding enhancers, you can run `src/gtex_overlap.r` as below `CMD` command line:
 
 ```CMD
-> Rscript src/gtex_overlap.r
------
-(1/2) Read files..
-  - data/snp_140_roadmap_encode.bed, rows= 140 cols= 4
-  - data/gtex_5e-08_745.tsv, rows= 29785 cols= 9
-  - data/gtex_nearest_df.tsv, rows= 788 cols= 7
- >> SNPs= 745 Genes= 159 (Nearest= 44)
-
-(2/2) Overlap these two files..
-  - TFBS overlap, rows= 5301 cols= 10
- >> SNPs= 74 Genes= 94 (Nearest= 25)
-
-  - Whole_Blood, rows= 202 cols= 10
- >> SNPs= 52 Genes= 29 (Nearest= 8)
-
->> File write: data/snp_74_gtex_enh.bed
+Rscript gtex_overlap.r data/snp_570_roadmap_encode.bed data/gtex_5e-08_2676.tsv data/gtex_nearest_df.tsv
 ```
+
+> (1/2) Read files..
+>   - data/snp_570_roadmap_encode.bed, rows= 570 cols= 4
+>   - data/gtex_5e-08_2676.tsv, rows= 137762 cols= 9
+>   - data/gtex_nearest_df.tsv, rows= 1952 cols= 7
+>
+> SNPs= 2676 Genes= 192 (Nearest= 91)
+>
+> (2/2) Overlap the two files..
+>   - TFBS overlap, rows= 41441 cols= 10
+>
+> SNPs= 348 Genes= 140 (Nearest= 63)
+>
+> File write: data/snp_348_gtex_enh.bed
 
 
 
@@ -521,70 +599,107 @@ Human SNPs located in long non-coding RNAs (lncRNAs) are archived in [**lncRNASN
 
 ```CMD
 Rscript lncrnasnp_dn.r
------
-1: package 'data.table' was built under R version 3.5.2
-2: package 'GenomeInfoDb' was built under R version 3.5.2
-trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/snps_mod.txt'
-Content type 'text/plain; charset=GBK' length 477785336 bytes (455.7 MB)
-==================================================
-downloaded 455.7 MB
-
-trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncrnas.txt'
-Content type 'text/plain; charset=GBK' length 7005411 bytes (6.7 MB)
-==================================================
-downloaded 6.7 MB
-
-trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncRNA_associated_disease_experiment.txt'
-Content type 'text/plain; charset=GBK' length 31542 bytes (30 KB)
-==================================================
-downloaded 30 KB
-
->> Job process: 1.4 min
->> File write: db/lncRNASNP2_snplist.txt.rds
->> File write: db/lncrnas.txt.rds
->> File write: db/lncrna-diseases_experiment.txt.rds
->> Job done for 2.2 min
 ```
+
+> 1: package 'data.table' was built under R version 3.5.2
+> 2: package 'GenomeInfoDb' was built under R version 3.5.2
+>
+> trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/snps_mod.txt'
+> Content type 'text/plain; charset=GBK' length 477785336 bytes (455.7 MB)
+>
+> downloaded 455.7 MB
+>
+> trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncrnas.txt'
+> Content type 'text/plain; charset=GBK' length 7005411 bytes (6.7 MB)
+>
+> downloaded 6.7 MB
+>
+> trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncRNA_associated_disease_experiment.txt'
+> Content type 'text/plain; charset=GBK' length 31542 bytes (30 KB)
+>
+> downloaded 30 KB
+>
+> Job process: 1.4 min
+> File write: db/lncRNASNP2_snplist.txt.rds
+> File write: db/lncrnas.txt.rds
+> File write: db/lncrna-diseases_experiment.txt.rds
+> Job done for 2.2 min
 
 To identify lncRNA overlapped longevity SNPs:
 
 ```CMD
-> Rscript lncrnasnp.r data/seedSNP_1817.bed db/lncRNASNP2_snplist.txt.rds db/lncrnas.txt.rds db/lncrna-diseases_experiment.txt.rds
------
-(1/3) Read files..
-  - data/seedSNP_1817.bed; Job process: 0 sec
-  - db/lncRNASNP2_snplist.txt.rds; Job process: 16 sec
-  - db/lncrnas.txt.rds; Job process: 16.2 sec
-  - db/lncrna-diseases_experiment.txt.rds; Job process: 16.2 sec
-|path                                  |     nrow| ncol|
-|:-------------------------------------|--------:|----:|
-|data/seedSNP_1817.bed                 |     1817|    4|
-|db/lncRNASNP2_snplist.txt.rds         | 10205295|    2|
-|db/lncrnas.txt.rds                    |   141271|    4|
-|db/lncrna-diseases_experiment.txt.rds |      753|    3|
-  - Job process: 16.3 sec
-
-(2/3) Overlapping lncRNA to my SNP list and binding annotation..
-| lncRNA| SNPs|
-|------:|----:|
-|     42|   78|
->> File write: data/snp_78_lncrnasnp.bed
-
-(3/3) Annotating SNPs in lncRNAs
->> File write: data/lncrnasnp_78.tsv
+Rscript lncrnasnp.r data/seedSNP_5245_bm.bed db/lncRNASNP2_snplist.txt.rds db/lncrnas.txt.rds db/lncrna-diseases_experiment.txt.rds
 ```
 
-- `data/snp_78_lncrnasnp.bed` - 78 SNPs `BED` file
-- `data/lncrnasnp_78.tsv` - 78 SNPs associated with 42 lncRNAs
+> (1/3) Read files..
+>   - data/seedSNP_5245_bm.bed; Job process: 0.1 sec
+>   - db/lncRNASNP2_snplist.txt.rds; Job process: 17.3 sec
+>   - db/lncrnas.txt.rds; Job process: 17.5 sec
+>   - db/lncrna-diseases_experiment.txt.rds; Job process: 17.5 sec
+> | path                                  |     nrow | ncol |
+> | :------------------------------------ | -------: | ---: |
+> | data/seedSNP_5245_bm.bed              |     5245 |    4 |
+> | db/lncRNASNP2_snplist.txt.rds         | 10205295 |    2 |
+> | db/lncrnas.txt.rds                    |   141271 |    4 |
+> | db/lncrna-diseases_experiment.txt.rds |      753 |    3 |
+>   - Job process: 17.7 sec
+>
+> (2/3) Overlapping lncRNA to my SNP list and binding annotation..
+> | lncRNA | SNPs |
+> | -----: | ---: |
+> |    147 |  261 |
+> File write: data/snp_261_lncrnasnp.bed
+>
+> (3/3) Annotating SNPs in lncRNAs
+>
+> File write: data/lncrnasnp_261.tsv
+>
+> Job done for 22.8 sec
+
+- `data/snp_261_lncrnasnp.bed` - 261 SNPs `BED` file
+- `data/lncrnasnp_261.tsv` -> **Supplementary Table 5**
 
 ### > venn.r
 
 ```CMD
-Rscript venn.r data/snp_26_core_tfbs.bed data/snp_74_gtex_enh.bed data/snp_78_lncrnasnp.bed
+Rscript venn.r data/snp_79_core_tfbs.bed data/snp_348_gtex_enh.bed data/snp_261_lncrnasnp.bed
 ```
 
-- `venn.tsv` > `venn_lncrnasnp.tsv`: binary SNP overlap table
-- `vennCounts.tsv` > `vennCounts_lncrnasnp.tsv`: overlapped SNP numbers
-- `snp_2_core.bed` > `snp_2_core_lncrnasnp.bed`: SNP `BED` format file
+> [1] "snp_79_core_tfbs"
+> [1] "snp_348_gtex_enh"
+> [1] "snp_261_lncrnasnp"
+> File write: data/venn.tsv
+> File write: data/vennCounts.tsv
+>
+> Euler fit is done.
+> Figure draw: fig/euler_snp_79_core_snp_348_gtex_enh.png
+> File write: data/snp_7_core.bed
+>
+> Job done for 0.3 sec
+
+- `venn.tsv` -> `venn_lncrnasnp.tsv`: binary SNP overlap table
+- `vennCounts.tsv` -> `vennCounts_lncrnasnp.tsv`: overlapped SNP numbers
+- `snp_7_core.bed` -> `snp_7_core_lncrnasnp.bed`: SNP `BED` format file
 
 ![](fig/euler_snp_26_core_tfbs_snp_74_gtex_enh.png)
+
+```cmd
+Rscript venn.r data/seedSNP_5245_bm.bed data/snp_2676_gtex.bed data/snp_1253_encode_dist.bed data/snp_1688_roadmap_dist.bed data/snp_301_regulome2b.bed data/snp_261_lncrnasnp.bed
+```
+
+> [1] "seedSNP_5245_bm"
+> [1] "snp_2676_gtex"
+> [1] "snp_1253_encode_dist"
+> [1] "snp_1688_roadmap_dist"
+> [1] "snp_301_regulome2b"
+> [1] "snp_261_lncrnasnp"
+>
+> Message: Can't plot Venn diagram for more than 5 sets.
+> File write: data/venn.tsv
+> File write: data/vennCounts.tsv
+>
+> Job done for 0.3 sec
+
+- `venn.tsv` -> `summary.tsv` : Summary file for this analysis.
+- `vennCounts.tsv` -> `summaryCount.tsv` : Summary SNP numbers.
+
