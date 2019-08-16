@@ -37,8 +37,8 @@ dis = as.numeric(as.character(enh$dis))
 rd.df = cbind(gwas,enh[1:2],dis)
 
 # 2. Filtering SNPs by distance of closest enhancers
-rd.df_ = unique(subset(rd.df,dis==0))
-#rd.df_ = rd.df
+#rd.df_ = unique(subset(rd.df,dis==0))
+rd.df_ = rd.df
 cat(paste0('Input SNPs = ',length(unique(rd.df_$rsid)),'\n'))
 cat(paste0('Nearest genes = ',length(unique(rd.df_$gene_pos)),'\n'))
 f.path1 = paste0(dir,f.name,'_df.tsv')
