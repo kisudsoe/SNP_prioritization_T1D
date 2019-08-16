@@ -6,7 +6,8 @@
 # Usage: Rscript gtex.r data/seedSNP_1817.bed db/gtex_signif_5e-8.tsv.gz
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript gtex_filt.r [SNP_file_path] [GTEx_download_target_dir]
-  - Arguments [SNP_file_path] and [GTEx_download_target_dir] are needed.'
+  - Argument [SNP_file_path] is mandatory.
+  - Argument [GTEx_download_target_dir] is mandatory.'
 if(length(args)<2|length(args)>2) stop(hmsg)
 snp.path = args[1]
 gte.path = args[2]
@@ -28,7 +29,8 @@ cat(paste0('Input SNPs number = ',len.snpids,'\n'))
 
 # 1. Loading GTEx significant file
 cat("\n(1/3) Loading GTEx significant file\n")
-if(file_ext(gte.path)=='gz') gte = read.delim(gzfile(gte.path),header=T)
+if(file_ext(gte.path)=='gz') { gte = read.delim(gzfile(gte.path),header=T)
+} else if(file_ext(gte.path)=='rds') gte = readRDS(gte.path)
 colnames(gte)[9] = 'rsid'
 dim.gte = prettyNum(dim(gte),big.mark=',',preserve.width='none')
 cat(paste0('  - ',basename(gte.path),': rows= ',dim.gte[1],' cols= ',dim.gte[2],'\n'))
