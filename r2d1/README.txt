@@ -1,0 +1,1 @@
+Files in this folder are previous results from stringent LD threshold r2>0.6 and D'=1.
