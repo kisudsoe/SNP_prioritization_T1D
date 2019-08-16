@@ -5,13 +5,13 @@
 # ldlink.bat; Rscript ldlink_filt.r data/gwas_5e-08_129.tsv db/ldlink
 args = commandArgs(trailingOnly=T)
 hmsg = 'Rscript ldlink_filt.r [SNP_file_path] [LDlink_download_target_dir] [LDlink_filter_option]
-  - Argument [SNP_file_path] is a mendatory for indicating root GWAS data file path.
-  - Argument [LDlink_download_target_dir] is a mendatory for indicating LDlink data folder path.
-  - Argument [LDlink_filter_option] is a mendatory. Choose one of the following option numbers.
-    1) "r2>0.6 or Dprime=1": This is usual choice to get LD associated SNPs.
-    2) "r2>0.6"
+  - Argument [SNP_file_path] is a mandatory for indicating root GWAS data file path.
+  - Argument [LDlink_download_target_dir] is a mandatory for indicating LDlink data folder path.
+  - Argument [LDlink_filter_option] is a mandatory. Choose one of the following option numbers.
+    1) "r2>0.6 or Dprime=1"
+    2) "r2>0.6"					<-This is usual choice to get LD associated SNPs.
     3) "Dprime=1"
-    4) "r2>0.6 and Dprime=1": This is the most stringent criteria.'
+    4) "r2>0.6 and Dprime=1"	<-This is the most stringent criteria.'
 if(length(args)<3|length(args)>3) stop(hmsg)
 snp_path    = unlist(args[1])
 ld_path     = unlist(args[2])
