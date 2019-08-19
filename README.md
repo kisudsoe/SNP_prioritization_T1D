@@ -636,6 +636,7 @@ Rscript lncrnasnp.r data/seedSNP_5245_bm.bed db/lncRNASNP2_snplist.txt.rds db/ln
 >   - db/lncRNASNP2_snplist.txt.rds; Job process: 17.3 sec
 >   - db/lncrnas.txt.rds; Job process: 17.5 sec
 >   - db/lncrna-diseases_experiment.txt.rds; Job process: 17.5 sec
+>   
 > | path                                  |     nrow | ncol |
 > | :------------------------------------ | -------: | ---: |
 > | data/seedSNP_5245_bm.bed              |     5245 |    4 |
@@ -645,6 +646,7 @@ Rscript lncrnasnp.r data/seedSNP_5245_bm.bed db/lncRNASNP2_snplist.txt.rds db/ln
 >   - Job process: 17.7 sec
 >
 > (2/3) Overlapping lncRNA to my SNP list and binding annotation..
+> 
 > | lncRNA | SNPs |
 > | -----: | ---: |
 > |    147 |  261 |
