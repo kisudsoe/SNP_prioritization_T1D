@@ -602,27 +602,35 @@ Rscript lncrnasnp_dn.r
 ```
 
 > 1: package 'data.table' was built under R version 3.5.2
+>
 > 2: package 'GenomeInfoDb' was built under R version 3.5.2
 >
 > trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/snps_mod.txt'
+>
 > Content type 'text/plain; charset=GBK' length 477785336 bytes (455.7 MB)
 >
 > downloaded 455.7 MB
 >
 > trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncrnas.txt'
+>
 > Content type 'text/plain; charset=GBK' length 7005411 bytes (6.7 MB)
 >
 > downloaded 6.7 MB
 >
 > trying URL 'http://bioinfo.life.hust.edu.cn/static/lncRNASNP2/downloads/lncRNA_associated_disease_experiment.txt'
+>
 > Content type 'text/plain; charset=GBK' length 31542 bytes (30 KB)
 >
 > downloaded 30 KB
 >
 > Job process: 1.4 min
+>
 > File write: db/lncRNASNP2_snplist.txt.rds
+>
 > File write: db/lncrnas.txt.rds
+>
 > File write: db/lncrna-diseases_experiment.txt.rds
+>
 > Job done for 2.2 min
 
 To identify lncRNA overlapped longevity SNPs:
