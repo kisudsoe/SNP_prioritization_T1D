@@ -15,7 +15,7 @@ To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research
 - Usage: `Rscript gwas.r [GWAS_file_path] [p-value_criteria]`
 
 ```cmd
-Rscript T1D_gwas.r db/GWAS_EFO0001359.tsv 5e-08
+Rscript gwas.r db/GWAS_EFO0001359.tsv 5e-08
 ```
 
 ### > ldlink_dn.py / link_filt.r
