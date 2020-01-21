@@ -18,7 +18,7 @@ To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research
 Rscript gwas.r db/GWAS_EFO0001359.tsv 5e-08
 ```
 
-### > ldlink_dn.py / link_filt.r
+### > ldlink_dn.py and ldink_filt.r
 
 To download **LDlink data** (version 3.3.0 12/24/2018) (Machiela et al, 2015, Bioinformatics, pmid 26139635), you can run `T1D_ldlink.py` as below `CMD` command line:
 
