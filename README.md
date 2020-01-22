@@ -143,7 +143,7 @@ Rscript roadmap_filt_dtr.r
 To avoid multiple count of enhancers as well as to reduce file size and to achieve faster process, merge RoadMap enhancer information using a `BASH` tool `bedtools`. Here is the `BASH` pipeline for `bedtools sort` and `bedtools merge`. Then, to identify T1D SNPs occupied in RoadMap enhancers, you can use `BASH` tool `bedtools intersect` as below code:
 
 - Compressed file size of `roadmap_enh.bed.gz` is >139 MB.
-- Compressed file size of `roadmap_enh_merer.bed.gz` is about 3.7 MB.
+- Compressed file size of `roadmap_enh_merge.bed.gz` is about 3.7 MB.
 - Removing NA values, `data/seedSNP_5245_bm.bed` file is updated version from the `data/seedSNP_5245.bed` file.
 
 ```SHELL
