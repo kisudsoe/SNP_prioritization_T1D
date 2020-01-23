@@ -498,7 +498,7 @@ The result files are generated as below:
 
 The result figure is generated as below:
 
-![](./fig/euler_snp_570_roadmap_encode_snp_79_core.png)
+![](./fig/euler_seedSNP_1817_snp_140_roadmap_encode.png)
 
 
 
