@@ -21,7 +21,9 @@ suppressMessages(library(tools))
 suppressMessages(library(limma))
 suppressMessages(library(eulerr))
 source('src/pdtime.r')
-t0 = Sys.time()
+t0  = Sys.time()
+dir = 'data/'
+dir_fig = 'fig/'
 
 #########################
 ## Function start here ##
@@ -53,7 +55,7 @@ colnames(union) = subtitle			# Names attach to venn diagram
 
 # Draw Venn Diagram
 if(n>3 & n<5) {
-	f.name1 = paste0('fig/venn_',names[1],'_',names[2],'.png')
+	f.name1 = paste0(dir_fig,'/venn_',names[1],'_',names[2],'.png')
 	title1 = paste0('Venn analysis of ',nrow(union),' SNPs')
 	png(f.name1,width=10,height=10,units='in',res=100)
 	vennDiagram(union, main=title1, circle.col=rainbow(length(subtitle))) # limma
@@ -66,17 +68,17 @@ colnames(union) = names
 union.df = cbind(union,ann=rownames(union))
 union.out= merge(snp.li[[1]],union.df,by="ann")
 venn.li  = list(list=union.out, vennCounts=vennCounts(union))
-f.name2  = paste0('data/venn.tsv')
+f.name2  = paste0(dir,'venn.tsv')
 write.table(venn.li[[1]],f.name2,row.names=F,col.names=T,quote=F,sep='\t')
 cat(paste0('File write: ',f.name2,'\n'))
 
-f.name3 = paste0('data/vennCounts.tsv')
+f.name3 = paste0(dir,'vennCounts.tsv')
 write.table(venn.li[[2]],f.name3,row.names=F,col.names=T,quote=F,sep='\t')
 cat(paste0('File write: ',f.name3,'\n'))
 
 # Draw Euler plot
 if(n==3) {
-	f.name3a = paste0('fig/euler_',names[1],'_',names[2],'.png')
+	f.name3a = paste0(dir_fig,'euler_',names[1],'_',names[2],'.png')
 	png(f.name3a,width=10,height=10,units='in',res=100)
 	venn_c = unlist(venn.li[[2]][,4])
 	venn_fit = euler(c( # How to automate this?!
@@ -101,10 +103,10 @@ if(n==3) {
 	cat(paste0('\nFigure draw: ',f.name3a,'\n'))
 	
 	# Write core snp list from the three groups as snp_#_core.bed file.
-	f.name4 = paste0('data/snp_',nrow(core.df),'_core.bed')
 	core.df = union.out[(union.out[,5]==TRUE&
 						 union.out[,6]==TRUE&
 						 union.out[,7]==TRUE),c(2:4,1)]
+	f.name4 = paste0(dir,'snp_',nrow(core.df),'_core.bed')
 	write.table(core.df,f.name4,row.names=F,col.names=F,quote=F,sep='\t')
 	cat(paste0('File write: ',f.name4,'\n'))
 }
