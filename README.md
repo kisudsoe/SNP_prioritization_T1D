@@ -15,10 +15,10 @@ To download **GWAS Catalog data** (MacArthur et al, 2017, Nucleic Acids Research
 - Usage: `Rscript gwas.r [GWAS_file_path] [p-value_criteria]`
 
 ```cmd
-Rscript T1D_gwas.r db/GWAS_EFO0001359.tsv 5e-08
+Rscript gwas.r db/GWAS_EFO0001359.tsv 5e-08
 ```
 
-### > ldlink_dn.py / link_filt.r
+### > ldlink_dn.py and ldink_filt.r
 
 To download **LDlink data** (version 3.3.0 12/24/2018) (Machiela et al, 2015, Bioinformatics, pmid 26139635), you can run `T1D_ldlink.py` as below `CMD` command line:
 
@@ -143,7 +143,7 @@ Rscript roadmap_filt_dtr.r
 To avoid multiple count of enhancers as well as to reduce file size and to achieve faster process, merge RoadMap enhancer information using a `BASH` tool `bedtools`. Here is the `BASH` pipeline for `bedtools sort` and `bedtools merge`. Then, to identify T1D SNPs occupied in RoadMap enhancers, you can use `BASH` tool `bedtools intersect` as below code:
 
 - Compressed file size of `roadmap_enh.bed.gz` is >139 MB.
-- Compressed file size of `roadmap_enh_merer.bed.gz` is about 3.7 MB.
+- Compressed file size of `roadmap_enh_merge.bed.gz` is about 3.7 MB.
 - Removing NA values, `data/seedSNP_5245_bm.bed` file is updated version from the `data/seedSNP_5245.bed` file.
 
 ```SHELL
@@ -498,7 +498,7 @@ The result files are generated as below:
 
 The result figure is generated as below:
 
-![](./fig/euler_snp_570_roadmap_encode_snp_79_core.png)
+![](./fig/euler_seedSNP_1817_snp_140_roadmap_encode.png)
 
 
 
