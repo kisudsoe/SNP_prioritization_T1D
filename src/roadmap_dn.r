@@ -24,7 +24,8 @@ if(file.exists(dir)) { cat(paste0('Directory exists: ',dir,'\n'))
 ## Function start here ##
 #########################
 cid = as.character(formatC(c(1:129),width=3,flag='0'))
-urls = paste0('https://egg2.wustl.edu/roadmap/data/byFileType/chromhmmSegmentations/ChmmModels/imputed12marks/jointModel/final/E',cid,'_25_imputed12marks_hg38lift_dense.bed.gz')
+#urls = paste0('https://egg2.wustl.edu/roadmap/data/byFileType/chromhmmSegmentations/ChmmModels/imputed12marks/jointModel/final/E',cid,'_25_imputed12marks_hg38lift_dense.bed.gz')
+urls = paste0('https://egg2.wustl.edu/roadmap/data/byFileType/chromhmmSegmentations/ChmmModels/imputed12marks/jointModel/final/E',cid,'_25_imputed12marks_dense.bed.gz')
 #head(urls)
 t=lapply(urls,function(url) {
 	f_name = paste0(dir,basename(url))

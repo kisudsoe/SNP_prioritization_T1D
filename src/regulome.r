@@ -50,18 +50,18 @@ cat(paste0('Functional motifs (1f_only-2b) = ',nrow(reg_2b)-nrow(reg_1f_only),'\
 
 snpids.1f_only = subset(reg_1f_only,rsid%in%snpids)
 snpids.2b      = subset(reg_2b,     rsid%in%snpids)
-cat(paste0('  - Regulome >=2b SNPs = ',nrow(snpids.2b),'\n'))
-cat(paste0('  - SNPs with functional motifs (1f_only-2b) = ',
+cat(paste0('  Regulome >=2b SNPs = ',nrow(snpids.2b),'\n'))
+cat(paste0('  SNPs with functional motifs (1f_only-2b) = ',
                 nrow(snpids.2b)-nrow(snpids.1f_only),'\n'))
-f.name1 = paste0(dir,'regulome/regulome_',nrow(snpids.2b),'.tsv')
+f.name1 = paste0(dir,'regulome_',nrow(snpids.2b),'.tsv')
 write.table(snpids.2b,f.name1,row.names=F,col.names=T,quote=T,sep='\t')
-cat(paste0('\n>> File write: ',f.name1,'\n'))
+cat(paste0('\nFile write: ',f.name1,'\n'))
 
 snp.rsid= data.frame(snp,rsid=snpids)
 snp.bed = subset(snp.rsid,rsid%in%snpids.2b$rsid)
-f.name2 = paste0(dir,'regulome/snp_',nrow(snp.bed),'_regulome2b.bed')
+f.name2 = paste0(dir,'snp_',nrow(snp.bed),'_regulome2b.bed')
 write.table(snp.bed[,1:4],f.name2,row.names=F,col.names=F,quote=T,sep='\t')
-cat(paste0('>> File write: ',f.name2,'\n'))
+cat(paste0('File write: ',f.name2,'\n'))
 cat(paste0(pdtime(t0,1),'\n'))
 ##################
 ## Function end ##

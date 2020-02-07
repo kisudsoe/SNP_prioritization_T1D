@@ -17,6 +17,7 @@ for(i in 1:n) {
 }
 
 # System parameter
+suppressMessages(library(dplyr))
 suppressMessages(library(tools))
 suppressMessages(library(limma))
 suppressMessages(library(eulerr))
@@ -35,8 +36,9 @@ for(i in 1:n) {
 	snp.li[[i]] = tb
 	snpids.li[[i]] = tb$ann
 	names = c(names,file_path_sans_ext(basename(f.path[i])))
-	print(file_path_sans_ext(basename(f.path[i])))
+	cat('  '); cat(file_path_sans_ext(basename(f.path[i]))); cat('\n')
 }
+snp.df = Reduce(rbind,snp.li) %>% unique
 
 unionlist = Reduce(union,snpids.li)
 # Collapse the list to one dataFrame list
@@ -54,34 +56,35 @@ union = as.data.frame(union)	# Make 'union' to data.frame from
 colnames(union) = subtitle			# Names attach to venn diagram
 
 # Draw Venn Diagram
-if(n>3 & n<5) {
+if(n==4) {
 	f.name1 = paste0(dir_fig,'/venn_',names[1],'_',names[2],'.png')
 	title1 = paste0('Venn analysis of ',nrow(union),' SNPs')
 	png(f.name1,width=10,height=10,units='in',res=100)
 	vennDiagram(union, main=title1, circle.col=rainbow(length(subtitle))) # limma
 	dev.off()
 	cat(paste0('\nFigure draw: ',f.name1,'\n'))
-} else if(n>4) cat("Message: Can't plot Venn diagram for more than 5 sets.\n")
+} else if(n>4) message("\n[Message] Can't plot Venn diagram for more than 5 sets.")
 
 # Write files
 colnames(union) = names
 union.df = cbind(union,ann=rownames(union))
-union.out= merge(snp.li[[1]],union.df,by="ann")
+union.out= merge(snp.df,union.df,by="ann",all=T)
 venn.li  = list(list=union.out, vennCounts=vennCounts(union))
 f.name2  = paste0(dir,'venn.tsv')
 write.table(venn.li[[1]],f.name2,row.names=F,col.names=T,quote=F,sep='\t')
-cat(paste0('File write: ',f.name2,'\n'))
+cat(paste0('\nFile write: ',f.name2,'\n'))
 
-f.name3 = paste0(dir,'vennCounts.tsv')
-write.table(venn.li[[2]],f.name3,row.names=F,col.names=T,quote=F,sep='\t')
-cat(paste0('File write: ',f.name3,'\n'))
+#f.name3 = paste0(dir,'vennCounts.tsv')
+#write.table(venn.li[[2]],f.name3,row.names=F,col.names=T,quote=F,sep='\t')
+#cat(paste0('File write: ',f.name3,'\n'))
 
 # Draw Euler plot
 if(n==3) {
+	cat(paste0('\n** Euler fitting... '))
 	f.name3a = paste0(dir_fig,'euler_',names[1],'_',names[2],'.png')
 	png(f.name3a,width=10,height=10,units='in',res=100)
 	venn_c = unlist(venn.li[[2]][,4])
-	venn_fit = euler(c( # How to automate this?!
+	venn_fit = euler(c( # eulerr, How to automate this?!
 		'A'    =as.numeric(venn_c[5]), 
 		'B'    =as.numeric(venn_c[3]),
 		'C'    =as.numeric(venn_c[2]),
@@ -89,15 +92,15 @@ if(n==3) {
 		'A&C'  =as.numeric(venn_c[6]),
 		'B&C'  =as.numeric(venn_c[4]),
 		'A&B&C'=as.numeric(venn_c[8])
-	)) # eulerr
-	cat(paste0('> Euler fit is done.'))
-	p=plot(
+	))
+	cat(paste0('done.\n'))
+	p=plot( # eulerr
 		venn_fit, quantities=T,
 		labels=colnames(venn.li[[2]])[1:3],
-		edges=list(col=c('red','green','blue'),lwd=3),
+		edges=list(col =c('red','green','blue'),lwd=3),
 		fills=list(fill=c('red','green','blue'),alpha=0.2),
 		main=''
-	) # eulerr
+	)
 	print(p)
 	dev.off()
 	cat(paste0('\nFigure draw: ',f.name3a,'\n'))
@@ -109,8 +112,10 @@ if(n==3) {
 	f.name4 = paste0(dir,'snp_',nrow(core.df),'_core.bed')
 	write.table(core.df,f.name4,row.names=F,col.names=F,quote=F,sep='\t')
 	cat(paste0('File write: ',f.name4,'\n'))
+} else {
+	message(paste0('\n[Message] If you need snp_#_core.bed file, please input three groups.'))
 }
-cat(paste0('\n>> ',pdtime(t0,1),'\n'))
+cat(paste0(pdtime(t0,1)))
 ##################
 ## Function end ##
 ##################
