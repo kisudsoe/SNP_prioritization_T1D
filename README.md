@@ -781,23 +781,66 @@ Rscript src/venn.r ^
 
 # *Enrichment analysis
 
-## Downloading 1KG DB
+Contingency table by cell types
+
+|                    | Roadmap enhancer | Other Chr status |
+| ------------------ | ---------------- | ---------------- |
+| T1D candidate SNPs | k (SNP number)   | n                |
+| Others?            | m                | l                |
 
 
 
+## Run permutation test
+
+To calculate enrichment, run below command function at `bash`
+
+```shell
+Rscript src/enrich.r --permu \
+    --gwassnp data/seedSNP_1817_bm.bed \
+    --chrstatus db/roadmap_bed \
+    --dbsource roadmap_bed \
+    --permn 100 \
+    --out enrich
+Rscript src/enrich.r --permu \
+    --gwassnp data/seedSNP_1817_bm.bed \
+    --chrstatus db/roadmap_bed \
+    --dbsource roadmap_bed \
+    --permn 5000 \
+    --out enrich
+```
+
+> ** Run perm_test function in enrich.r **
+>
+> * Gwas snp = [1] 1817    4
+> * 127 files were found from db/roadmap_bed:
+>   1 Load E001: roadmap_bed = [1] 933206      4
+>
+>   Run permTest: 25 annotations, [.........................] done. Job process: 1.3 min
+>   2 Load E002: roadmap_bed = [1] 837982      4
+>
+>   ...
+>
+>   Run permTest: 25 annotations, [.........................] done. Job process: 1.4 min
+>   126 Load E128: roadmap_bed = [1] 835642      4
+>
+>   Run permTest: 25 annotations, [.........................] done. Job process: 1.4 min
+>   127 Load E129: roadmap_bed = [1] 912567      4
+>
+>   Run permTest: 25 annotations, [.........................] done. Job process: 1.4 min
+>
+> * Write file: enrich/roadmap_bed-seedSNP_1817_bm-zscore.tsv
+> * Write file: enrich/roadmap_bed-seedSNP_1817_bm-pval.tsv
+> There were 50 or more warnings (use warnings() to see the first 50)
+>
+> Job done: 2021-01-07 21:12:50 for 2.8 hr
 
 
-## Prepare GWAS SNPs with LD ($r^2$>0.6 & d' = 1)
 
-Below description is referred from `2020-05 Senescent cell enhancer/Enrichment analysis.md` log file, Section 3: Calculate LD $r^2$ values.
-
-* LDs of SNPs were calculated by using --r2 function in plink1.9 linux version with options: `inter-chr` to get a table format report, `yes-really` to get unfiltered raw results, `--exclude` for removing duplicated variants, -`-ld-snp-list` 
-
-
+# *Obsolete codes
 
 ## Prepare Roadmap enhancers
 
-SNP residing on regulatory elements in Roadmap data: Run below command function at bash
+SNP residing on regulatory elements in Roadmap data: Run below command function at `bash`
 
 Run a bash file `db/roadmap_dist.sh`:
 
@@ -827,14 +870,3 @@ Rscript src/enrich.r --roadmap --dir db/roadmap_dist --out db
 > Write TSV file: dbroadmap_merge.tsv
 >
 > Job done: 2021-01-06 22:12:10 for 3.1 sec
-
-
-
-## 
-
-
-
-```shell
-Rscript src/enrich.r --fisher --gwassnp ? --enhsnp ? --age ? --out ?
-```
-
