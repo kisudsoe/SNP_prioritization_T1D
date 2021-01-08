@@ -792,7 +792,10 @@ Contingency table by cell types
 
 ## Run permutation test
 
-To calculate enrichment, run below command function at `bash`
+To calculate enrichment, run below command function at `bash`.
+
+* T1D GWAS SNP file: `data/seedSNP_1817_bm.bed`
+* Roadmap 127 BED files at `db/roadmap_bed` directory
 
 ```shell
 Rscript src/enrich.r --permu \
@@ -805,7 +808,7 @@ Rscript src/enrich.r --permu \
     --gwassnp data/seedSNP_1817_bm.bed \
     --chrstatus db/roadmap_bed \
     --dbsource roadmap_bed \
-    --permn 5000 \
+    --permn 1000 \
     --out enrich
 ```
 
@@ -833,6 +836,21 @@ Rscript src/enrich.r --permu \
 > There were 50 or more warnings (use warnings() to see the first 50)
 >
 > Job done: 2021-01-07 21:12:50 for 2.8 hr
+
+
+
+Run this function for 129 seed gwas SNPs.
+
+```bash
+Rscript src/enrich.r --permu \
+    --gwassnp data/gwas_5e-08_129_hg19.bed \
+    --chrstatus db/roadmap_bed \
+    --dbsource roadmap_bed \
+    --permn 100 \
+    --out enrich
+```
+
+> 
 
 
 
