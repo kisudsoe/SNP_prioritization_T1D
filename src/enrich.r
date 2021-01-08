@@ -19,6 +19,13 @@ Rscript src/enrich.r --permu \
     --dbsource roadmap_bed \
     --permn 5000 \
     --out enrich
+
+Rscript src/enrich.r --heatmap \
+    --pmdata enrich/roadmap_bed-gwas_5e-08_129_hg19-zscore.tsv \
+    --meta db/roadmap_meta.tsv \
+    --out enrich \
+    --annot BLOOD,PANCREAS,THYMUS \
+    --fileext png
 '
 
 ### Shared Arguments
@@ -30,11 +37,14 @@ p = add_argument(p, '--permu',     help="[Flag] Run fisher test", flag=T)
 p = add_argument(p, '--gwassnp',   help="[Path] GWAS list file. Columns: <SNPS> <MAPPED_TRAIT> <P.VALUE>")
 p = add_argument(p, '--chrstatus', help="[Path] BED file including chromosome status for permtest functions.")
 p = add_argument(p, '--dbsource',  help="[roadmap_bed/encode] Type in one of these options for source of your chromosome status.")
-p = add_argument(p, '--permn',     help="[Number] Set permutation number. Default=500", default=500, type="numeric")
+p = add_argument(p, '--permn',     help="[Number] Set permutation number. Default=1000", default=1000, type="numeric")
 
 ### Arguments for draw_heatmap function
-p = add_argument(p, '--heatmap',     help="[Flag] Draw a heatmap from permu results.", flag=T)
-p = add_argument(p, '--zscoretb',   help="[Path] Z-score table file.")
+p = add_argument(p, '--heatmap',   help="[Flag] Draw a heatmap from permu results.", flag=T)
+p = add_argument(p, '--pmdata',    help="[Path] Z-score table file.")
+p = add_argument(p, '--meta',      help="[Path] Add roadmap meta-info file for heatmap annotation.")
+p = add_argument(p, '--annot',     help="[BLOOD,PANCREAS,THYMUS ...] Choose ANATOMYs of roadmap meta-info to annotate heatmap.")
+p = add_argument(p, '--fileext',   help="[png/sgv] Choose output figure format.")
 
 argv = parse_args(p)
 
@@ -45,9 +55,83 @@ suppressMessages(library(tidyr))
 
 ## Functions ##
 draw_heatmap = function(
-    f_zscore = NULL,
-    out      = 'enrich'
-) {}
+    f_pmdata = NULL,
+    f_meta   = NULL,
+    out      = 'enrich',
+    annot    = NULL,
+    fileext  = 'png'
+) {
+    paste0('\n** Run draw_heatmap function in enrich.r **\n\n') %>% cat
+    suppressMessages(library(ComplexHeatmap))
+    suppressMessages(library(circlize))
+    ifelse(!dir.exists(out), dir.create(out), "")
+
+    # Read file
+    paste0('* Permutation result table = ') %>% cat
+    pmdata = read.delim(f_pmdata, stringsAsFactors=F)
+    dim(pmdata) %>% print
+
+    # Prepare heatmap table
+    pmdata_mat = pmdata[,-1]
+    rownames(pmdata_mat) = pmdata$Status
+
+    # [Optional] Read meta-info. file
+    if(length(f_meta)>0) {
+        paste0('* [Optional] Add meta-info. table = ') %>% cat
+        meta = read.delim(f_meta, stringsAsFactors=F)
+        dim(meta) %>% print
+
+        # Match meta-info. with original colnames
+        pmdata_mat = pmdata_mat[,meta$EID]
+        pmdata_col = paste0(meta$EDACC_NAME," (",meta$EID,")")
+        ha1 = HeatmapAnnotation(Name=anno_text(pmdata_col))
+        show_column_names = FALSE
+
+        # [Optional] Add column annotation to heatmap by ANATOMY
+        if(length(f_meta)>0 & length(annot)>0) {
+            annots = strsplit(annot,',')[[1]]
+            anatomy = meta$ANATOMY
+            `%notin%` = Negate(`%in%`) # define %notin% operator
+            anatomy[meta$ANATOMY %notin% annots] = 'Other' # A bug to change as NA
+            ha2 = HeatmapAnnotation(
+                Anatomy=anatomy,
+                #col=list(Anatomy=c("Other"="Grey")),
+                gp=gpar(col="black", lwd=.5)
+            )
+        } else { ha2 = NULL }
+    } else { 
+        show_column_names = TRUE
+        ha1 = NULL
+        ha2 = NULL
+    }
+    
+    # Configuration for heatmap
+    pmdata_mat = as.matrix(pmdata_mat)
+    my_col = colorRamp2(c(-4,0,4),c("#2E86C1","#FEF9E7","#C0392B"))
+
+    # Draw heatmap
+    file_base = basename(f_pmdata)
+    file_name = tools::file_path_sans_ext(file_base)
+    f_name = paste0(out,'/',file_name,'.png')
+
+    if(fileext=='png') { png(f_name,width=22,height=12,units='in',res=300)
+    } else if(fileext=='svg') {}
+    p=Heatmap(
+        pmdata_mat,
+        name = "Enrich.\nz-score",
+        col  = my_col,
+        rect_gp = gpar(col = "black", lwd = .5),
+        column_dend_height = unit(1, "in"),
+        row_dend_width = unit(1, "in"),
+        column_names_max_height = unit(7,"in"),
+        show_column_names = show_column_names,
+        bottom_annotation = ha1,
+        top_annotation = ha2
+    )
+    print(p)
+    dev.off()
+    paste0('\nSave as ',f_name,'\n') %>% cat
+}
 
 
 perm_test = function(
@@ -55,7 +139,7 @@ perm_test = function(
     f_status   = NULL,
     db_src     = NULL,
     out        = 'enrich',
-    perm_n     = 5000,
+    perm_n     = 1000,
     verbose    = NULL
 ) {
     paste0('\n** Run perm_test function in enrich.r **\n\n') %>% cat
@@ -85,7 +169,7 @@ perm_test = function(
         ## Read file
         paste0(i,' Load ',cell_type,': ') %>% cat
         status = read_status_file(f_status_paths[i],db_src)
-        dim(status) %>% print
+        paste0(nrow(status),'; ') %>% cat
 
         ## Run perm_test
         pt_df = perm_test_calc(gwas_snp_bed,status,perm_n,verbose)
@@ -105,7 +189,7 @@ perm_test = function(
     gwas_base = basename(f_gwas_snp)
     gwas_f_name = tools::file_path_sans_ext(gwas_base)
     
-    f_name1 = paste0(out,'/',db_src,'-',gwas_f_name,'-zscore.tsv')
+    f_name1 = paste0(out,'/',db_src,'-',gwas_f_name,'-permn_',perm_n,'-zscore.tsv')
     write.table(zscore_df,f_name1,sep='\t',row.names=F,quote=F)
     paste0('\n* Write file: ',f_name1,'\n') %>% cat
     
@@ -139,7 +223,7 @@ perm_test_calc = function(
     #suppressMessages(library(regioneR))
 
     # Calculate permTest to get z-scores and p-values by chromosome status
-    paste0('  Run permTest: ') %>% cat
+    paste0(' permTest for') %>% cat
     status_ann = status$Ann %>% unique %>% sort
     paste0(length(status_ann),' annotations, [') %>% cat
     status_all_bed = toGRanges(status[,1:4],format="BED")
@@ -186,6 +270,12 @@ if(argv$example) {
         verbose    = argv$verbose
     )
 } else if(argv$heatmap) {
-    draw_heatmap()
+    draw_heatmap(
+        f_pmdata = argv$pmdata,
+        f_meta   = argv$meta,
+        out      = argv$out,
+        annot    = argv$annot,
+        fileext  = argv$fileext
+    )
 }
 paste0('\n',pdtime(t0,1),'\n') %>% cat
