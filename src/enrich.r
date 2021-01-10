@@ -21,9 +21,10 @@ Rscript src/enrich.r --permu \
     --out enrich
 
 Rscript src/enrich.r --heatmap \
-    --pmdata enrich/roadmap_bed-gwas_5e-08_129_hg19-zscore.tsv \
+    --pmdata enrich/roadmap_bed-snp_484_roadmap_dist-permn_100-zscore.tsv \
     --meta db/roadmap_meta.tsv \
     --out enrich \
+    --range -3,3 \
     --annot BLOOD,PANCREAS,THYMUS \
     --fileext png
 
@@ -33,27 +34,42 @@ Rscript src/enrich.r --splittfbs \
 '
 
 ### Shared Arguments
-p = add_argument(p, '--out',       help="[Path] Target directory for output files.")
-p = add_argument(p, '--verbose',   help="[Flag] Show detailed process.", flag=T)
+p = add_argument(p,'--out',
+    help="[Path] Target directory for output files.")
+p = add_argument(p,'--verbose',flag=T,
+    help="[Flag] Show detailed process.")
 
 ### Arguments for perm_test function
-p = add_argument(p, '--permu',     help="[Flag] Run fisher test", flag=T)
-p = add_argument(p, '--gwassnp',   help="[Path] GWAS list file. Columns: <SNPS> <MAPPED_TRAIT> <P.VALUE>")
-p = add_argument(p, '--chrstatus', help="[Path] BED file including chromosome status for permtest functions.")
-p = add_argument(p, '--dbsource',  help="[roadmap_bed/encode] Type in one of these options for source of your chromosome status.")
-p = add_argument(p, '--permn',     help="[Number] Set permutation number. Default=1000", default=1000, type="numeric")
+p = add_argument(p,'--permu',flag=T,
+    help="[Flag] Run fisher test")
+p = add_argument(p,'--gwassnp',
+    help="[Path] GWAS list file. Columns: <SNPS> <MAPPED_TRAIT> <P.VALUE>")
+p = add_argument(p,'--chrstatus',
+    help="[Path] BED file including chromosome status for permtest functions.")
+p = add_argument(p,'--dbsource', 
+    help="[roadmap_bed/encode_bed/gtex_tsv] Type in one of these options for source of your chromosome status.")
+p = add_argument(p,'--permn',default=1000, type="numeric",
+    help="[Number] Set permutation number. Default=1000")
 
 ### Arguments for draw_heatmap function
-p = add_argument(p, '--heatmap',   help="[Flag] Draw a heatmap from permu results.", flag=T)
-p = add_argument(p, '--pmdata',    help="[Path] Z-score table file.")
-p = add_argument(p, '--meta',      help="[Path] Add roadmap meta-info file for heatmap annotation.")
-p = add_argument(p, '--range',     help="[-4,4] Set coloring Z-score range to display.", default="-4,4")
-p = add_argument(p, '--annot',     help="[BLOOD,PANCREAS,THYMUS ...] Choose ANATOMYs of roadmap meta-info to annotate heatmap.")
-p = add_argument(p, '--fileext',   help="[png/sgv] Choose output figure format.")
+p = add_argument(p,'--heatmap',flag=T,
+    help="[Flag] Draw a heatmap from permu results.")
+p = add_argument(p,'--pmdata',
+    help="[Path] Z-score table file.")
+p = add_argument(p,'--meta',
+    help="[Path] Add roadmap meta-info file for heatmap annotation.")
+p = add_argument(p,'--range',default="-4,4",
+    help="[-4,4] Set coloring Z-score range to display.")
+p = add_argument(p,'--annot',
+    help="[BLOOD,PANCREAS,THYMUS ...] Choose ANATOMYs of roadmap meta-info to annotate heatmap.")
+p = add_argument(p,'--fileext',
+    help="[png/sgv] Choose output figure format.")
 
 ### Arguments for split_tfbs function
-p = add_argument(p, '--splittfbs', help="[Flag] Split ENCODE TFBS BED file by cell types.", flag=T)
-p = add_argument(p, '--tfbs',      help="[Path] ENCODE TFBS BED file.")
+p = add_argument(p,'--splittfbs',flag=T,
+    help="[Flag] Split ENCODE TFBS BED file by cell types.")
+p = add_argument(p,'--tfbs',
+    help="[Path] ENCODE TFBS BED file.")
 
 
 argv = parse_args(p)
@@ -72,14 +88,52 @@ split_tfbs = function(
     ifelse(!dir.exists(out), dir.create(out), "")
 
     # Read file
-    paste0('* Permutation result table = ') %>% cat
+    paste0('* ENCODE TFBS table = ') %>% cat
     tfbs = read.delim(f_tfbs, stringsAsFactors=F)
-    colnames(tfbs) = c('Chr','Start','End','TF','nada','Cells')
+    colnames(tfbs) = c('Chr','Start','End','TF','ids','Cells')
     dim(tfbs) %>% print
-    head(tfbs) %>% print
 
-    # Find unique cell types
-    cell_types = tfbs$Cells %>% unique
+    # Get unique cell types
+    cell_types = strsplit(tfbs$Cells,',') %>% unlist %>% unique %>% sort
+    n = length(cell_types)
+    paste0('* ',n,' unique cell types are found.\n\n') %>% cat
+
+    # Expand data by unique cell types
+    source('src/pdtime.r')
+    o = lapply(c(1:n), function(i) {
+        t1=Sys.time()
+
+        # Subset ENCODE data by cell type
+        paste0(i,' ',cell_types[i],':\t') %>% cat
+        tfbs_sub = subset(tfbs, grepl(cell_types[i],tfbs$Cells))
+        m = nrow(tfbs_sub)
+        progress = m%/%10
+        paste0(m,' regions, filtering [') %>% cat
+
+        # Split file by unique cell types
+        tfbs_filt_li = lapply(c(1:m), function(j) {
+            if(j%%progress==0) { '.' %>% cat }
+
+            tfbs_sub_j = tfbs_sub[j,1:4]
+            tfbs_cell = tfbs_sub[j,]$Cells
+            cells = strsplit(tfbs_cell,',')[[1]]
+            which_cells = which(cells==cell_types[i])
+            if(length(which_cells)>0) {
+                tfbs_sub_df = data.frame(tfbs_sub_j, Cell=cells[which_cells]) # debug
+            } else tfbs_sub_df = NULL
+            return(tfbs_sub_df)
+        })
+        paste0('] row = ') %>% cat
+        tfbs_filt_df = data.table::rbindlist(tfbs_filt_li)
+        tf_len = tfbs_filt_df$TF %>% unique %>% length
+        paste0(nrow(tfbs_filt_df),', TFs = ',tf_len,'. ') %>% cat
+
+        # Save file as BED format
+        f_name = paste0(out,'/',cell_types[i],'.bed')
+        write.table(tfbs_filt_df[,1:4],f_name,sep='\t',row.names=F,col.names=F,quote=F)
+        paste0('Save: ',f_name,'; ',pdtime(t1,2),'\n') %>% cat
+        return(NULL)
+    })
 }
 
 
@@ -123,21 +177,28 @@ draw_heatmap = function(
             anatomy = meta$ANATOMY
             `%notin%` = Negate(`%in%`) # define %notin% operator
             anatomy[meta$ANATOMY %notin% annots] = 'Other' # A bug to change as NA
+            anatomy_uq = anatomy %>% unique %>% sort
+
+            ## Set column annotation color
+            ann_cols = terrain.colors(length(anatomy_uq))
+            names(ann_cols) = anatomy_uq
             ha2 = HeatmapAnnotation(
                 Anatomy=anatomy,
-                #col=list(Anatomy=c("Other"="Grey")),
+                col=list(Anatomy=ann_cols),
                 gp=gpar(col="black", lwd=.5)
             )
         } else { ha2 = NULL }
-    } else { 
+    } else {
+        paste0('* [Notice] Meta-info table is not found.') %>% cat
         show_column_names = TRUE
         ha1 = NULL
         ha2 = NULL
     }
     
     # Configuration for heatmap
+    z_range = strsplit(range,',')[[1]] %>% as.numeric
     pmdata_mat = as.matrix(pmdata_mat)
-    my_col = colorRamp2(c(-4,0,4),c("#2E86C1","#FEF9E7","#C0392B"))
+    my_col = colorRamp2(c(z_range[1],0,z_range[2]),c("#2E86C1","#FEF9E7","#C0392B"))
 
     # Draw heatmap
     file_base = basename(f_pmdata)
@@ -197,7 +258,7 @@ perm_test = function(
         cell_types = c(cell_types,cell_type)
 
         ## Read file
-        paste0(i,' Load ',cell_type,': ') %>% cat
+        paste0(i,' ',cell_type,': ') %>% cat
         status = read_status_file(f_status_paths[i],db_src)
         paste0(nrow(status),'; ') %>% cat
 
@@ -208,9 +269,7 @@ perm_test = function(
         overlap_li[[i]] = data.frame(Status=pt_df$Status, Overlap=pt_df$Overlap)
         paste0(pdtime(t1,2),'\n') %>% cat
     }
-    pm_merge = function(x,y) {
-        merge(x=x,y=y,by='Status',all=T)
-    }
+    pm_merge = function(x,y) { merge(x=x,y=y,by='Status',all=T) }
     zscore_df  = Reduce(pm_merge, zscore_li)
     pval_df    = Reduce(pm_merge, pval_li)
     overlap_df = Reduce(pm_merge, overlap_li)
@@ -241,8 +300,12 @@ read_status_file = function(path,db_src) {
         status_raw = read.delim(path,header=F,skip=1)
         status_raw = status_raw[,1:4]
         colnames(status_raw) = c('Chr','Start','End','Ann')
-    } else if(db_src=='encode') {
-        paste0('encode = ') %>% cat
+    } else if(db_src=='encode_bed') {
+        status_raw = read.delim(path,header=F)
+        status_raw = status_raw[,1:4]
+        colnames(status_raw) = c('Chr','Start','End','Ann')
+    } else if(db_src=='gtex_tsv') {
+        #
     } else {
         paste0('\n\n[Error] Unknown option is flagged. Please choose one of [roadmap_bed/encode].\n') %>% cat
         stop()
@@ -262,12 +325,14 @@ perm_test_calc = function(
     # Calculate permTest to get z-scores and p-values by chromosome status
     paste0('permTest - ') %>% cat
     status_ann = status$Ann %>% unique %>% sort
-    paste0(length(status_ann),' annots = [') %>% cat
+    n = length(status_ann)
+    paste0(n,' annots = [') %>% cat
     status_all_bed = toGRanges(status[,1:4],format="BED")
-    pt_li = lapply(status_ann,function(x) {
-        '.' %>% cat
+    progress = n%/%10
+    pt_li = lapply(c(1:n),function(i) {
+        if(i%%progress==0) { '.' %>% cat }
         # Convert data.frame to GRanges format
-        status_sub = subset(status,Ann==x)
+        status_sub = subset(status,Ann==status_ann[i])
         status_sub_bed = toGRanges(status_sub,format="BED")
         
         pt = permTest(
@@ -281,7 +346,7 @@ perm_test_calc = function(
             verbose            = verbose
         )
         pt_df = data.frame(
-            Status  = x,
+            Status  = status_ann[i],
             Zscore  = pt$numOverlaps$zscore,
             Pval    = pt$numOverlaps$pval,
             Overlap = pt$numOverlaps$observed
