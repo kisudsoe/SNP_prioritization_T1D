@@ -858,29 +858,89 @@ Run this function for 484 roadmap enhancer SNPs.
 
 ```bash
 Rscript src/enrich.r --permu \
-    --gwassnp data/gwas_5e-08_129_hg19.bed \
+    --gwassnp data/snp_484_roadmap_dist.bed \
     --chrstatus db/roadmap_bed \
     --dbsource roadmap_bed \
     --permn 1000 \
     --out enrich
 ```
 
-> 
+> ** Run perm_test function in enrich.r **
+>
+> * Gwas snp = [1] 484   4
+> * 127 files were found from db/roadmap_bed.
+>
+> 1 E001: roadmap_bed = 933206; permTest - 25 annots = [............] done. Job process: 6.9 min
+> 2 E002: roadmap_bed = 837982; permTest - 25 annots = [............] done. Job process: 6.3 min
+> ...
+> 126 E128: roadmap_bed = 835642; permTest - 25 annots = [............] done. Job process: 6.4 min
+> 127 E129: roadmap_bed = 912567; permTest - 25 annots = [............] done. Job process: 6.8 min
+>
+> * Write file: enrich/roadmap_bed-snp_484_roadmap_dist-permn_1000-zscore.tsv
+> * Write file: enrich/roadmap_bed-snp_484_roadmap_dist-permn_1000-pval.tsv
+> * Write file: enrich/roadmap_bed-snp_484_roadmap_dist-permn_1000-overlap.tsv
+> There were 50 or more warnings (use warnings() to see the first 50)
+>
+> Job done: 2021-01-10 17:23:15 for 13.7 hr
 
 
 
-Run this function for encode tfbs SNPs.
+Run this function for 364 encode tfbs SNPs.
 
 ```bash
 Rscript src/enrich.r --permu \
     --gwassnp data/snp_364_encode_dist.bed \
     --chrstatus db/roadmap_bed \
     --dbsource roadmap_bed \
-    --permn 100 \
+    --permn 1000 \
     --out enrich
 ```
 
-> 
+> ** Run perm_test function in enrich.r **
+>
+> * Gwas snp = [1] 364   4
+> * 127 files were found from db/roadmap_bed.
+>
+> 1 E001: roadmap_bed = 933206; permTest - 25 annots [.........................] done. Job process: 1.9 min
+> 2 E002: roadmap_bed = 837982; permTest - 25 annots [.........................] done. Job process: 1.7 min
+> ...
+> 126 E128: roadmap_bed = 835642; permTest - 25 annots [.........................] done. Job process: 1.4 min
+> 127 E129: roadmap_bed = 912567; permTest - 25 annots [.........................] done. Job process: 1.4 min
+>
+> * Write file: enrich/roadmap_bed-snp_364_encode_dist-permn_100-zscore.tsv
+> * Write file: enrich/roadmap_bed-snp_364_encode_dist-permn_100-pval.tsv
+> * Write file: enrich/roadmap_bed-snp_364_encode_dist-permn_100-overlap.tsv
+
+
+
+Run this function for 745 gtex eQTL SNPs.
+
+```bash
+Rscript src/enrich.r --permu \
+    --gwassnp data/snp_745_gtex.bed \
+    --chrstatus db/roadmap_bed \
+    --dbsource roadmap_bed \
+    --permn 1000 \
+    --out enrich
+```
+
+> ** Run perm_test function in enrich.r **
+>
+> * Gwas snp = [1] 745   4
+> * 127 files were found from db/roadmap_bed.
+>
+> 1 E001: roadmap_bed = 933206; permTest - 25 annots [.....] done. Job process: 1.5 min
+> 2 E002: roadmap_bed = 837982; permTest - 25 annots [.....] done. Job process: 1.1 min
+> ...
+> 126 E128: roadmap_bed = 835642; permTest - 25 annots [.....] done. Job process: 1.5 min
+> 127 E129: roadmap_bed = 912567; permTest - 25 annots [.....] done. Job process: 1.5 min
+>
+> * Write file: enrich/roadmap_bed-snp_745_gtex-permn_100-zscore.tsv
+> * Write file: enrich/roadmap_bed-snp_745_gtex-permn_100-pval.tsv
+> * Write file: enrich/roadmap_bed-snp_745_gtex-permn_100-overlap.tsv
+>   There were 50 or more warnings (use warnings() to see the first 50)
+>
+> Job done: 2021-01-11 08:56:39 for 2.8 hr
 
 
 
@@ -928,11 +988,11 @@ Rscript src/enrich.r --heatmap \
 
 
 
-Draw heatmap for 484 roadmap enhancer SNPs.
+Draw heatmap for 484 roadmap enhancer SNPs:
 
 ```bash
 Rscript src/enrich.r --heatmap \
-    --pmdata enrich/roadmap_bed-snp_484_roadmap_dist-permn_1000-zscore.tsv \
+    --pmdata enrich/roadmap_bed-snp_484_roadmap_dist-permn_100-zscore.tsv \
     --meta db/roadmap_meta.tsv \
     --out enrich \
     --range -3,3 \
@@ -951,9 +1011,51 @@ Rscript src/enrich.r --heatmap \
 
 
 
+Draw heatmap for 364 tfbs residing SNPs:
+
+```
+Rscript src/enrich.r --heatmap \
+    --pmdata enrich/roadmap_bed-snp_364_encode_dist-permn_100-zscore.tsv \
+    --meta db/roadmap_meta.tsv \
+    --out enrich \
+    --range -4,4 \
+    --annot BLOOD,PANCREAS,THYMUS \
+    --fileext png
+```
+
+> ** Run draw_heatmap function in enrich.r **
+>
+> * Permutation result table = [1]  25 128
+> * [Optional] Add meta-info. table = [1] 127   9
+>
+> Save as enrich/roadmap_bed-snp_364_encode_dist-permn_100-zscore.png
 
 
-## ENCODE Analysis Data
+
+Draw heatmap for 745 GTEx eQTL SNPs:
+
+```
+Rscript src/enrich.r --heatmap \
+    --pmdata enrich/roadmap_bed-snp_745_gtex-permn_100-zscore.tsv \
+    --meta db/roadmap_meta.tsv \
+    --out enrich \
+    --range -4,4 \
+    --annot BLOOD,PANCREAS,THYMUS \
+    --fileext png
+```
+
+> ** Run draw_heatmap function in enrich.r **
+>
+> * Permutation result table = [1]  25 128
+> * [Optional] Add meta-info. table = [1] 127   9
+>
+> Save as enrich/roadmap_bed-snp_745_gtex-permn_100-zscore.png
+>
+> Job done: 2021-01-11 21:51:22 for 4.2 sec
+
+
+
+## ENCODE TFBS data
 
 Data browse and download: http://genome.ucsc.edu/ENCODE/downloads.html
 
@@ -1077,7 +1179,144 @@ Rscript src/enrich.r --permu \
     --out enrich
 ```
 
-> 
+> ** Run perm_test function in enrich.r **
+>
+> * Gwas snp = [1] 129   4
+> * 91 files were found from db/encode_bed.
+>
+> 1 A549: encode_bed = 380569; permTest - 24 annots [......] done. Job process: 1.8 min
+> 2 AG04449: encode_bed = 49378; permTest - 1 annots [Error in if (i%%progress == 0) { : missing value where TRUE/FALSE needed       
+> Calls: perm_test -> perm_test_calc -> lapply -> lapply -> FUN
+> Execution halted
+> root@f1e31bda3122:/git# Rscript src/enrich.r --permu     --gwassnp data/gwas_5e-08_129_hg19.bed     --chrstatus db/encode_bed     --dbsource encode_bed     --permn 100     --out enrich
+>
+> ** Run perm_test function in enrich.r **
+>
+> * Gwas snp = [1] 129   4
+> * 91 files were found from db/encode_bed.
+>
+> 1 A549: encode_bed = 380569; permTest - 24 annots [......] done. Job process: 42.7 sec
+> 2 AG04449: encode_bed = 49378; permTest - 1 annots [] done. Job process: 2.4 sec
+> ...
+> 90 WERI-Rb-1: encode_bed = 49892; permTest - 1 annots [] done. Job process: 4.7 sec
+> 91 WI-38: encode_bed = 31216; permTest - 1 annots [] done. Job process: 3.7 sec
+>
+> * Write file: enrich/encode_bed-gwas_5e-08_129_hg19-permn_100-zscore.tsv
+> * Write file: enrich/encode_bed-gwas_5e-08_129_hg19-permn_100-pval.tsv
+> * Write file: enrich/encode_bed-gwas_5e-08_129_hg19-permn_100-overlap.tsv
+
+
+
+Run below code for T1D candidate1817 SNP data:
+
+```bash
+Rscript src/enrich.r --permu \
+    --gwassnp data/seedSNP_1817_bm.bed \
+    --chrstatus db/encode_bed \
+    --dbsource encode_bed \
+    --permn 100 \
+    --out enrich
+```
+
+> * Gwas snp = [1] 1817    4
+> * 91 files were found from db/encode_bed.
+>
+> 1 A549: encode_bed = 380569; permTest - 24 annots [........................] done. Job process: 1.2 min
+> 2 AG04449: encode_bed = 49378; permTest - 1 annots [.] done. Job process: 3.9 sec
+> 3 AG04450: encode_bed = 46148; permTest - 1 annots [.] done. Job process: 4.8 sec
+> 4 AG09309: encode_bed = 43614; permTest - 1 annots [.] done. Job process: 3.6 sec
+> 5 AG09319: encode_bed = 49235; permTest - 1 annots [.] done. Job process: 4.8 sec
+> 6 AG10803: encode_bed = 47269; permTest - 1 annots [.] done. Job process: 4.9 sec
+> 7 AoAF: encode_bed = 45395; permTest - 1 annots [.] done. Job process: 4.3 sec
+> 8 BE2_C: encode_bed = 54249; permTest - 1 annots [.] done. Job process: 4.5 sec
+> 9 BJ: encode_bed = 44331; permTest - 1 annots [.] done. Job process: 4.6 sec
+> 10 Caco-2: encode_bed = 46436; permTest - 1 annots [.] done. Job process: 6.5 sec
+> 11 Dnd41: encode_bed = 51005; permTest - 2 annots [..] done. Job process: 7.5 sec
+> 12 ECC-1: encode_bed = 70393; permTest - 5 annots [.....] done. Job process: 17.7 sec
+> 13 Fibrobl: encode_bed = 45188; permTest - 1 annots [.] done. Job process: 4.8 sec
+> 14 GM06990: encode_bed = 45215; permTest - 1 annots [.] done. Job process: 4.8 sec
+> 15 GM08714: encode_bed = 441; permTest - 1 annots [.] done. Job process: 4.1 sec
+> 16 GM10847: encode_bed = 17131; permTest - 2 annots [..] done. Job process: 6.4 sec
+> 17 GM12801: encode_bed = 2882; permTest - 1 annots [.] done. Job process: 2.3 sec
+> 18 GM12864: encode_bed = 46474; permTest - 1 annots [.] done. Job process: 3.6 sec
+> 19 GM12865: encode_bed = 43737; permTest - 1 annots [.] done. Job process: 3.1 sec
+> 20 GM12872: encode_bed = 46803; permTest - 1 annots [.] done. Job process: 3.4 sec
+> 21 GM12873: encode_bed = 50614; permTest - 1 annots [.] done. Job process: 3.8 sec
+> 22 GM12874: encode_bed = 37269; permTest - 1 annots [.] done. Job process: 3.2 sec
+> 23 GM12875: encode_bed = 38921; permTest - 1 annots [.] done. Job process: 3.4 sec
+> 24 GM12878: encode_bed = 1061985; permTest - 76 annots [............................................................................] done. Job process: 4.1 min
+> 25 GM12891: encode_bed = 179010; permTest - 8 annots [........] done. Job process: 27.7 sec
+> 26 GM12892: encode_bed = 109701; permTest - 6 annots [......] done. Job process: 19 sec
+> 27 GM15510: encode_bed = 25455; permTest - 2 annots [..] done. Job process: 5.8 sec
+> 28 GM18505: encode_bed = 23947; permTest - 2 annots [..] done. Job process: 5.9 sec
+> 29 GM18526: encode_bed = 15322; permTest - 2 annots [..] done. Job process: 7 sec
+> 30 GM18951: encode_bed = 28090; permTest - 2 annots [..] done. Job process: 6 sec
+> 31 GM19099: encode_bed = 23281; permTest - 2 annots [..] done. Job process: 5.8 sec
+> 32 GM19193: encode_bed = 20116; permTest - 2 annots [..] done. Job process: 5.3 sec
+> 33 GM19238: encode_bed = 48654; permTest - 1 annots [.] done. Job process: 5 sec
+> 34 GM19239: encode_bed = 40161; permTest - 1 annots [.] done. Job process: 4.5 sec
+> 35 GM19240: encode_bed = 44690; permTest - 1 annots [.] done. Job process: 3.6 sec
+> 36 Gliobla: encode_bed = 75041; permTest - 2 annots [..] done. Job process: 8.1 sec
+> 37 H1-hESC: encode_bed = 579539; permTest - 50 annots [..................................................] done. Job process: 2.6 min
+> 38 HA-sp: encode_bed = 46196; permTest - 1 annots [.] done. Job process: 4.6 sec
+> 39 HAc: encode_bed = 45162; permTest - 1 annots [.] done. Job process: 3.9 sec
+> 40 HBMEC: encode_bed = 57865; permTest - 1 annots [.] done. Job process: 4.9 sec
+> 41 HCFaa: encode_bed = 41307; permTest - 1 annots [.] done. Job process: 4.1 sec
+> 42 HCM: encode_bed = 49849; permTest - 1 annots [.] done. Job process: 3.9 sec
+> 43 HCPEpiC: encode_bed = 60523; permTest - 1 annots [.] done. Job process: 4.3 sec
+> 44 HCT-116: encode_bed = 108478; permTest - 5 annots [.....] done. Job process: 16.7 sec
+> 45 HEEpiC: encode_bed = 45911; permTest - 1 annots [.] done. Job process: 4.7 sec
+> 46 HEK293-T-REx: encode_bed = 27223; permTest - 1 annots [.] done. Job process: 4.3 sec
+> 47 HEK293: encode_bed = 83501; permTest - 5 annots [.....] done. Job process: 17 sec
+> 48 HFF-Myc: encode_bed = 43263; permTest - 1 annots [.] done. Job process: 4.3 sec
+> 49 HFF: encode_bed = 34712; permTest - 1 annots [.] done. Job process: 3.7 sec
+> 50 HL-60: encode_bed = 16646; permTest - 1 annots [.] done. Job process: 4.8 sec
+> 51 HMEC: encode_bed = 59572; permTest - 2 annots [..] done. Job process: 7.5 sec
+> 52 HMF: encode_bed = 53800; permTest - 1 annots [.] done. Job process: 4.6 sec
+> 53 HPAF: encode_bed = 56233; permTest - 1 annots [.] done. Job process: 5.8 sec
+> 54 HPF: encode_bed = 45785; permTest - 1 annots [.] done. Job process: 4.1 sec
+> 55 HRE: encode_bed = 42047; permTest - 1 annots [.] done. Job process: 4.2 sec
+> 56 HRPEpiC: encode_bed = 52715; permTest - 1 annots [.] done. Job process: 5 sec
+> 57 HSMM: encode_bed = 51799; permTest - 2 annots [..] done. Job process: 7.2 sec
+> 58 HSMMtube: encode_bed = 49162; permTest - 2 annots [..] done. Job process: 8 sec
+> 59 HUVEC: encode_bed = 199307; permTest - 8 annots [........] done. Job process: 31.9 sec
+> 60 HVMF: encode_bed = 46055; permTest - 1 annots [.] done. Job process: 3.8 sec
+> 61 HeLa-S3: encode_bed = 706062; permTest - 55 annots [.......................................................] done. Job process: 
+> 3 min
+> 62 HepG2: encode_bed = 977490; permTest - 59 annots [...........................................................] done. Job process: 4.4 min
+> 63 IMR90: encode_bed = 207461; permTest - 5 annots [.....] done. Job process: 21.2 sec
+> 64 K562: encode_bed = 1338658; permTest - 100 annots [....................................................................................................] done. Job process: 6.1 min
+> 65 MCF-7: encode_bed = 199597; permTest - 7 annots [.......] done. Job process: 32.2 sec
+> 66 MCF10A-Er-Src: encode_bed = 240871; permTest - 5 annots [.....] done. Job process: 24.6 sec
+> 67 NB4: encode_bed = 108920; permTest - 4 annots [....] done. Job process: 17.2 sec
+> 68 NH-A: encode_bed = 41714; permTest - 2 annots [..] done. Job process: 7.8 sec
+> 69 NHDF-Ad: encode_bed = 51628; permTest - 2 annots [..] done. Job process: 8.4 sec
+> 70 NHDF-neo: encode_bed = 45555; permTest - 1 annots [.] done. Job process: 4.3 sec
+> 71 NHEK: encode_bed = 73479; permTest - 3 annots [...] done. Job process: 12.2 sec
+> 72 NHLF: encode_bed = 46063; permTest - 2 annots [..] done. Job process: 7.8 sec
+> 73 NT2-D1: encode_bed = 7534; permTest - 3 annots [...] done. Job process: 8.6 sec
+> 74 Osteobl: encode_bed = 52928; permTest - 1 annots [.] done. Job process: 4.3 sec
+> 75 PANC-1: encode_bed = 32124; permTest - 4 annots [....] done. Job process: 12.1 sec
+> 76 PBDE: encode_bed = 30175; permTest - 2 annots [..] done. Job process: 8.1 sec
+> 77 PBDEFetal: encode_bed = 2125; permTest - 1 annots [.] done. Job process: 3.7 sec
+> 78 PFSK-1: encode_bed = 40286; permTest - 4 annots [....] done. Job process: 14.9 sec
+> 79 ProgFib: encode_bed = 55609; permTest - 2 annots [..] done. Job process: 9.7 sec
+> 80 RPTEC: encode_bed = 58235; permTest - 1 annots [.] done. Job process: 5.1 sec
+> 81 Raji: encode_bed = 13738; permTest - 1 annots [.] done. Job process: 4.1 sec
+> 82 SAEC: encode_bed = 42144; permTest - 1 annots [.] done. Job process: 5.1 sec
+> 83 SH-SY5Y: encode_bed = 49309; permTest - 2 annots [..] done. Job process: 7.8 sec
+> 84 SK-N-MC: encode_bed = 36916; permTest - 2 annots [..] done. Job process: 10.3 sec
+> 85 SK-N-SH: encode_bed = 77541; permTest - 4 annots [....] done. Job process: 15 sec
+> 86 SK-N-SH_RA: encode_bed = 192380; permTest - 5 annots [.....] done. Job process: 28.6 sec
+> 87 T-47D: encode_bed = 132022; permTest - 5 annots [.....] done. Job process: 23 sec
+> 88 U2OS: encode_bed = 32015; permTest - 2 annots [..] done. Job process: 8.4 sec
+> 89 U87: encode_bed = 30009; permTest - 2 annots [..] done. Job process: 6.8 sec
+> 90 WERI-Rb-1: encode_bed = 49892; permTest - 1 annots [.] done. Job process: 4.5 sec
+> 91 WI-38: encode_bed = 31216; permTest - 1 annots [.] done. Job process: 4.8 sec
+>
+> * Write file: enrich/encode_bed-seedSNP_1817_bm-permn_100-zscore.tsv
+> * Write file: enrich/encode_bed-seedSNP_1817_bm-permn_100-pval.tsv
+> * Write file: enrich/encode_bed-seedSNP_1817_bm-permn_100-overlap.tsv
 
 
 
@@ -1093,6 +1332,140 @@ Rscript src/enrich.r --heatmap \
     --range -3,3 \
     --annot blood,pancreas \
     --fileext png
+```
+
+> ** Run draw_heatmap function in enrich.r **
+>
+> * Permutation result table = [1] 161  92
+> * [Optional] Add meta-info. table = [1] 91  7
+>
+> Save as enrich/encode_bed-gwas_5e-08_129_hg19-permn_100-zscore.png
+
+Run below code for T1D candidate1817 SNP data:
+
+```bash
+Rscript src/enrich.r --heatmap \
+    --pmdata enrich/encode_bed-seedSNP_1817_bm-permn_100-zscore.tsv \
+    --meta db/encode_meta.tsv \
+    --out enrich \
+    --range -3,3 \
+    --annot blood,pancreas \
+    --fileext png
+```
+
+> ** Run draw_heatmap function in enrich.r **
+>
+> * Permutation result table = [1] 161  92
+> * [Optional] Add meta-info. table = [1] 91  7
+>
+> Save as enrich/encode_bed-seedSNP_1817_bm-permn_100-zscore.png
+
+
+
+## GTEx eQTL data
+
+To split ENCODE TFBS file by cell types, run below code:
+
+```bash
+Rscript src/enrich.r --splitgtex \
+    --gtex db/gtex_signif_5e-8.tsv.rds \
+    --out db/gtex_tsv
+```
+
+> ** Run split_gtex function in enrich.r **
+>
+> * GTEx table = [1] 17113536        9
+> * 48 unique tissue types are found.
+>
+> 1 Adipose_Subcutaneous: 732572 pairs, SNPs = 479346, genes = 6458. Save: db/gtex_tsv/Adipose_Subcutaneous.tsv; Job process: 14.3 sec
+> 2 Adipose_Visceral_Omentum:     488060 pairs, SNPs = 343596, genes = 4640. Save: db/gtex_tsv/Adipose_Visceral_Omentum.tsv; Job process: 10.3 sec
+> 3 Adrenal_Gland:        251774 pairs, SNPs = 178087, genes = 3013. Save: db/gtex_tsv/Adrenal_Gland.tsv; Job process: 5.4 sec
+> 4 Artery_Aorta: 497489 pairs, SNPs = 347636, genes = 4889. Save: db/gtex_tsv/Artery_Aorta.tsv; Job process: 9.1 sec
+> 5 Artery_Coronary:      170735 pairs, SNPs = 121719, genes = 2055. Save: db/gtex_tsv/Artery_Coronary.tsv; Job process: 4.4 sec
+> 6 Artery_Tibial:        745555 pairs, SNPs = 503781, genes = 6548. Save: db/gtex_tsv/Artery_Tibial.tsv; Job process: 13.2 sec
+> 7 Brain_Amygdala:       75907 pairs, SNPs = 47669, genes = 892. Save: db/gtex_tsv/Brain_Amygdala.tsv; Job process: 2.4 sec
+> 8 Brain_Anterior_cingulate_cortex_BA24: 130324 pairs, SNPs = 88664, genes = 1568. Save: db/gtex_tsv/Brain_Anterior_cingulate_cortex_BA24.tsv; Job process: 3.2 sec
+> 9 Brain_Caudate_basal_ganglia:  193909 pairs, SNPs = 136644, genes = 2305. Save: db/gtex_tsv/Brain_Caudate_basal_ganglia.tsv; Job process: 4.6 sec
+> 10 Brain_Cerebellar_Hemisphere: 255466 pairs, SNPs = 161056, genes = 2902. Save: db/gtex_tsv/Brain_Cerebellar_Hemisphere.tsv; Job process: 5.9 sec
+> 11 Brain_Cerebellum:    364347 pairs, SNPs = 237434, genes = 4156. Save: db/gtex_tsv/Brain_Cerebellum.tsv; Job process: 7.5 sec
+> 12 Brain_Cortex:        210939 pairs, SNPs = 148013, genes = 2581. Save: db/gtex_tsv/Brain_Cortex.tsv; Job process: 5.1 sec
+> 13 Brain_Frontal_Cortex_BA9:    151424 pairs, SNPs = 103230, genes = 1964. Save: db/gtex_tsv/Brain_Frontal_Cortex_BA9.tsv; Job process: 4.3 sec
+> 14 Brain_Hippocampus:   105435 pairs, SNPs = 71524, genes = 1250. Save: db/gtex_tsv/Brain_Hippocampus.tsv; Job process: 2.6 sec
+> 15 Brain_Hypothalamus:  110627 pairs, SNPs = 73904, genes = 1321. Save: db/gtex_tsv/Brain_Hypothalamus.tsv; Job process: 3.6 sec
+> 16 Brain_Nucleus_accumbens_basal_ganglia:       167615 pairs, SNPs = 116190, genes = 2016. Save: db/gtex_tsv/Brain_Nucleus_accumbens_basal_ganglia.tsv; Job process: 4.6 sec
+> 17 Brain_Putamen_basal_ganglia: 132821 pairs, SNPs = 90976, genes = 1625. Save: db/gtex_tsv/Brain_Putamen_basal_ganglia.tsv; Job process: 4.1 sec
+> 18 Brain_Spinal_cord_cervical_c-1:      79575 pairs, SNPs = 49284, genes = 1033. Save: db/gtex_tsv/Brain_Spinal_cord_cervical_c-1.tsv; Job process: 2.5 sec
+> 19 Brain_Substantia_nigra:      62312 pairs, SNPs = 38290, genes = 738. Save: db/gtex_tsv/Brain_Substantia_nigra.tsv; Job process: 
+> 2.1 sec
+> 20 Breast_Mammary_Tissue:       359737 pairs, SNPs = 248378, genes = 3630. Save: db/gtex_tsv/Breast_Mammary_Tissue.tsv; Job process: 7.3 sec
+> 21 Cells_EBV-transformed_lymphocytes:   133183 pairs, SNPs = 89175, genes = 1690. Save: db/gtex_tsv/Cells_EBV-transformed_lymphocytes.tsv; Job process: 3.5 sec
+> 22 Cells_Transformed_fibroblasts:       593793 pairs, SNPs = 416044, genes = 5771. Save: db/gtex_tsv/Cells_Transformed_fibroblasts.tsv; Job process: 11.3 sec
+> 23 Colon_Sigmoid:       322044 pairs, SNPs = 221996, genes = 3431. Save: db/gtex_tsv/Colon_Sigmoid.tsv; Job process: 7.6 sec
+> 24 Colon_Transverse:    380068 pairs, SNPs = 261772, genes = 3929. Save: db/gtex_tsv/Colon_Transverse.tsv; Job process: 8 sec
+> 25 Esophagus_Gastroesophageal_Junction: 337678 pairs, SNPs = 235643, genes = 3562. Save: db/gtex_tsv/Esophagus_Gastroesophageal_Junction.tsv; Job process: 8.2 sec
+> 26 Esophagus_Mucosa:    726202 pairs, SNPs = 468871, genes = 6378. Save: db/gtex_tsv/Esophagus_Mucosa.tsv; Job process: 14.7 sec
+> 27 Esophagus_Muscularis:        678726 pairs, SNPs = 456865, genes = 6025. Save: db/gtex_tsv/Esophagus_Muscularis.tsv; Job process: 14.2 sec
+> 28 Heart_Atrial_Appendage:      402932 pairs, SNPs = 287951, genes = 4053. Save: db/gtex_tsv/Heart_Atrial_Appendage.tsv; Job process: 8.7 sec
+> 29 Heart_Left_Ventricle:        365179 pairs, SNPs = 260492, genes = 3713. Save: db/gtex_tsv/Heart_Left_Ventricle.tsv; Job process: 8.3 sec
+> 30 Liver:       157448 pairs, SNPs = 111629, genes = 1877. Save: db/gtex_tsv/Liver.tsv; Job process: 4.3 sec
+> 31 Lung:        694407 pairs, SNPs = 453798, genes = 6102. Save: db/gtex_tsv/Lung.tsv; Job process: 13.2 sec
+> 32 Minor_Salivary_Gland:        66481 pairs, SNPs = 45632, genes = 941. Save: db/gtex_tsv/Minor_Salivary_Gland.tsv; Job process: 3 sec
+> 33 Muscle_Skeletal:     724430 pairs, SNPs = 485201, genes = 5791. Save: db/gtex_tsv/Muscle_Skeletal.tsv; Job process: 13.6 sec
+> 34 Nerve_Tibial:        890851 pairs, SNPs = 571923, genes = 7782. Save: db/gtex_tsv/Nerve_Tibial.tsv; Job process: 19 sec
+> 35 Ovary:       134741 pairs, SNPs = 89668, genes = 1670. Save: db/gtex_tsv/Ovary.tsv; Job process: 4.4 sec
+> 36 Pancreas:    345819 pairs, SNPs = 247140, genes = 3764. Save: db/gtex_tsv/Pancreas.tsv; Job process: 7.4 sec
+> 37 Pituitary:   262721 pairs, SNPs = 176991, genes = 2846. Save: db/gtex_tsv/Pituitary.tsv; Job process: 5.8 sec
+> 38 Prostate:    143429 pairs, SNPs = 94202, genes = 1647. Save: db/gtex_tsv/Prostate.tsv; Job process: 4 sec
+> 39 Skin_Not_Sun_Exposed_Suprapubic:     607740 pairs, SNPs = 405351, genes = 5689. Save: db/gtex_tsv/Skin_Not_Sun_Exposed_Suprapubic.tsv; Job process: 12.8 sec
+> 40 Skin_Sun_Exposed_Lower_leg:  821197 pairs, SNPs = 532886, genes = 7065. Save: db/gtex_tsv/Skin_Sun_Exposed_Lower_leg.tsv; Job process: 16 sec
+> 41 Small_Intestine_Terminal_Ileum:      137388 pairs, SNPs = 95423, genes = 1734. Save: db/gtex_tsv/Small_Intestine_Terminal_Ileum.tsv; Job process: 4.6 sec
+> 42 Spleen:      232394 pairs, SNPs = 165671, genes = 3025. Save: db/gtex_tsv/Spleen.tsv; Job process: 4.9 sec
+> 43 Stomach:     305539 pairs, SNPs = 216267, genes = 3157. Save: db/gtex_tsv/Stomach.tsv; Job process: 6.7 sec
+> 44 Testis:      677525 pairs, SNPs = 473444, genes = 7154. Save: db/gtex_tsv/Testis.tsv; Job process: 12.8 sec
+> 45 Thyroid:     997164 pairs, SNPs = 614306, genes = 8063. Save: db/gtex_tsv/Thyroid.tsv; Job process: 17.7 sec
+> 46 Uterus:      95351 pairs, SNPs = 58512, genes = 1100. Save: db/gtex_tsv/Uterus.tsv; Job process: 3.5 sec
+> 47 Vagina:      91635 pairs, SNPs = 59912, genes = 1015. Save: db/gtex_tsv/Vagina.tsv; Job process: 3.1 sec
+> 48 Whole_Blood: 500848 pairs, SNPs = 344421, genes = 4847. Save: db/gtex_tsv/Whole_Blood.tsv; Job process: 9.6 sec
+>
+> Job done: 2021-01-10 06:53:10 for 7 min
+
+
+
+### Run permutation test
+
+Run below code for T1D candidate 1817 SNPs:
+
+```bash
+data/seedSNP_1817_bm.bed
+data/gwas_5e-08_129_hg19.bed
+data/snp_364_encode_dist.bed
+data/snp_484_roadmap_dist.bed
+data/snp_745_gtex.bed
+
+--gtex_base data/gtex_5e-08_745.tsv
+--gtex_base db/gtex_signif_5e-8.tsv.rds
+
+Rscript src/enrich.r --gtex_perm \
+	--gwas_snp data/seedSNP_1817_bm.bed \
+    --gtex_base db/gtex_signif_5e-8.tsv.rds \
+    --gtex_median_tpm db/gtex_analysis_v8_rnaseq_gene_median_tpm_ensgid.gct.rds \
+    --perm_n 1000 \
+    --out enrich
+```
+
+> 
+
+
+
+Run below code for T1D GWAS 129 SNP data:
+
+```bash
+Rscript src/enrich.r --gtex_perm \
+	--gwas_snp data/gwas_5e-08_129.tsv \
+    --gtex_base db/gtex_signif_5e-8.tsv.rds \
+    --gtex_median_tpm db/gtex_analysis_v8_rnaseq_gene_median_tpm_ensgid.gct.rds \
+    --perm_n 1000 \
+    --out enrich
 ```
 
 > 
