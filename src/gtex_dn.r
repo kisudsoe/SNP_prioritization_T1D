@@ -4,7 +4,7 @@
 ## Command Arg Parameters ##
 # Usage: Rscript gtex_dn.r
 args = commandArgs(trailingOnly=T)
-hmsg = 'Rscript gtex.r
+hmsg = 'Rscript gtex_dn.r
   - No argument is needed.'
 if(length(args) > 0) stop(hmsg)
 
