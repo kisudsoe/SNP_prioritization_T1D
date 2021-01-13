@@ -6,18 +6,33 @@ p = arg_parser("Function for enrichment analysis (Fisher/Permutation)")
 ### Examples
 p = add_argument(p, '--example', help="See examples to run this tool.", flag=T)
 example_msg = '
-Rscript src/enrich.r --permu --verbose \
-    --gwassnp data/seedSNP_1817_bm.bed \
-    --chrstatus db/roadmap_bed/E001_25_imputed12marks_dense.bed \
-    --dbsource roadmap_bed \
-    --permn 5000 \
-    --out enrich
+Rscript src/enrich.r --splittfbs \
+    --tfbs db/wgEncodeRegTfbsClusteredWithCellsV3.bed \
+    --out db/tfbs_cell
+
+Rscript src/enrich.r --splitgtex \
+    --gtex db/gtex_signif_5e-8.tsv.rds \
+    --out db/gtex_tsv
 
 Rscript src/enrich.r --permu \
     --gwassnp data/seedSNP_1817_bm.bed \
     --chrstatus db/roadmap_bed \
     --dbsource roadmap_bed \
-    --permn 5000 \
+    --permn 1000 \
+    --out enrich
+
+Rscript src/enrich.r --permu \
+    --gwassnp data/gwas_5e-08_129_hg19.bed \
+    --chrstatus db/encode_bed \
+    --dbsource encode_bed \
+    --permn 100 \
+    --out enrich
+
+Rscript src/enrich.r --gtexperm \
+    --gtex_base data/gtex_5e-08_745.tsv \
+    --snp_filt db/gtex_tsv \
+    --gtex_median_tpm db/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_median_tpm.gct
+    --permn 100 \
     --out enrich
 
 Rscript src/enrich.r --heatmap \
@@ -27,34 +42,30 @@ Rscript src/enrich.r --heatmap \
     --range -3,3 \
     --annot BLOOD,PANCREAS,THYMUS \
     --fileext png
-
-Rscript src/enrich.r --splittfbs \
-    --tfbs db/wgEncodeRegTfbsClusteredWithCellsV3.bed \
-    --out db/tfbs_cell
 '
 
 ### Shared Arguments
+p = add_argument(p,'--gwas_snp',
+    help="[Path] GWAS list BED file. Columns: <Chr> <Start> <End> <Rsid>")
 p = add_argument(p,'--out',
     help="[Path] Target directory for output files.")
 p = add_argument(p,'--verbose',flag=T,
     help="[Flag] Show detailed process.")
+p = add_argument(p,'--perm_n',default=1000, type="numeric",
+    help="[Number] Set permutation number. Default=1000")
 
 ### Arguments for perm_test function
 p = add_argument(p,'--permu',flag=T,
-    help="[Flag] Run fisher test")
-p = add_argument(p,'--gwassnp',
-    help="[Path] GWAS list file. Columns: <SNPS> <MAPPED_TRAIT> <P.VALUE>")
-p = add_argument(p,'--chrstatus',
+    help="[Flag] Run permutation test for Roadmap/ENCODE data.")
+p = add_argument(p,'--chr_status',
     help="[Path] BED file including chromosome status for permtest functions.")
-p = add_argument(p,'--dbsource', 
-    help="[roadmap_bed/encode_bed/gtex_tsv] Type in one of these options for source of your chromosome status.")
-p = add_argument(p,'--permn',default=1000, type="numeric",
-    help="[Number] Set permutation number. Default=1000")
+p = add_argument(p,'--db_source', 
+    help="[roadmap_bed/encode_bed] Type in one of these options for source of your chromosome status.")
 
 ### Arguments for draw_heatmap function
 p = add_argument(p,'--heatmap',flag=T,
     help="[Flag] Draw a heatmap from permu results.")
-p = add_argument(p,'--pmdata',
+p = add_argument(p,'--pm_data',
     help="[Path] Z-score table file.")
 p = add_argument(p,'--meta',
     help="[Path] Add roadmap meta-info file for heatmap annotation.")
@@ -62,14 +73,28 @@ p = add_argument(p,'--range',default="-4,4",
     help="[-4,4] Set coloring Z-score range to display.")
 p = add_argument(p,'--annot',
     help="[BLOOD,PANCREAS,THYMUS ...] Choose ANATOMYs of roadmap meta-info to annotate heatmap.")
-p = add_argument(p,'--fileext',
+p = add_argument(p,'--file_ext',
     help="[png/sgv] Choose output figure format.")
 
 ### Arguments for split_tfbs function
-p = add_argument(p,'--splittfbs',flag=T,
+p = add_argument(p,'--split_tfbs',flag=T,
     help="[Flag] Split ENCODE TFBS BED file by cell types.")
 p = add_argument(p,'--tfbs',
     help="[Path] ENCODE TFBS BED file.")
+
+### Arguments for split_gtex function
+p = add_argument(p,'--split_gtex',flag=T,
+    help="[Flag] Split GTEx eQTL file by tissue types.")
+p = add_argument(p,'--gtex',
+    help="[Path] GTEx eQTL RDS file.")
+
+### Arguments for gtex_perm_test function
+p = add_argument(p,'--gtex_perm',flag=T,
+    help="[Flag] Run permutation test for GTEx eQTL data.")
+p = add_argument(p,'--gtex_base',
+    help="[Path] GTEx overlapped TSV file.")
+p = add_argument(p,'--gtex_median_tpm',
+    help="[Path] GTEx gene median tpm GCT file.")
 
 
 argv = parse_args(p)
@@ -80,6 +105,44 @@ suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
 
 ## Functions ##
+split_gtex = function(
+    f_gtex = NULL,
+    out    = NULL
+) {
+    paste0('\n** Run split_gtex function in enrich.r **\n\n') %>% cat
+    ifelse(!dir.exists(out), dir.create(out), "")
+
+    # Read file
+    paste0('* GTEx table = ') %>% cat
+    gtex = readRDS(f_gtex)
+    dim(gtex) %>% print
+
+    # Get unique tissue types
+    tissue_types = gtex$tissue %>% unique %>% sort
+    n = length(tissue_types)
+    paste0('* ',n,' unique tissue types are found.\n\n') %>% cat
+
+    # Split file by unique tissue types
+    source('src/pdtime.r')
+    o=lapply(c(1:n), function(i) {
+        t1 = Sys.time()
+        paste0(i,' ',tissue_types[i],':\t') %>% cat
+        gtex_sub = subset(gtex,tissue==tissue_types[i])
+        m = nrow(gtex_sub)
+        paste0(m,' pairs, SNPs = ') %>% cat
+        snps_len = gtex_sub$variant_id %>% unique %>% length
+        gene_len = gtex_sub$gene_id %>% unique %>% length
+        paste0(snps_len,', genes = ',gene_len,'. ') %>% cat
+
+        # Save file as BED format
+        f_name = paste0(out,'/',tissue_types[i],'.tsv')
+        write.table(gtex_sub[,c(1:5,9)],f_name,sep='\t',row.names=F,quote=F)
+        paste0('Save: ',f_name,'; ',pdtime(t1,2),'\n') %>% cat
+        return(NULL)
+    })
+}
+
+
 split_tfbs = function(
     f_tfbs = NULL,
     out    = NULL
@@ -246,6 +309,149 @@ draw_heatmap = function(
 }
 
 
+gtex_perm_test = function(
+    f_gwas_snp  = NULL,
+    f_gtex_base = NULL,
+    f_gtex_median_tpm = NULL,
+    out         = 'enrich',
+    perm_n      = 1000
+) {
+    paste0('\n** Run gtex_perm_test function in enrich.r **\n\n') %>% cat
+    suppressMessages(library(fgsea))
+    suppressMessages(library(data.table))
+    suppressMessages(library(ggplot2))
+    suppressMessages(library(tidyr))
+    ifelse(!dir.exists(out), dir.create(out), "")
+
+    # Read files
+    paste0('* Input SNPs = ') %>% cat
+    snps = read.delim(f_gwas_snp, header=F, stringsAsFactors=F)
+    colnames(snps) = c('Chr','Start','End','Rsid')
+    dim(snps) %>% print
+
+    paste0('* GTEx eQTL pairs = ') %>% cat
+    gtex_pairs = readRDS(f_gtex_base)
+    colnames(gtex_pairs) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
+    gtex_pairs$Ensgid = sapply(gtex_pairs$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
+    dim(gtex_pairs) %>% print
+
+    paste0('* GTEx gene median tpm GCT = ') %>% cat
+    gct = readRDS(f_gtex_median_tpm)
+    nrow(gct) %>% cat
+    #gct_negate = data.frame(gct[,1:2],-gct[,3:ncol(gct)])
+    #' -> negate ' %>% cat
+    gct_gather = gct %>% gather("Tissue","TPM",-Ensgid,-Description)
+    ' -> transform ' %>% cat
+    eqtl_genes = gtex_pairs$Gene_id %>% unique
+    gct_filt_gene = subset(gct_gather, Ensgid %in% eqtl_genes)$Ensgid %>% unique
+    paste0('-> Filtering= ',length(gct_filt_gene),'\n') %>% cat
+
+    # Filter SNP eQTL genes and their tissues
+    paste0('* Filtering eQTLs by SNP: ') %>% cat
+    gtex_pairs_sub = subset(gtex_pairs,Rsid %in% snps$Rsid)
+    gene_eqtl = gtex_pairs_sub$Gene_id %>% unique %>% sort
+    paste0('genes = ',length(gene_eqtl)) %>% cat
+    eqtl_tissue = gtex_pairs_sub$Tissue %>% unique %>% sort
+    n = length(eqtl_tissue)
+    paste0(', tissues = ',n) %>% cat
+    
+    # Preparing gene sets by tissue eQTL genes
+    ' [' %>% cat
+    geneset_li = lapply(c(1:n),function(i) {
+        if(i%%5==0) '.' %>% cat
+        subset(gtex_pairs_sub,Tissue==eqtl_tissue[i])$Ensgid %>% unique
+    })
+    names(geneset_li) = eqtl_tissue
+    '] done.\n\n' %>% cat
+
+    # Run by each tissue
+    fgseaRes_li = list()
+    for(i in 18:n) {
+        paste0(i,' ',eqtl_tissue[i],': ') %>% cat
+        gtex_pairs$Tissue %>% table %>% print #<- debugging..
+
+        # Prepare data
+        eqtlgene_tissue_all = subset(gtex_pairs,Tissue==eqtl_tissue[i])$Ensgid %>% unique
+        gene_n = length(geneset_li[[i]])
+        paste0('genes = ',gene_n,' / ',length(eqtlgene_tissue_all),', ') %>% cat
+        
+        ranked_ts = subset(gct_gather, Tissue==eqtl_tissue[i])
+        ranked_ts_gene = subset(ranked_ts, Ensgid %in% eqtlgene_tissue_all)
+        ranked = ranked_ts_gene$TPM
+        names(ranked) = ranked_ts_gene$Ensgid
+        ranked = ranked[order(ranked_ts_gene$TPM)] # sort by rank
+        paste0('exp. = ',length(ranked),'\n') %>% cat
+
+        # Run fgsea (fgsea)
+        inter = intersect(geneset_li[[i]],names(ranked))
+        result = fgsea(
+            pathways = geneset_li[i],
+            stats    = ranked,
+            nperm    = perm_n
+        )
+        fgseaRes_li[[i]] = data.frame(
+            result[,1:7],
+            queried_gene=gene_n,
+            total=length(ranked)
+        )
+    }
+    fgseaRes = data.table::rbindlist(fgseaRes_li) %>% as.data.frame
+    # Save result as a file
+    f_base = basename(f_gwas_snp)
+    file_base = tools::file_path_sans_ext(f_base)
+    f_name1 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.tsv')
+    write.table(fgseaRes[order(fgseaRes$pval), ],f_name1,sep='\t',row.names=F)
+    paste0('\nWrite file: ',f_name1,'\n') %>% cat
+
+
+    # Prepare tissues for plot
+    topTissueUp_df = fgseaRes[fgseaRes$ES>0,]
+    if(nrow(topTissueUp_df)>0) { 
+        topTissueUp = topTissueUp_df[order(topTissueUp_df$pval),]$pathway
+    } else topTissueUp = NULL
+    topTissueDn_df = fgseaRes[fgseaRes$ES<0,]
+    if(nrow(topTissueDn_df)>0) { 
+        topTissueDn = topTissueDn_df[order(topTissueDn_df$pval),]$pathway
+    } else topTissueDn = NULL
+    topTissues  = c(topTissueUp,rev(topTissueDn))
+
+    # Draw plot
+    f_name2 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.png')
+    png(f_name2,width=10,height=20,units='in',res=200)
+    plotGseaTable(geneset_li[topTissues],ranked,fgseaRes, gseaParam=0.5)
+    dev.off()
+    paste0('Draw figure: ',f_name2,'\n') %>% cat
+
+    # paste0('\n* SNP overlapped eQTL gene-tissue pairs = ') %>% cat
+    
+    # gsa_df = GSAsummaryTable(gsaRes)
+    # zscore_df  = data.frame(Name=c('Stat (dist.dir)'),
+    #     gsa_df %>% select('Stat (dist.dir)') %>% t)
+    # pval_df    = data.frame(Name=c('p (dist.dir.up)','p (dist.dir.dn)'),
+    #     gsa_df %>% select('p (dist.dir.up)','p (dist.dir.dn)') %>% t)
+    # overlap_df = data.frame(Name=c('Genes (tot)','Genes (up)','Genes (down)'),
+    #     gsa_df %>% select('Genes (tot)','Genes (up)','Genes (down)') %>% t)
+    # colnames(zscore_df)  = c('Name',gsa_df$Name)
+    # colnames(pval_df)    = c('Name',gsa_df$Name)
+    # colnames(overlap_df) = c('Name',gsa_df$Name)
+    
+    # # Write TSV file
+    # file_name = tools::file_path_sans_ext(f_gtex_base %>% basename)
+
+    # f_name1 = paste0(out,'/',file_name,'-permn_',perm_n,'-zscore.tsv')
+    # write.table(zscore_df,f_name1,sep='\t',row.names=F,quote=F)
+    # paste0('\n* Write file: ',f_name1,'\n') %>% cat
+    
+    # f_name2 = paste0(out,'/',file_name,'-permn_',perm_n,'-pval.tsv')
+    # write.table(pval_df,f_name2,sep='\t',row.names=F,quote=F)
+    # paste0('* Write file: ',f_name2,'\n') %>% cat
+
+    # f_name3 = paste0(out,'/',file_name,'-permn_',perm_n,'-overlap.tsv')
+    # write.table(overlap_df,f_name3,sep='\t',row.names=F,quote=F)
+    # paste0('* Write file: ',f_name3,'\n') %>% cat
+}
+
+
 perm_test = function(
     f_gwas_snp = NULL,
     f_status   = NULL,
@@ -268,7 +474,7 @@ perm_test = function(
     # Run perm_test for each status files
     f_status_paths = list.files(f_status, full.names=T, include.dirs=T)
     n = length(f_status_paths)
-    if(n==0) { f_status_paths = f_status; n=1 }
+    if(n==1) { f_status_paths = f_status; n=1 }
     paste0('* ',n,' files were found from ',f_status,'.\n\n') %>% cat
     cell_types=NULL; zscore_li=list(); pval_li=list(); overlap_li=list()
     source('src/pdtime.r')
@@ -294,7 +500,7 @@ perm_test = function(
         overlap_li[[i]] = data.frame(Status=pt_df$Status, Overlap=pt_df$Overlap)
         paste0(pdtime(t1,2),'\n') %>% cat
     }
-    pm_merge = function(x,y) { merge(x=x,y=y,by='Status',all=T) }
+    pm_merge = function(x,y) { merge(x=x, y=y, by='Status', all=T) }
     zscore_df  = Reduce(pm_merge, zscore_li)
     pval_df    = Reduce(pm_merge, pval_li)
     overlap_df = Reduce(pm_merge, overlap_li)
@@ -329,8 +535,6 @@ read_status_file = function(path,db_src) {
         status_raw = read.delim(path,header=F)
         status_raw = status_raw[,1:4]
         colnames(status_raw) = c('Chr','Start','End','Ann')
-    } else if(db_src=='gtex_tsv') {
-        #
     } else {
         paste0('\n\n[Error] Unknown option is flagged. Please choose one of [roadmap_bed/encode].\n') %>% cat
         stop()
@@ -342,12 +546,9 @@ perm_test_calc = function(
     gwas_snp_bed = NULL,
     status   = NULL,
     db_src   = NULL,
-    perm_n   = 5000,
+    perm_n   = 1000,
     verbose  = FALSE
 ) {
-    #paste0('\n** Run perm_test function in enrich.r **\n\n') %>% cat
-    #suppressMessages(library(regioneR))
-
     # Calculate permTest to get z-scores and p-values by chromosome status
     paste0('permTest - ') %>% cat
     status_ann = status$Ann %>% unique %>% sort
@@ -356,17 +557,11 @@ perm_test_calc = function(
 
     # Set background status as universe
     status_all_bed = toGRanges(status[,1:4],format="BED")
-    # if(db_src=='roadmap_bed') {
-    #     status_all_bed = toGRanges(status[,1:4],format="BED")
-    # } else if (db_src=='encode_bed') {
-    #     encode_tfbs_v3 = readRDS('db/wgEncodeRegTfbsClusteredV3.bed.rds')
-    #     status_all_bed = toGRanges(encode_tfbs_v3[,1:4],format="BED")
-    # }
     
-    progress = n%/%5
+    check_n = 5; progress = n%/%check_n
     pt_li = lapply(c(1:n),function(i) {
-        if(n>=5 & i%%progress==0) { '.' %>% cat
-        } else '.' %>% cat
+        if(n>=check_n & i%%progress==0) { '.' %>% cat } 
+        else if(n<check_n) { '.' %>% cat }
         # Convert data.frame to GRanges format
         status_sub = subset(status,Ann==status_ann[i])
         status_sub_bed = toGRanges(status_sub,format="BED")
@@ -396,6 +591,26 @@ perm_test_calc = function(
 
 ## Functions End ##
 
+## SQLite code sniffet ##
+library(RSQLite)
+
+path1 = 'db/gtex_analysis_v8_rnaseq_gene_median_tpm_ensgid.gct.rds'
+path2 = 'db/gtex_signif_5e-8.tsv.rds'
+f_db  = 'db/gtex_signif_5e-8.db'
+db_name = "gtex"
+
+gct   = readRDS(path1); dim(gct)
+pair  = readRDS(path2); dim(pair)
+colnames(pair) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
+pair$Ensgid = sapply(pair$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
+
+conn = dbConnect(RSQLite::SQLite(),f_db)
+dbWriteTable(conn, db_name, pair)
+
+my_query = paste0('SELECT * FROM ',db_name,' LIMIT 10')
+dbGetQuery(conn, my_query) %>% print
+## Sniffet End ##
+
 ## Run Function ##
 source('src/pdtime.r')
 t0 = Sys.time()
@@ -404,26 +619,40 @@ if(argv$example) {
     cat(example_msg)
 } else if(argv$permu) {
     perm_test(
-        f_gwas_snp = argv$gwassnp,
-        f_status   = argv$chrstatus,
-        db_src     = argv$dbsource,
-        perm_n     = argv$permn,
+        f_gwas_snp = argv$gwas_snp,
+        f_status   = argv$chr_status,
+        db_src     = argv$db_source,
+        perm_n     = argv$perm_n,
         out        = argv$out,
         verbose    = argv$verbose
     )
 } else if(argv$heatmap) {
     draw_heatmap(
-        f_pmdata = argv$pmdata,
+        f_pmdata = argv$pm_data,
         f_meta   = argv$meta,
         range    = argv$range,
         out      = argv$out,
         annot    = argv$annot,
-        fileext  = argv$fileext
+        fileext  = argv$file_ext
     )
-} else if(argv$splittfbs) {
+} else if(argv$split_tfbs) {
     split_tfbs(
         f_tfbs = argv$tfbs,
         out    = argv$out
     )
+} else if(argv$split_gtex) {
+    split_gtex(
+        f_gtex = argv$gtex,
+        out    = argv$out
+    )
+} else if(argv$gtex_perm) {
+    gtex_perm_test(
+        f_gwas_snp  = argv$gwas_snp,
+        f_gtex_base = argv$gtex_base,
+        f_gtex_median_tpm = argv$gtex_median_tpm,
+        out         = argv$out,
+        perm_n      = argv$perm_n
+    )
 }
+
 paste0('\n',pdtime(t0,1),'\n') %>% cat
