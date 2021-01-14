@@ -1436,21 +1436,83 @@ Rscript src/enrich.r --splitgtex \
 Run below code for T1D candidate 1817 SNPs:
 
 ```bash
-data/seedSNP_1817_bm.bed
-data/gwas_5e-08_129_hg19.bed
-data/snp_364_encode_dist.bed
-data/snp_484_roadmap_dist.bed
-data/snp_745_gtex.bed
+f=(seedSNP_1817_bm.bed gwas_5e-08_129_hg19.bed snp_364_encode_dist.bed snp_484_roadmap_dist.bed snp_745_gtex.bed)
 
---gtex_base data/gtex_5e-08_745.tsv
---gtex_base db/gtex_signif_5e-8.tsv.rds
-
+for i in {2..4}
+do
 Rscript src/enrich.r --gtex_perm \
-	--gwas_snp data/seedSNP_1817_bm.bed \
-    --gtex_base db/gtex_signif_5e-8.tsv.rds \
+	--gwas_snp data/${f[i]} \
+    --gtex_base db/gtex_signif_5e-8.db \
     --gtex_median_tpm db/gtex_analysis_v8_rnaseq_gene_median_tpm_ensgid.gct.rds \
     --perm_n 1000 \
-    --out enrich
+    --out enrich \
+    > enrich/log_${f[i]}.txt
+done
+```
+
+> ** Run gtex_perm_test function in enrich.r **
+>
+> * Input SNPs = [1] 1817    4
+> * db/gtex_signif_5e-8.db, Ensgid = [1] 21404
+> * GTEx gene median tpm GCT = 56156 -> transform -> Filt gene = 20691
+> * Filtering eQTLs by SNP: genes = 159, tissues = 48 [.........] done.
+>
+> 1 Adipose_Subcutaneous: genes = 43 / 6458, exp. = 6231
+> 2 Adipose_Visceral_Omentum: genes = 32 / 4640, exp. = 4450
+> 3 Adrenal_Gland: genes = 22 / 3013, exp. = 2895
+> 4 Artery_Aorta: genes = 36 / 4889, exp. = 4709
+> 5 Artery_Coronary: genes = 14 / 2055, exp. = 1966
+> 6 Artery_Tibial: genes = 46 / 6548, exp. = 6324
+> 7 Brain_Amygdala: genes = 7 / 892, exp. = 855
+> 8 Brain_Anterior_cingulate_cortex_BA24: genes = 9 / 1568, exp. = 1499
+> 9 Brain_Caudate_basal_ganglia: genes = 16 / 2305, exp. = 2203
+> 10 Brain_Cerebellar_Hemisphere: genes = 9 / 2902, exp. = 2780
+> 11 Brain_Cerebellum: genes = 18 / 4156, exp. = 3991
+> 12 Brain_Cortex: genes = 13 / 2581, exp. = 2480
+> 13 Brain_Frontal_Cortex_BA9: genes = 7 / 1964, exp. = 1885
+> 14 Brain_Hippocampus: genes = 8 / 1250, exp. = 1194
+> 15 Brain_Hypothalamus: genes = 7 / 1321, exp. = 1251
+> 16 Brain_Nucleus_accumbens_basal_ganglia: genes = 10 / 2016, exp. = 1940
+> 17 Brain_Putamen_basal_ganglia: genes = 6 / 1625, exp. = 1560
+> 18 Brain_Spinal_cord_cervical_c-1: genes = 4 / 1033, exp. = 0
+> 19 Brain_Substantia_nigra: genes = 3 / 738, exp. = 713
+> 20 Breast_Mammary_Tissue: genes = 22 / 3630, exp. = 3476
+> 21 Cells_EBV-transformed_lymphocytes: genes = 14 / 1690, exp. = 0
+> 22 Cells_Transformed_fibroblasts: genes = 28 / 5771, exp. = 0
+> 23 Colon_Sigmoid: genes = 26 / 3431, exp. = 3285
+> 24 Colon_Transverse: genes = 33 / 3929, exp. = 3755
+> 25 Esophagus_Gastroesophageal_Junction: genes = 23 / 3562, exp. = 3427
+> 26 Esophagus_Mucosa: genes = 47 / 6378, exp. = 6156
+> 27 Esophagus_Muscularis: genes = 49 / 6025, exp. = 5811
+> 28 Heart_Atrial_Appendage: genes = 29 / 4053, exp. = 3898
+> 29 Heart_Left_Ventricle: genes = 26 / 3713, exp. = 3571
+> 30 Liver: genes = 18 / 1877, exp. = 1788
+> 31 Lung: genes = 51 / 6102, exp. = 5874
+> 32 Minor_Salivary_Gland: genes = 6 / 941, exp. = 889
+> 33 Muscle_Skeletal: genes = 43 / 5791, exp. = 5609
+> 34 Nerve_Tibial: genes = 48 / 7782, exp. = 7495
+> 35 Ovary: genes = 6 / 1670, exp. = 1590
+> 36 Pancreas: genes = 30 / 3764, exp. = 3627
+> 37 Pituitary: genes = 16 / 2846, exp. = 2718
+> 38 Prostate: genes = 13 / 1647, exp. = 1555
+> 39 Skin_Not_Sun_Exposed_Suprapubic: genes = 42 / 5689, exp. = 5483
+> 40 Skin_Sun_Exposed_Lower_leg: genes = 54 / 7065, exp. = 6816
+> 41 Small_Intestine_Terminal_Ileum: genes = 14 / 1734, exp. = 1647
+> 42 Spleen: genes = 18 / 3025, exp. = 2893
+> 43 Stomach: genes = 27 / 3157, exp. = 3028
+> 44 Testis: genes = 40 / 7154, exp. = 6896
+> 45 Thyroid: genes = 58 / 8063, exp. = 7757
+> 46 Uterus: genes = 4 / 1100, exp. = 1039
+> 47 Vagina: genes = 3 / 1015, exp. = 947
+> 48 Whole_Blood: genes = 43 / 4847, exp. = 4680
+>
+> Write file: enrich/gtex-seedSNP_1817_bm-permn_1000.tsv
+> Write file: enrich/gtex-seedSNP_1817_bm-permn_1000.rds
+
+```bash
+Rscript src/enrich.r --gtex_pm_plot \
+	--fgsea_rds enrich/gtex-seedSNP_1817_bm-permn_1000.rds \
+	--out enrich
 ```
 
 > 
@@ -1461,8 +1523,8 @@ Run below code for T1D GWAS 129 SNP data:
 
 ```bash
 Rscript src/enrich.r --gtex_perm \
-	--gwas_snp data/gwas_5e-08_129.tsv \
-    --gtex_base db/gtex_signif_5e-8.tsv.rds \
+	--gwas_snp data/gwas_5e-08_129_hg19.bed \
+    --gtex_base db/gtex_signif_5e-8.db \
     --gtex_median_tpm db/gtex_analysis_v8_rnaseq_gene_median_tpm_ensgid.gct.rds \
     --perm_n 1000 \
     --out enrich

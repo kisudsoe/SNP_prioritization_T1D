@@ -96,6 +96,12 @@ p = add_argument(p,'--gtex_base',
 p = add_argument(p,'--gtex_median_tpm',
     help="[Path] GTEx gene median tpm GCT file.")
 
+### Arguments for gtex_pm_plot function
+p = add_argument(p,'--gtex_pm_plot',flag=T,
+    help="[Flag] Draw plot for GTEx permutation test result.")
+p = add_argument(p,'--fgsea_rds',
+    help="[Path] RDS file for GTEx permutation test result.")
+
 
 argv = parse_args(p)
 
@@ -319,8 +325,8 @@ gtex_perm_test = function(
     paste0('\n** Run gtex_perm_test function in enrich.r **\n\n') %>% cat
     suppressMessages(library(fgsea))
     suppressMessages(library(data.table))
-    suppressMessages(library(ggplot2))
     suppressMessages(library(tidyr))
+    suppressMessages(library(RSQLite))
     ifelse(!dir.exists(out), dir.create(out), "")
 
     # Read files
@@ -329,11 +335,16 @@ gtex_perm_test = function(
     colnames(snps) = c('Chr','Start','End','Rsid')
     dim(snps) %>% print
 
-    paste0('* GTEx eQTL pairs = ') %>% cat
-    gtex_pairs = readRDS(f_gtex_base)
-    colnames(gtex_pairs) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
-    gtex_pairs$Ensgid = sapply(gtex_pairs$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
-    dim(gtex_pairs) %>% print
+    #paste0('* GTEx eQTL pairs = ') %>% cat
+    #gtex_pairs = readRDS(f_gtex_base)
+    #colnames(gtex_pairs) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
+    #gtex_pairs$Ensgid = sapply(gtex_pairs$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
+    #dim(gtex_pairs) %>% print
+    paste0('* ',f_gtex_base,', Ensgid = ') %>% cat
+    conn = dbConnect(RSQLite::SQLite(),f_gtex_base)
+    gtex_pairs = dbGetQuery(conn,"SELECT Ensgid, Tissue, Rsid FROM gtex") %>% unique
+    eqtl_genes = gtex_pairs$Ensgid %>% unlist %>% unique
+    length(eqtl_genes) %>% print
 
     paste0('* GTEx gene median tpm GCT = ') %>% cat
     gct = readRDS(f_gtex_median_tpm)
@@ -342,15 +353,16 @@ gtex_perm_test = function(
     #' -> negate ' %>% cat
     gct_gather = gct %>% gather("Tissue","TPM",-Ensgid,-Description)
     ' -> transform ' %>% cat
-    eqtl_genes = gtex_pairs$Gene_id %>% unique
+    #eqtl_genes = gtex_pairs$Gene_id %>% unique
     gct_filt_gene = subset(gct_gather, Ensgid %in% eqtl_genes)$Ensgid %>% unique
-    paste0('-> Filtering= ',length(gct_filt_gene),'\n') %>% cat
+    paste0('-> Filt gene = ',length(gct_filt_gene),'\n') %>% cat
 
     # Filter SNP eQTL genes and their tissues
     paste0('* Filtering eQTLs by SNP: ') %>% cat
     gtex_pairs_sub = subset(gtex_pairs,Rsid %in% snps$Rsid)
-    gene_eqtl = gtex_pairs_sub$Gene_id %>% unique %>% sort
+    gene_eqtl = gtex_pairs_sub$Ensgid %>% unique
     paste0('genes = ',length(gene_eqtl)) %>% cat
+    #eqtl_tissue = gtex_pairs_sub$Tissue %>% unique %>% sort
     eqtl_tissue = gtex_pairs_sub$Tissue %>% unique %>% sort
     n = length(eqtl_tissue)
     paste0(', tissues = ',n) %>% cat
@@ -366,9 +378,8 @@ gtex_perm_test = function(
 
     # Run by each tissue
     fgseaRes_li = list()
-    for(i in 18:n) {
+    for(i in 1:n) {
         paste0(i,' ',eqtl_tissue[i],': ') %>% cat
-        gtex_pairs$Tissue %>% table %>% print #<- debugging..
 
         # Prepare data
         eqtlgene_tissue_all = subset(gtex_pairs,Tissue==eqtl_tissue[i])$Ensgid %>% unique
@@ -383,17 +394,20 @@ gtex_perm_test = function(
         paste0('exp. = ',length(ranked),'\n') %>% cat
 
         # Run fgsea (fgsea)
-        inter = intersect(geneset_li[[i]],names(ranked))
-        result = fgsea(
-            pathways = geneset_li[i],
-            stats    = ranked,
-            nperm    = perm_n
-        )
-        fgseaRes_li[[i]] = data.frame(
-            result[,1:7],
-            queried_gene=gene_n,
-            total=length(ranked)
-        )
+        if(length(ranked)>0) {
+            result = fgsea(
+                pathways = geneset_li[i],
+                stats    = ranked,
+                nperm    = perm_n
+            )
+            fgseaRes_li[[i]] = data.frame(
+                result[,1:7],
+                queried_gene=gene_n,
+                total=length(ranked)
+            )
+        } else {
+            fgseaRes_li[[i]] = NULL
+        }
     }
     fgseaRes = data.table::rbindlist(fgseaRes_li) %>% as.data.frame
     # Save result as a file
@@ -403,52 +417,50 @@ gtex_perm_test = function(
     write.table(fgseaRes[order(fgseaRes$pval), ],f_name1,sep='\t',row.names=F)
     paste0('\nWrite file: ',f_name1,'\n') %>% cat
 
+    f_name2 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.rds')
+    fgseaRes_li = list(
+        geneset_li = geneset_li,
+        ranked     = ranked,
+        fgseaRes   = fgseaRes[order(fgseaRes$pval), ]
+    )
+    saveRDS(fgseaRes_li,f_name2)
+    paste0('Write file: ',f_name2,'\n') %>% cat
+}
+
+gtex_pm_plot = function(
+    f_fgsea_rds = NULL,
+    out     = NULL
+) {
+    paste0('\n** Run gtex_pm_plot function in enrich.r **\n\n') %>% cat
+    suppressMessages(library(fgsea))
+    suppressMessages(library(ggplot2))
+    ifelse(!dir.exists(out), dir.create(out), "")
+    fgseaRes_li = readRDS(f_fgsea_rds)
+    geneset_li = fgseaRes_li[[1]]
+    ranked = fgseaRes_li[[2]]
+    fgseaRes = fgseaRes_li[[3]]
 
     # Prepare tissues for plot
-    topTissueUp_df = fgseaRes[fgseaRes$ES>0,]
+    fgseaRes_sig = fgseaRes[fgseaRes$pval<0.05,]
+    dim(fgseaRes_sig) %>% print
+    topTissueUp_df = fgseaRes_sig[fgseaRes_sig$ES>0,]
     if(nrow(topTissueUp_df)>0) { 
         topTissueUp = topTissueUp_df[order(topTissueUp_df$pval),]$pathway
     } else topTissueUp = NULL
-    topTissueDn_df = fgseaRes[fgseaRes$ES<0,]
+    topTissueDn_df = fgseaRes_sig[fgseaRes_sig$ES<0,]
     if(nrow(topTissueDn_df)>0) { 
         topTissueDn = topTissueDn_df[order(topTissueDn_df$pval),]$pathway
     } else topTissueDn = NULL
     topTissues  = c(topTissueUp,rev(topTissueDn))
 
     # Draw plot
-    f_name2 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.png')
-    png(f_name2,width=10,height=20,units='in',res=200)
+    f_base = basename(f_fgsea_rds)
+    file_base = tools::file_path_sans_ext(f_base)
+    f_name = paste0(out,'/',file_base,'.png')
+    png(f_name,width=8,height=12,units='in',res=200)
     plotGseaTable(geneset_li[topTissues],ranked,fgseaRes, gseaParam=0.5)
     dev.off()
-    paste0('Draw figure: ',f_name2,'\n') %>% cat
-
-    # paste0('\n* SNP overlapped eQTL gene-tissue pairs = ') %>% cat
-    
-    # gsa_df = GSAsummaryTable(gsaRes)
-    # zscore_df  = data.frame(Name=c('Stat (dist.dir)'),
-    #     gsa_df %>% select('Stat (dist.dir)') %>% t)
-    # pval_df    = data.frame(Name=c('p (dist.dir.up)','p (dist.dir.dn)'),
-    #     gsa_df %>% select('p (dist.dir.up)','p (dist.dir.dn)') %>% t)
-    # overlap_df = data.frame(Name=c('Genes (tot)','Genes (up)','Genes (down)'),
-    #     gsa_df %>% select('Genes (tot)','Genes (up)','Genes (down)') %>% t)
-    # colnames(zscore_df)  = c('Name',gsa_df$Name)
-    # colnames(pval_df)    = c('Name',gsa_df$Name)
-    # colnames(overlap_df) = c('Name',gsa_df$Name)
-    
-    # # Write TSV file
-    # file_name = tools::file_path_sans_ext(f_gtex_base %>% basename)
-
-    # f_name1 = paste0(out,'/',file_name,'-permn_',perm_n,'-zscore.tsv')
-    # write.table(zscore_df,f_name1,sep='\t',row.names=F,quote=F)
-    # paste0('\n* Write file: ',f_name1,'\n') %>% cat
-    
-    # f_name2 = paste0(out,'/',file_name,'-permn_',perm_n,'-pval.tsv')
-    # write.table(pval_df,f_name2,sep='\t',row.names=F,quote=F)
-    # paste0('* Write file: ',f_name2,'\n') %>% cat
-
-    # f_name3 = paste0(out,'/',file_name,'-permn_',perm_n,'-overlap.tsv')
-    # write.table(overlap_df,f_name3,sep='\t',row.names=F,quote=F)
-    # paste0('* Write file: ',f_name3,'\n') %>% cat
+    paste0('Draw figure: ',f_name,'\n') %>% cat
 }
 
 
@@ -591,25 +603,6 @@ perm_test_calc = function(
 
 ## Functions End ##
 
-## SQLite code sniffet ##
-library(RSQLite)
-
-path1 = 'db/gtex_analysis_v8_rnaseq_gene_median_tpm_ensgid.gct.rds'
-path2 = 'db/gtex_signif_5e-8.tsv.rds'
-f_db  = 'db/gtex_signif_5e-8.db'
-db_name = "gtex"
-
-gct   = readRDS(path1); dim(gct)
-pair  = readRDS(path2); dim(pair)
-colnames(pair) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
-pair$Ensgid = sapply(pair$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
-
-conn = dbConnect(RSQLite::SQLite(),f_db)
-dbWriteTable(conn, db_name, pair)
-
-my_query = paste0('SELECT * FROM ',db_name,' LIMIT 10')
-dbGetQuery(conn, my_query) %>% print
-## Sniffet End ##
 
 ## Run Function ##
 source('src/pdtime.r')
@@ -652,6 +645,11 @@ if(argv$example) {
         f_gtex_median_tpm = argv$gtex_median_tpm,
         out         = argv$out,
         perm_n      = argv$perm_n
+    )
+} else if(argv$gtex_pm_plot) {
+    gtex_pm_plot(
+        f_fgsea_rds = argv$fgsea_rds,
+        out         = argv$out
     )
 }
 
