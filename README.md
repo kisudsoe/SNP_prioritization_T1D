@@ -255,6 +255,55 @@ bash summ-analysis.sh
 
 
 
+
+
+# II. Enrichment analysis
+
+## 1. Heatmap for chromatin status
+
+To draw heatmap by using the Roadmap ChromHMM annotations, run below command function.
+
+```bash
+Rscript src/roadmap_summary.r --heatmap \
+    --f_roadmap_summ data/summary_roadmap.tsv \
+    --f_meta db/roadmap_meta.tsv \
+    --annot BLOOD,PANCREAS,THYMUS \
+    --f_snps data/summary/snp_encode_tfbs_1538.bed,data/summary/snp_roadmap_enh_merge_2234.bed,data/summary/snp_regulome2b_348.bed,data/gtex_eqtl/snp_union_gtex_eqtl_4092.bed \
+    --file_ext png \
+    --out fig
+```
+
+> ** Run heatmap function in roadmap_summary.r **
+>
+> * Read file: data/summary_roadmap.tsv = [1] 5892  128
+> * Meta-info table = [1] 127   9
+>   Reordering -> extract ha1 -> extract ha2 -> done
+>   Configuration for heatmap -> done
+> * Read SNPs BED files  [....] Annotation merge -> done
+> * Draw heatmap -> done
+>
+> Save as fig/roadmap_summ.png
+>
+> Job done: 2021-02-04 03:15:41 for 47.1 sec
+
+![](fig/roadmap_summ.png)
+
+
+
+## 2. Enrichment for chromatin status
+
+To generate summary table of Roadmap ChromHMM by SNPs, run below command function.
+
+```bash
+
+```
+
+
+
+
+
+
+
 # SessionInfo
 
 ```R
