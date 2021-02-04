@@ -1,3 +1,5 @@
+# 190807 Time result print to cat.
+# 191107 Revert the result as return 
 pdtime = function(time,type=1) {
     t=Sys.time()
     d=difftime(t,time,unit="sec")
