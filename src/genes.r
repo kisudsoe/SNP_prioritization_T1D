@@ -13,15 +13,21 @@ example_msg = '
 Rscript src/genes.r --disgenet \
     --f_gene data/disgenet/TFs_157.tsv \
     --out data/disgenet
+
+Rscript src/genes.r --cprofiler \
+    --
 '
 
 ### Shared Arguments
 p = add_argument(p,'--disgenet',flag=T,
-    help="[Function] Retrieve gene associated diseases from DisGeNET.\nSee details at https://www.disgenet.org/disgenet2r\n or https://www.disgenet.org/static/disgenet2r/disgenet2r.html")
+    help="[Function] Retrieve gene associated diseases from DisGeNET.\nSee details at https://www.disgenet.org/disgenet2r\nor https://www.disgenet.org/static/disgenet2r/disgenet2r.html")
 p = add_argument(p,'--f_gene',
     help="[Path] Gene list TSV file. Column: <Gene> <...>")
 p = add_argument(p,'--out',
     help="[Path] ")
+
+p = add_argument(p,'--cprofiler',flag=T,
+    help="[Function] Calculate gene set enrichment to ontologies.\nSee details at https://www.bioconductor.org/packages/release/bioc/html/clusterProfiler.html\nor https://www.bioconductor.org/packages/release/bioc/vignettes/clusterProfiler/inst/doc/clusterProfiler.html")
 
 argv = parse_args(p)
 
@@ -35,6 +41,7 @@ disgenet = function(
 ) {
     # Load library
     suppressMessages(library(disgenet2r))
+    ifelse(!dir.exists(out), dir.create(out), "")
 
     # Configurations
     gda_plot_wh = c(8.5,8) # inch
@@ -80,6 +87,28 @@ disgenet = function(
     plot(enrichRes,class="Enrichment",count=3,cutoff=0.05)
     dev.off()
     paste0('  Draw plot: ',f_name_enrich_plot,'\n') %>% cat
+}
+
+cprofiler = function(
+    f_gene = NULL,
+    out    = NULL
+) {
+    # Load library
+    suppressMessages(library(clusterProfiler))
+    ifelse(!dir.exists(out), dir.create(out), "")
+
+    # Configuration
+    f_base = tools::file_path_sans_ext(f_gene %>% basename)
+    f_name = paste0(out,'/',f_base,'.tsv')
+
+    # Read file
+    paste0('\n* Genes = ') %>% cat
+    gene = read.delim(f_gene,stringsAsFactors=F)$Gene %>% unique
+    length(gene) %>% print
+
+    # Universal enrichment analysis
+    paste0('1. WikiPathways analysis: ') %>% cat
+    
 }
 
 ## Functions End ##

@@ -463,6 +463,23 @@ Rscript src/roadmap_summary.r --heatmap \
 
 To generate summary table of Roadmap ChromHMM by SNPs, run below command function by performing GSEA.
 
+**152 T1D GWAS SNPs**
+
+* `data/input_bed/gwas_152.bed`: This BED file was manually generated.
+
+```bash
+Rscript src/enrich.r --roadmap_perm \
+    --gwas_snp data/input_bed/gwas_152.bed \
+    --f_roadmap db/roadmap_bed \
+    --db_source roadmap_bed \
+    --perm_n 1000 \
+    --out data/enrich
+```
+
+> 
+
+
+
 **5,892 T1D candidate SNPs**
 
 ```bash
@@ -563,10 +580,156 @@ Rscript src/enrich.r --heatmap \
 To identify T1D enriched TFs and their cell types, below command was run.
 
 ```bash
+f=(gwas_biomart_5892.bed overlap-1_164.bed overlap-2_585.bed)
 
+for i in {0..2}
+do
+    printf "$i. Running ${f[i]}:"
+    Rscript src/enrich.r --roadmap_perm \
+        --gwas_snp data/input_bed/${f[i]} \
+        --f_roadmap db/encode_bed \
+        --db_source encode_bed \
+        --perm_n 1000 \
+        --out data/enrich \
+        > data/enrich/log_${f[i]}.txt
+    printf " done\n"
+done
 ```
 
+> 0. Running gwas_biomart_5892.bed:There were 50 or more warnings (use warnings() to see the first 50)
+>  done
+> 1. Running overlap-1_164.bed:There were 50 or more warnings (use warnings() to see the first 50)
+>  done
+> 2. Running overlap-2_585.bed:bash: enrich/encode_tfbs/log_overlap-2_585.bed.txt: No such file or directoryry
+>  done
 
+
+
+To merge the ENCODE permutation test results, below command was run.
+
+```bash
+Rscript src/enrich.r --encode_tf_summ \
+    --encode_perm_results data/enrich \
+    --out data
+```
+
+> ** Run conv_dicevcf2db function in enrich.r **
+>
+> * In data/enrich, 9 encode_bed files found.
+>
+> * Convert [...] merge = [1] 539  12
+> * Write file: data/encode_tf_summ.tsv
+>
+> Job done: 2021-02-06 18:16:00 for 0.6 sec
+
+
+
+Split the `encode_tfbs.tsv` file by cell types.
+
+```bash
+Rscript src/enrich.r --split_tfbs \
+    --tfbs data/encode_tfbs.tsv \
+    --type tsv \
+    --out data/encode_dist
+```
+
+> ** Run split_tfbs function in enrich.r **
+>
+> * ENCODE TFBS table = [1] 7757   11
+> * 90 unique cell types are found.
+>
+> 1 A549: 593 regions, filtering [..........] row = 593, TFs = 24. Save: data/encode_dist/A549.tsv; Job process: 0.4 sec
+> 2 AG04449:      73 regions, filtering [..........] row = 73, TFs = 1. Save: data/encode_dist/AG04449.tsv; Job process: 0.1 sec
+> 3 AG04450:      73 regions, filtering [..........] row = 73, TFs = 1. Save: data/encode_dist/AG04450.tsv; Job process: 0.1 sec
+> 4 AG09309:      61 regions, filtering [..........] row = 61, TFs = 1. Save: data/encode_dist/AG09309.tsv; Job process: 0.1 sec
+> 5 AG09319:      74 regions, filtering [..........] row = 74, TFs = 1. Save: data/encode_dist/AG09319.tsv; Job process: 0.1 sec
+> 6 AG10803:      80 regions, filtering [..........] row = 80, TFs = 1. Save: data/encode_dist/AG10803.tsv; Job process: 0.1 sec
+> 7 AoAF: 74 regions, filtering [..........] row = 74, TFs = 1. Save: data/encode_dist/AoAF.tsv; Job process: 0.1 sec
+> 8 BE2_C:        69 regions, filtering [...........] row = 69, TFs = 1. Save: data/encode_dist/BE2_C.tsv; Job process: 0.1 sec
+> 9 BJ:   72 regions, filtering [..........] row = 72, TFs = 1. Save: data/encode_dist/BJ.tsv; Job process: 0.1 sec
+> 10 Caco-2:      75 regions, filtering [..........] row = 75, TFs = 1. Save: data/encode_dist/Caco-2.tsv; Job process: 0.1 sec
+> 11 Dnd41:       91 regions, filtering [..........] row = 91, TFs = 2. Save: data/encode_dist/Dnd41.tsv; Job process: 0.1 sec
+> 12 ECC-1:       164 regions, filtering [..........] row = 164, TFs = 4. Save: data/encode_dist/ECC-1.tsv; Job process: 0.1 sec
+> 13 Fibrobl:     79 regions, filtering [...........] row = 79, TFs = 1. Save: data/encode_dist/Fibrobl.tsv; Job process: 0.1 sec
+> 14 GM06990:     75 regions, filtering [..........] row = 75, TFs = 1. Save: data/encode_dist/GM06990.tsv; Job process: 0.1 sec
+> 15 GM10847:     291 regions, filtering [..........] row = 291, TFs = 2. Save: data/encode_dist/GM10847.tsv; Job process: 0.3 sec
+> 16 GM12801:     13 regions, filtering [.............] row = 13, TFs = 1. Save: data/encode_dist/GM12801.tsv; Job process: 0.1 sec
+> 17 GM12864:     91 regions, filtering [..........] row = 91, TFs = 1. Save: data/encode_dist/GM12864.tsv; Job process: 0.1 sec
+> 18 GM12865:     83 regions, filtering [..........] row = 83, TFs = 1. Save: data/encode_dist/GM12865.tsv; Job process: 0.1 sec
+> 19 GM12872:     81 regions, filtering [..........] row = 81, TFs = 1. Save: data/encode_dist/GM12872.tsv; Job process: 0.1 sec
+> 20 GM12873:     101 regions, filtering [..........] row = 101, TFs = 1. Save: data/encode_dist/GM12873.tsv; Job process: 0.1 sec
+> 21 GM12874:     64 regions, filtering [..........] row = 64, TFs = 1. Save: data/encode_dist/GM12874.tsv; Job process: 0.1 sec
+> 22 GM12875:     67 regions, filtering [...........] row = 67, TFs = 1. Save: data/encode_dist/GM12875.tsv; Job process: 0.1 sec
+> 23 GM12878:     3844 regions, filtering [..........] row = 3844, TFs = 73. Save: data/encode_dist/GM12878.tsv; Job process: 2.7 sec
+> 24 GM12891:     1161 regions, filtering [..........] row = 1161, TFs = 8. Save: data/encode_dist/GM12891.tsv; Job process: 0.8 sec
+> 25 GM12892:     881 regions, filtering [..........] row = 881, TFs = 6. Save: data/encode_dist/GM12892.tsv; Job process: 0.5 sec
+> 26 GM15510:     552 regions, filtering [..........] row = 552, TFs = 2. Save: data/encode_dist/GM15510.tsv; Job process: 0.4 sec
+> 27 GM18505:     624 regions, filtering [..........] row = 624, TFs = 2. Save: data/encode_dist/GM18505.tsv; Job process: 0.5 sec
+> 28 GM18526:     279 regions, filtering [..........] row = 279, TFs = 2. Save: data/encode_dist/GM18526.tsv; Job process: 0.2 sec
+> 29 GM18951:     510 regions, filtering [..........] row = 510, TFs = 2. Save: data/encode_dist/GM18951.tsv; Job process: 0.4 sec
+> 30 GM19099:     583 regions, filtering [..........] row = 583, TFs = 2. Save: data/encode_dist/GM19099.tsv; Job process: 0.5 sec
+> 31 GM19193:     441 regions, filtering [..........] row = 441, TFs = 2. Save: data/encode_dist/GM19193.tsv; Job process: 0.4 sec
+> 32 GM19238:     100 regions, filtering [..........] row = 100, TFs = 1. Save: data/encode_dist/GM19238.tsv; Job process: 0.1 sec
+> 33 GM19239:     74 regions, filtering [..........] row = 74, TFs = 1. Save: data/encode_dist/GM19239.tsv; Job process: 0.1 sec
+> 34 GM19240:     83 regions, filtering [..........] row = 83, TFs = 1. Save: data/encode_dist/GM19240.tsv; Job process: 0.2 sec
+> 35 Gliobla:     153 regions, filtering [..........] row = 153, TFs = 2. Save: data/encode_dist/Gliobla.tsv; Job process: 0.2 sec
+> 36 H1-hESC:     893 regions, filtering [..........] row = 893, TFs = 48. Save: data/encode_dist/H1-hESC.tsv; Job process: 0.7 sec
+> 37 HA-sp:       66 regions, filtering [...........] row = 66, TFs = 1. Save: data/encode_dist/HA-sp.tsv; Job process: 0.1 sec
+> 38 HAc: 63 regions, filtering [..........] row = 63, TFs = 1. Save: data/encode_dist/HAc.tsv; Job process: 0.1 sec
+> 39 HBMEC:       82 regions, filtering [..........] row = 82, TFs = 1. Save: data/encode_dist/HBMEC.tsv; Job process: 0.1 sec
+> 40 HCFaa:       58 regions, filtering [...........] row = 58, TFs = 1. Save: data/encode_dist/HCFaa.tsv; Job process: 0.1 sec
+> 41 HCM: 73 regions, filtering [..........] row = 73, TFs = 1. Save: data/encode_dist/HCM.tsv; Job process: 0.1 sec
+> 42 HCPEpiC:     80 regions, filtering [..........] row = 80, TFs = 1. Save: data/encode_dist/HCPEpiC.tsv; Job process: 0.1 sec
+> 43 HCT-116:     246 regions, filtering [..........] row = 246, TFs = 5. Save: data/encode_dist/HCT-116.tsv; Job process: 0.2 sec
+> 44 HEEpiC:      47 regions, filtering [...........] row = 47, TFs = 1. Save: data/encode_dist/HEEpiC.tsv; Job process: 0.1 sec
+> 45 HEK293:      283 regions, filtering [..........] row = 201, TFs = 5. Save: data/encode_dist/HEK293.tsv; Job process: 0.2 sec
+> 46 HEK293-T-REx:        82 regions, filtering [..........] row = 82, TFs = 1. Save: data/encode_dist/HEK293-T-REx.tsv; Job process: 0.1 sec
+> 47 HFF: 62 regions, filtering [..........] row = 56, TFs = 1. Save: data/encode_dist/HFF.tsv; Job process: 0.1 sec
+> 48 HFF-Myc:     58 regions, filtering [...........] row = 58, TFs = 1. Save: data/encode_dist/HFF-Myc.tsv; Job process: 0.1 sec
+> 49 HL-60:       23 regions, filtering [...........] row = 23, TFs = 1. Save: data/encode_dist/HL-60.tsv; Job process: 0 sec
+> 50 HMEC:        110 regions, filtering [..........] row = 110, TFs = 2. Save: data/encode_dist/HMEC.tsv; Job process: 0.1 sec
+> 51 HMF: 74 regions, filtering [..........] row = 74, TFs = 1. Save: data/encode_dist/HMF.tsv; Job process: 0.1 sec
+> 52 HPAF:        79 regions, filtering [...........] row = 79, TFs = 1. Save: data/encode_dist/HPAF.tsv; Job process: 0.1 sec
+> 53 HPF: 67 regions, filtering [...........] row = 67, TFs = 1. Save: data/encode_dist/HPF.tsv; Job process: 0.1 sec
+> 54 HRE: 59 regions, filtering [...........] row = 59, TFs = 1. Save: data/encode_dist/HRE.tsv; Job process: 0.1 sec
+> 55 HRPEpiC:     70 regions, filtering [..........] row = 70, TFs = 1. Save: data/encode_dist/HRPEpiC.tsv; Job process: 0.1 sec
+> 56 HSMM:        119 regions, filtering [..........] row = 100, TFs = 2. Save: data/encode_dist/HSMM.tsv; Job process: 0.1 sec
+> 57 HSMMtube:    102 regions, filtering [..........] row = 102, TFs = 2. Save: data/encode_dist/HSMMtube.tsv; Job process: 0.1 sec
+> 58 HUVEC:       329 regions, filtering [..........] row = 329, TFs = 8. Save: data/encode_dist/HUVEC.tsv; Job process: 0.3 sec
+> 59 HVMF:        74 regions, filtering [..........] row = 74, TFs = 1. Save: data/encode_dist/HVMF.tsv; Job process: 0.1 sec
+> 60 HeLa-S3:     1155 regions, filtering [..........] row = 1155, TFs = 50. Save: data/encode_dist/HeLa-S3.tsv; Job process: 0.9 sec
+> 61 HepG2:       1485 regions, filtering [..........] row = 1485, TFs = 57. Save: data/encode_dist/HepG2.tsv; Job process: 1 sec
+> 62 IMR90:       267 regions, filtering [..........] row = 267, TFs = 5. Save: data/encode_dist/IMR90.tsv; Job process: 0.2 sec
+> 63 K562:        2171 regions, filtering [..........] row = 2171, TFs = 97. Save: data/encode_dist/K562.tsv; Job process: 1.4 sec
+> 64 MCF-7:       406 regions, filtering [..........] row = 406, TFs = 7. Save: data/encode_dist/MCF-7.tsv; Job process: 0.3 sec
+> 65 MCF10A-Er-Src:       283 regions, filtering [..........] row = 283, TFs = 5. Save: data/encode_dist/MCF10A-Er-Src.tsv; Job process: 0.2 sec
+> 66 NB4: 275 regions, filtering [..........] row = 275, TFs = 4. Save: data/encode_dist/NB4.tsv; Job process: 0.2 sec
+> 67 NH-A:        95 regions, filtering [..........] row = 95, TFs = 2. Save: data/encode_dist/NH-A.tsv; Job process: 0.1 sec
+> 68 NHDF-Ad:     109 regions, filtering [..........] row = 109, TFs = 2. Save: data/encode_dist/NHDF-Ad.tsv; Job process: 0.1 sec
+> 69 NHDF-neo:    73 regions, filtering [..........] row = 73, TFs = 1. Save: data/encode_dist/NHDF-neo.tsv; Job process: 0.1 sec
+> 70 NHEK:        159 regions, filtering [..........] row = 159, TFs = 3. Save: data/encode_dist/NHEK.tsv; Job process: 0.1 sec
+> 71 NHLF:        110 regions, filtering [..........] row = 110, TFs = 2. Save: data/encode_dist/NHLF.tsv; Job process: 0.1 sec
+> 72 NT2-D1:      22 regions, filtering [...........] row = 22, TFs = 2. Save: data/encode_dist/NT2-D1.tsv; Job process: 0 sec
+> 73 Osteobl:     82 regions, filtering [..........] row = 82, TFs = 1. Save: data/encode_dist/Osteobl.tsv; Job process: 0.1 sec
+> 74 PANC-1:      99 regions, filtering [...........] row = 99, TFs = 4. Save: data/encode_dist/PANC-1.tsv; Job process: 0.1 sec
+> 75 PBDE:        126 regions, filtering [..........] row = 126, TFs = 2. Save: data/encode_dist/PBDE.tsv; Job process: 0.1 sec
+> 76 PBDEFetal:   5 regions, filtering [.....] row = 5, TFs = 1. Save: data/encode_dist/PBDEFetal.tsv; Job process: 0 sec
+> 77 PFSK-1:      54 regions, filtering [..........] row = 54, TFs = 4. Save: data/encode_dist/PFSK-1.tsv; Job process: 0.1 sec
+> 78 ProgFib:     150 regions, filtering [..........] row = 150, TFs = 2. Save: data/encode_dist/ProgFib.tsv; Job process: 0.1 sec
+> 79 RPTEC:       75 regions, filtering [..........] row = 75, TFs = 1. Save: data/encode_dist/RPTEC.tsv; Job process: 0.1 sec
+> 80 Raji:        265 regions, filtering [..........] row = 265, TFs = 1. Save: data/encode_dist/Raji.tsv; Job process: 0.2 sec
+> 81 SAEC:        68 regions, filtering [...........] row = 68, TFs = 1. Save: data/encode_dist/SAEC.tsv; Job process: 0.1 sec
+> 82 SH-SY5Y:     27 regions, filtering [.............] row = 27, TFs = 2. Save: data/encode_dist/SH-SY5Y.tsv; Job process: 0 sec
+> 83 SK-N-MC:     93 regions, filtering [..........] row = 93, TFs = 2. Save: data/encode_dist/SK-N-MC.tsv; Job process: 0.1 sec
+> 84 SK-N-SH:     393 regions, filtering [..........] row = 210, TFs = 4. Save: data/encode_dist/SK-N-SH.tsv; Job process: 0.3 sec
+> 85 SK-N-SH_RA:  183 regions, filtering [..........] row = 183, TFs = 5. Save: data/encode_dist/SK-N-SH_RA.tsv; Job process: 0.2 sec
+> 86 T-47D:       135 regions, filtering [..........] row = 135, TFs = 5. Save: data/encode_dist/T-47D.tsv; Job process: 0.2 sec
+> 87 U2OS:        44 regions, filtering [...........] row = 44, TFs = 2. Save: data/encode_dist/U2OS.tsv; Job process: 0.1 sec
+> 88 U87: 149 regions, filtering [..........] row = 149, TFs = 2. Save: data/encode_dist/U87.tsv; Job process: 0.3 sec
+> 89 WERI-Rb-1:   69 regions, filtering [...........] row = 69, TFs = 1. Save: data/encode_dist/WERI-Rb-1.tsv; Job process: 0.1 sec
+> 90 WI-38:       42 regions, filtering [..........] row = 42, TFs = 1. Save: data/encode_dist/WI-38.tsv; Job process: 0.1 sec
+>
+> Job done: 2021-02-06 05:50:36 for 19.9 sec
 
 
 
@@ -644,6 +807,40 @@ Rscript src/genes.r --disgenet \
 | ![](data/disgenet/TFs_157_gda.png)  | ![](data/disgenet/TFs_157_enrich.png) |
 
 We sought T1D as enriched, but failed to find it.
+
+
+
+## 4. Geneset enrichment analysis
+
+Ontologies supported by **Cluster Profiler**:
+
+- [x] Disease Ontology (via [DOSE](https://www.bioconductor.org/packages/DOSE))
+
+- [ ] [Network of Cancer Gene](http://ncg.kcl.ac.uk/) (via [DOSE](https://www.bioconductor.org/packages/DOSE))
+
+- [x] [DisGeNET](http://www.disgenet.org/web/DisGeNET/menu/home) (via [DOSE](https://www.bioconductor.org/packages/DOSE))
+
+- [x] Gene Ontology (supports many species with GO annotation query online via [AnnotationHub](https://bioconductor.org/packages/AnnotationHub/))
+
+- [x] KEGG Pathway and Module with latest online data (supports more than 4000 species listed in http://www.genome.jp/kegg/catalog/org_list.html)
+- [x] Reactome Pathway (via [ReactomePA](https://www.bioconductor.org/packages/ReactomePA))
+- [x] DAVID (via [RDAVIDWebService](https://www.bioconductor.org/packages/RDAVIDWebService))
+- [x] Molecular Signatures Database
+  - hallmark gene sets
+  - positional gene sets
+  - curated gene sets
+  - motif gene sets
+  - computational gene sets
+  - GO gene sets
+  - oncogenic signatures
+  - immunologic signatures
+- [ ] Other Annotations
+  - from other sources (e.g. [DisGeNET](http://www.disgenet.org/web/DisGeNET/menu/home) as [an example](https://guangchuangyu.github.io/2015/05/use-clusterprofiler-as-an-universal-enrichment-analysis-tool/))
+  - user’s annotation
+  - customized ontology
+  - and many others
+
+
 
 
 

@@ -10,7 +10,7 @@ ANN_GTEX=$WORK_DIR"/gtex_signif_3938.tsv"
 printf "1. Summary table.. "
 Rscript postgwas-exe.r \
   --dbvenn summ \
-  --base   $WORK_DIR/summary $WORK_DIR/gtex_eqtl \
+  --base   $WORK_DIR/summary $WORK_DIR/gtex_eqtl $WORK_DIR/encode_over \
   --out    $WORK_DIR \
   --sub_dir FALSE \
   --uni_save FALSE \
