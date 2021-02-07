@@ -56,12 +56,18 @@ Rscript src/enrich.r --heatmap \
     --out enrich \
     --range -3,3 \
     --annot BLOOD,PANCREAS,THYMUS \
-    --fileext png
+    --file_ext png
 
 # Transform encode permutation result from wide to long
 Rscript src/enrich.r --encode_tf_summ \
     --encode_perm_results data/enrich \
     --out data
+
+# Draw boxplot from the transformed permutation result table
+Rscript src/enrich.r --encode_tf_boxplot \
+    --encode_summ data/encode_tf_enrich_tissue.tsv \
+    --out fig \
+    --file_ext png
 
 # GSEA for GTEx eQTL pairs by considering tissue-specific gene expression levels
 Rscript src/enrich.r --gtex_perm \
@@ -175,6 +181,12 @@ p = add_argument(p,'--encode_tf_summ',flag=T,
 p = add_argument(p, '--encode_perm_results',
     help="[Path] Directory including ENCODE permutation results.")
 
+### Arguments for encode_tf_boxplot
+p = add_argument(p,'--encode_tf_boxplot',flag=T,
+    help="[Function] Draw box plot from the ENCODE permutation result summary.")
+p = add_argument(p,'--encode_summ',
+    help="[Path] ENCODE permutation result summary TSV file.")
+
 ### Arguments for conv_Dicevcf2db function
 p = add_argument(p,'--conv_dicevcf2db',flag=T,
     help="[Function] Convert the DICE eQTL VCF files to database for GSEA.")
@@ -262,6 +274,67 @@ encode_tf_summ = function(
     f_name = paste0(out,'/encode_tf_enrich.tsv')
     write.table(summ_merge,f_name,sep='\t',row.names=F,quote=F)
     paste0('* Write file: ',f_name,'\n') %>% cat
+}
+
+
+encode_tf_boxplot = function(
+    f_encode_summ = NULL,
+    out     = NULL,
+    fileext = NULL
+) {
+    paste0('\n** Run encode_tf_boxplot function in enrich.r **\n\n') %>% cat
+    suppressMessages(library(ggplot2))
+    ifelse(!dir.exists(out), dir.create(out), "")
+
+    # Read file
+    paste0('* ',f_encode_summ,' = ') %>% cat
+    dat = read.delim(f_encode_summ,stringsAsFactors=F)
+    dim(dat) %>% print
+
+    if(fileext=='png') {
+        f_name1 = paste0(out,'/encode-total_SNP_n.',fileext)
+        f_name2 = paste0(out,'/encode-total_TF_Pval.',fileext)
+        f_name3 = paste0(out,'/encode-total_TF_Zscore.',fileext)
+        f_name4 = paste0(out,'/encode-over1_SNP_n.',fileext)
+        f_name5 = paste0(out,'/encode-over1_TF_Pval.',fileext)
+        f_name6 = paste0(out,'/encode-over1_TF_Zscore.',fileext)
+        wh = c(6,4)
+    }
+    p1=ggplot(dat,aes(x=Tissue,y=`SNP_n...gwas_biomart_5892`))+
+        geom_boxplot()+
+        scale_x_discrete(guide = guide_axis(angle = 45))
+    ggsave(f_name1,p1,width=wh[1],height=wh[2],units='in')
+    paste0('  Draw plot1: ',f_name1,'\n') %>% cat
+
+    p2=ggplot(dat,aes(x=Tissue,y=`Perm_P_val...gwas_biomart_5892`))+
+        geom_boxplot()+
+        scale_x_discrete(guide = guide_axis(angle = 45))
+    ggsave(f_name2,p2,width=wh[1],height=wh[2],units='in')
+    paste0('  Draw plot2: ',f_name2,'\n') %>% cat
+
+    p3=ggplot(dat,aes(x=Tissue,y=`Z.score...gwas_biomart_5892`))+
+        geom_boxplot()+
+        scale_x_discrete(guide = guide_axis(angle = 45))
+    ggsave(f_name3,p3,width=wh[1],height=wh[2],units='in')
+    paste0('  Draw plot3: ',f_name3,'\n') %>% cat
+
+    p4=ggplot(dat,aes(x=Tissue,y=`SNP_n...overlap.1_164`))+
+        geom_boxplot()+
+        scale_x_discrete(guide = guide_axis(angle = 45))
+    ggsave(f_name4,p4,width=wh[1],height=wh[2],units='in')
+    paste0('  Draw plot4: ',f_name1,'\n') %>% cat
+
+    p5=ggplot(dat,aes(x=Tissue,y=`Perm_P_val...overlap.1_164`))+
+        geom_boxplot()+
+        scale_x_discrete(guide = guide_axis(angle = 45))
+    ggsave(f_name5,p5,width=wh[1],height=wh[2],units='in')
+    paste0('  Draw plot5: ',f_name5,'\n') %>% cat
+
+    p6=ggplot(dat,aes(x=Tissue,y=`Z.score...overlap.1_164`))+
+        geom_boxplot()+
+        scale_x_discrete(guide = guide_axis(angle = 45))
+    ggsave(f_name6,p6,width=wh[1],height=wh[2],units='in')
+    paste0('  Draw plot6: ',f_name6,'\n') %>% cat
 }
 
 
@@ -1053,6 +1126,12 @@ if(argv$example) {
     encode_tf_summ(
         f_encode_perm_results = argv$encode_perm_results,
         out    = argv$out
+    )
+} else if(argv$encode_tf_boxplot) {
+    encode_tf_boxplot(
+        f_encode_summ = argv$encode_summ,
+        out     = argv$out,
+        fileext = argv$file_ext
     )
 } else if(argv$tfbs2bed) {
     tfbs2bed(
