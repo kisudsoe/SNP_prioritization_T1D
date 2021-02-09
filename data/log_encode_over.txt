@@ -1,5 +1,0 @@
-** Run tfbs2bed function in enrich.r **
-
-* In encode_dist, 90 files found: write encode_over [..........] done
-
-Job done: 2021-02-06 23:29:18 for 2.9 sec

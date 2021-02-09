@@ -1,225 +1,135 @@
 sub_dir = [1] "FALSE"
 
 ** Run function: db_venn.r/summ_ann... ready
-204 Files/folders input.
-  1 data/encode_over/snp_encode_A549.bed
-  2 data/encode_over/snp_encode_AG04449.bed
-  3 data/encode_over/snp_encode_AG04450.bed
-  4 data/encode_over/snp_encode_AG09309.bed
-  5 data/encode_over/snp_encode_AG09319.bed
-  6 data/encode_over/snp_encode_AG10803.bed
-  7 data/encode_over/snp_encode_AoAF.bed
-  8 data/encode_over/snp_encode_BE2_C.bed
-  9 data/encode_over/snp_encode_BJ.bed
-  10 data/encode_over/snp_encode_Caco-2.bed
-  11 data/encode_over/snp_encode_Dnd41.bed
-  12 data/encode_over/snp_encode_ECC-1.bed
-  13 data/encode_over/snp_encode_Fibrobl.bed
-  14 data/encode_over/snp_encode_GM06990.bed
-  15 data/encode_over/snp_encode_GM10847.bed
-  16 data/encode_over/snp_encode_GM12801.bed
-  17 data/encode_over/snp_encode_GM12864.bed
-  18 data/encode_over/snp_encode_GM12865.bed
-  19 data/encode_over/snp_encode_GM12872.bed
-  20 data/encode_over/snp_encode_GM12873.bed
-  21 data/encode_over/snp_encode_GM12874.bed
-  22 data/encode_over/snp_encode_GM12875.bed
-  23 data/encode_over/snp_encode_GM12878.bed
-  24 data/encode_over/snp_encode_GM12891.bed
-  25 data/encode_over/snp_encode_GM12892.bed
-  26 data/encode_over/snp_encode_GM15510.bed
-  27 data/encode_over/snp_encode_GM18505.bed
-  28 data/encode_over/snp_encode_GM18526.bed
-  29 data/encode_over/snp_encode_GM18951.bed
-  30 data/encode_over/snp_encode_GM19099.bed
-  31 data/encode_over/snp_encode_GM19193.bed
-  32 data/encode_over/snp_encode_GM19238.bed
-  33 data/encode_over/snp_encode_GM19239.bed
-  34 data/encode_over/snp_encode_GM19240.bed
-  35 data/encode_over/snp_encode_Gliobla.bed
-  36 data/encode_over/snp_encode_H1-hESC.bed
-  37 data/encode_over/snp_encode_HA-sp.bed
-  38 data/encode_over/snp_encode_HAc.bed
-  39 data/encode_over/snp_encode_HBMEC.bed
-  40 data/encode_over/snp_encode_HCFaa.bed
-  41 data/encode_over/snp_encode_HCM.bed
-  42 data/encode_over/snp_encode_HCPEpiC.bed
-  43 data/encode_over/snp_encode_HCT-116.bed
-  44 data/encode_over/snp_encode_HEEpiC.bed
-  45 data/encode_over/snp_encode_HEK293-T-REx.bed
-  46 data/encode_over/snp_encode_HEK293.bed
-  47 data/encode_over/snp_encode_HFF-Myc.bed
-  48 data/encode_over/snp_encode_HFF.bed
-  49 data/encode_over/snp_encode_HL-60.bed
-  50 data/encode_over/snp_encode_HMEC.bed
-  51 data/encode_over/snp_encode_HMF.bed
-  52 data/encode_over/snp_encode_HPAF.bed
-  53 data/encode_over/snp_encode_HPF.bed
-  54 data/encode_over/snp_encode_HRE.bed
-  55 data/encode_over/snp_encode_HRPEpiC.bed
-  56 data/encode_over/snp_encode_HSMM.bed
-  57 data/encode_over/snp_encode_HSMMtube.bed
-  58 data/encode_over/snp_encode_HUVEC.bed
-  59 data/encode_over/snp_encode_HVMF.bed
-  60 data/encode_over/snp_encode_HeLa-S3.bed
-  61 data/encode_over/snp_encode_HepG2.bed
-  62 data/encode_over/snp_encode_IMR90.bed
-  63 data/encode_over/snp_encode_K562.bed
-  64 data/encode_over/snp_encode_MCF-7.bed
-  65 data/encode_over/snp_encode_MCF10A-Er-Src.bed
-  66 data/encode_over/snp_encode_NB4.bed
-  67 data/encode_over/snp_encode_NH-A.bed
-  68 data/encode_over/snp_encode_NHDF-Ad.bed
-  69 data/encode_over/snp_encode_NHDF-neo.bed
-  70 data/encode_over/snp_encode_NHEK.bed
-  71 data/encode_over/snp_encode_NHLF.bed
-  72 data/encode_over/snp_encode_NT2-D1.bed
-  73 data/encode_over/snp_encode_Osteobl.bed
-  74 data/encode_over/snp_encode_PANC-1.bed
-  75 data/encode_over/snp_encode_PBDE.bed
-  76 data/encode_over/snp_encode_PBDEFetal.bed
-  77 data/encode_over/snp_encode_PFSK-1.bed
-  78 data/encode_over/snp_encode_ProgFib.bed
-  79 data/encode_over/snp_encode_RPTEC.bed
-  80 data/encode_over/snp_encode_Raji.bed
-  81 data/encode_over/snp_encode_SAEC.bed
-  82 data/encode_over/snp_encode_SH-SY5Y.bed
-  83 data/encode_over/snp_encode_SK-N-MC.bed
-  84 data/encode_over/snp_encode_SK-N-SH.bed
-  85 data/encode_over/snp_encode_SK-N-SH_RA.bed
-  86 data/encode_over/snp_encode_T-47D.bed
-  87 data/encode_over/snp_encode_U2OS.bed
-  88 data/encode_over/snp_encode_U87.bed
-  89 data/encode_over/snp_encode_WERI-Rb-1.bed
-  90 data/encode_over/snp_encode_WI-38.bed
-  91 data/gtex_eqtl/snp_gtex_Adipose_Subcutaneous_2469.bed
-  92 data/gtex_eqtl/snp_gtex_Adipose_Visceral_Omentum_2004.bed
-  93 data/gtex_eqtl/snp_gtex_Adrenal_Gland_1554.bed
-  94 data/gtex_eqtl/snp_gtex_Artery_Aorta_1910.bed
-  95 data/gtex_eqtl/snp_gtex_Artery_Coronary_1197.bed
-  96 data/gtex_eqtl/snp_gtex_Artery_Tibial_2091.bed
-  97 data/gtex_eqtl/snp_gtex_Brain_Amygdala_1021.bed
-  98 data/gtex_eqtl/snp_gtex_Brain_Anterior_cingulate_cortex_BA24_1051.bed
-  99 data/gtex_eqtl/snp_gtex_Brain_Caudate_basal_ganglia_1294.bed
-  100 data/gtex_eqtl/snp_gtex_Brain_Cerebellar_Hemisphere_1651.bed
-  101 data/gtex_eqtl/snp_gtex_Brain_Cerebellum_2015.bed
-  102 data/gtex_eqtl/snp_gtex_Brain_Cortex_1358.bed
-  103 data/gtex_eqtl/snp_gtex_Brain_Frontal_Cortex_BA9_1043.bed
-  104 data/gtex_eqtl/snp_gtex_Brain_Hippocampus_1197.bed
-  105 data/gtex_eqtl/snp_gtex_Brain_Hypothalamus_1208.bed
-  106 data/gtex_eqtl/snp_gtex_Brain_Nucleus_accumbens_basal_ganglia_1220.bed
-  107 data/gtex_eqtl/snp_gtex_Brain_Putamen_basal_ganglia_1094.bed
-  108 data/gtex_eqtl/snp_gtex_Brain_Spinal_cord_cervical_c-1_702.bed
-  109 data/gtex_eqtl/snp_gtex_Brain_Substantia_nigra_528.bed
-  110 data/gtex_eqtl/snp_gtex_Breast_Mammary_Tissue_1876.bed
-  111 data/gtex_eqtl/snp_gtex_Cells_Cultured_fibroblasts_1897.bed
-  112 data/gtex_eqtl/snp_gtex_Cells_EBV-transformed_lymphocytes_1282.bed
-  113 data/gtex_eqtl/snp_gtex_Colon_Sigmoid_1945.bed
-  114 data/gtex_eqtl/snp_gtex_Colon_Transverse_2059.bed
-  115 data/gtex_eqtl/snp_gtex_Esophagus_Gastroesophageal_Junction_1982.bed
-  116 data/gtex_eqtl/snp_gtex_Esophagus_Mucosa_2395.bed
-  117 data/gtex_eqtl/snp_gtex_Esophagus_Muscularis_2156.bed
-  118 data/gtex_eqtl/snp_gtex_Heart_Atrial_Appendage_2120.bed
-  119 data/gtex_eqtl/snp_gtex_Heart_Left_Ventricle_1748.bed
-  120 data/gtex_eqtl/snp_gtex_Kidney_Cortex_323.bed
-  121 data/gtex_eqtl/snp_gtex_Liver_1482.bed
-  122 data/gtex_eqtl/snp_gtex_Lung_2136.bed
-  123 data/gtex_eqtl/snp_gtex_Minor_Salivary_Gland_867.bed
-  124 data/gtex_eqtl/snp_gtex_Muscle_Skeletal_2062.bed
-  125 data/gtex_eqtl/snp_gtex_Nerve_Tibial_2750.bed
-  126 data/gtex_eqtl/snp_gtex_Ovary_1092.bed
-  127 data/gtex_eqtl/snp_gtex_Pancreas_1958.bed
-  128 data/gtex_eqtl/snp_gtex_Pituitary_1839.bed
-  129 data/gtex_eqtl/snp_gtex_Prostate_1339.bed
-  130 data/gtex_eqtl/snp_gtex_Skin_Not_Sun_Exposed_Suprapubic_2301.bed
-  131 data/gtex_eqtl/snp_gtex_Skin_Sun_Exposed_Lower_leg_2487.bed
-  132 data/gtex_eqtl/snp_gtex_Small_Intestine_Terminal_Ileum_1399.bed
-  133 data/gtex_eqtl/snp_gtex_Spleen_1866.bed
-  134 data/gtex_eqtl/snp_gtex_Stomach_1660.bed
-  135 data/gtex_eqtl/snp_gtex_Testis_2408.bed
-  136 data/gtex_eqtl/snp_gtex_Thyroid_2546.bed
-  137 data/gtex_eqtl/snp_gtex_Uterus_792.bed
-  138 data/gtex_eqtl/snp_gtex_Vagina_925.bed
-  139 data/gtex_eqtl/snp_gtex_Whole_Blood_2327.bed
-  140 data/gtex_eqtl/snp_union_gtex_eqtl_4092.bed
-  141 data/summary/snp_encode_tfbs_1538.bed
-  142 data/summary/snp_lncrnasnp_314.bed
-  143 data/summary/snp_regulome2b_348.bed
-  144 data/summary/snp_roadmap_enh_merge_2234.bed
-  145 data/summary/snp_ucsc_cds_163.bed
-  146 data/summary/snp_ucsc_proximalPromoter_923.bed
-  147 data/summary/snp_ucsc_wholeGene_3544.bed
-  148 data/summary/snp_union_roadmap_over_2414.bed
-  149 data/summary/snp_union_roadmap_over_ADRENAL_283.bed
-  150 data/summary/snp_union_roadmap_over_BONE_encode_237.bed
-  151 data/summary/snp_union_roadmap_over_BRAIN_443.bed
-  152 data/summary/snp_union_roadmap_over_BRAIN_encode_221.bed
-  153 data/summary/snp_union_roadmap_over_BREAST_396.bed
-  154 data/summary/snp_union_roadmap_over_BREAST_encode_239.bed
-  155 data/summary/snp_union_roadmap_over_Blood_B-cell_CD19p_1030.bed
-  156 data/summary/snp_union_roadmap_over_Blood_HSC_CD34p_838.bed
-  157 data/summary/snp_union_roadmap_over_Blood_Leukemia_encode_825.bed
-  158 data/summary/snp_union_roadmap_over_Blood_Lymphoblastoid_encode_854.bed
-  159 data/summary/snp_union_roadmap_over_Blood_Monocytes_CD14_609.bed
-  160 data/summary/snp_union_roadmap_over_Blood_Monocytes_CD14_encode_656.bed
-  161 data/summary/snp_union_roadmap_over_Blood_Mononuclear_cell_681.bed
-  162 data/summary/snp_union_roadmap_over_Blood_NK_cell_CD56_689.bed
-  163 data/summary/snp_union_roadmap_over_Blood_Neutrophils_CD15_752.bed
-  164 data/summary/snp_union_roadmap_over_Blood_T-cell_CD3_1005.bed
-  165 data/summary/snp_union_roadmap_over_Blood_T-cell_CD8_785.bed
-  166 data/summary/snp_union_roadmap_over_Blood_Th17_PMA-I_stim_CD4p_CD25m_IL17p_609.bed
-  167 data/summary/snp_union_roadmap_over_Blood_Th_CD4_751.bed
-  168 data/summary/snp_union_roadmap_over_Blood_Th_CD4p_CD25m_655.bed
-  169 data/summary/snp_union_roadmap_over_Blood_Th_PMA-I_stim_CD4p_CD25m_IL17m_653.bed
-  170 data/summary/snp_union_roadmap_over_Blood_Th_memory_CD4p_CD25m_637.bed
-  171 data/summary/snp_union_roadmap_over_Blood_Th_naive_CD4p_CD25m_604.bed
-  172 data/summary/snp_union_roadmap_over_Blood_Tmem_CD4p_CD25int_CD127p_669.bed
-  173 data/summary/snp_union_roadmap_over_Blood_Treg_CD4p_CD25p_654.bed
-  174 data/summary/snp_union_roadmap_over_CERVIX_encode_262.bed
-  175 data/summary/snp_union_roadmap_over_ESC_2262.bed
-  176 data/summary/snp_union_roadmap_over_ESC_DERIVED_575.bed
-  177 data/summary/snp_union_roadmap_over_FAT_495.bed
-  178 data/summary/snp_union_roadmap_over_GI_COLON_553.bed
-  179 data/summary/snp_union_roadmap_over_GI_DUODENUM_466.bed
-  180 data/summary/snp_union_roadmap_over_GI_ESOPHAGUS_261.bed
-  181 data/summary/snp_union_roadmap_over_GI_INTESTINE_475.bed
-  182 data/summary/snp_union_roadmap_over_GI_RECTUM_524.bed
-  183 data/summary/snp_union_roadmap_over_GI_STOMACH_588.bed
-  184 data/summary/snp_union_roadmap_over_HEART_377.bed
-  185 data/summary/snp_union_roadmap_over_IPSC_310.bed
-  186 data/summary/snp_union_roadmap_over_KIDNEY_237.bed
-  187 data/summary/snp_union_roadmap_over_LIVER_352.bed
-  188 data/summary/snp_union_roadmap_over_LIVER_encode_275.bed
-  189 data/summary/snp_union_roadmap_over_LUNG_476.bed
-  190 data/summary/snp_union_roadmap_over_LUNG_encode_331.bed
-  191 data/summary/snp_union_roadmap_over_MUSCLE_515.bed
-  192 data/summary/snp_union_roadmap_over_MUSCLE_LEG_212.bed
-  193 data/summary/snp_union_roadmap_over_MUSCLE_encode_270.bed
-  194 data/summary/snp_union_roadmap_over_OVARY_183.bed
-  195 data/summary/snp_union_roadmap_over_PANCREAS_235.bed
-  196 data/summary/snp_union_roadmap_over_PANCREAS_Islets_193.bed
-  197 data/summary/snp_union_roadmap_over_PLACENTA_426.bed
-  198 data/summary/snp_union_roadmap_over_SKIN_436.bed
-  199 data/summary/snp_union_roadmap_over_SKIN_encode_333.bed
-  200 data/summary/snp_union_roadmap_over_SPLEEN_454.bed
-  201 data/summary/snp_union_roadmap_over_STROMAL_CONNECTIVE_253.bed
-  202 data/summary/snp_union_roadmap_over_THYMUS_793.bed
-  203 data/summary/snp_union_roadmap_over_VASCULAR_162.bed
-  204 data/summary/snp_union_roadmap_over_VASCULAR_encode_180.bed
-Total 204 file(s) is/are input.
+114 Files/folders input.
+  1 data/gtex_eqtl/snp_gtex_Adipose_Subcutaneous_2469.bed
+  2 data/gtex_eqtl/snp_gtex_Adipose_Visceral_Omentum_2004.bed
+  3 data/gtex_eqtl/snp_gtex_Adrenal_Gland_1554.bed
+  4 data/gtex_eqtl/snp_gtex_Artery_Aorta_1910.bed
+  5 data/gtex_eqtl/snp_gtex_Artery_Coronary_1197.bed
+  6 data/gtex_eqtl/snp_gtex_Artery_Tibial_2091.bed
+  7 data/gtex_eqtl/snp_gtex_Brain_Amygdala_1021.bed
+  8 data/gtex_eqtl/snp_gtex_Brain_Anterior_cingulate_cortex_BA24_1051.bed
+  9 data/gtex_eqtl/snp_gtex_Brain_Caudate_basal_ganglia_1294.bed
+  10 data/gtex_eqtl/snp_gtex_Brain_Cerebellar_Hemisphere_1651.bed
+  11 data/gtex_eqtl/snp_gtex_Brain_Cerebellum_2015.bed
+  12 data/gtex_eqtl/snp_gtex_Brain_Cortex_1358.bed
+  13 data/gtex_eqtl/snp_gtex_Brain_Frontal_Cortex_BA9_1043.bed
+  14 data/gtex_eqtl/snp_gtex_Brain_Hippocampus_1197.bed
+  15 data/gtex_eqtl/snp_gtex_Brain_Hypothalamus_1208.bed
+  16 data/gtex_eqtl/snp_gtex_Brain_Nucleus_accumbens_basal_ganglia_1220.bed
+  17 data/gtex_eqtl/snp_gtex_Brain_Putamen_basal_ganglia_1094.bed
+  18 data/gtex_eqtl/snp_gtex_Brain_Spinal_cord_cervical_c-1_702.bed
+  19 data/gtex_eqtl/snp_gtex_Brain_Substantia_nigra_528.bed
+  20 data/gtex_eqtl/snp_gtex_Breast_Mammary_Tissue_1876.bed
+  21 data/gtex_eqtl/snp_gtex_Cells_Cultured_fibroblasts_1897.bed
+  22 data/gtex_eqtl/snp_gtex_Cells_EBV-transformed_lymphocytes_1282.bed
+  23 data/gtex_eqtl/snp_gtex_Colon_Sigmoid_1945.bed
+  24 data/gtex_eqtl/snp_gtex_Colon_Transverse_2059.bed
+  25 data/gtex_eqtl/snp_gtex_Esophagus_Gastroesophageal_Junction_1982.bed
+  26 data/gtex_eqtl/snp_gtex_Esophagus_Mucosa_2395.bed
+  27 data/gtex_eqtl/snp_gtex_Esophagus_Muscularis_2156.bed
+  28 data/gtex_eqtl/snp_gtex_Heart_Atrial_Appendage_2120.bed
+  29 data/gtex_eqtl/snp_gtex_Heart_Left_Ventricle_1748.bed
+  30 data/gtex_eqtl/snp_gtex_Kidney_Cortex_323.bed
+  31 data/gtex_eqtl/snp_gtex_Liver_1482.bed
+  32 data/gtex_eqtl/snp_gtex_Lung_2136.bed
+  33 data/gtex_eqtl/snp_gtex_Minor_Salivary_Gland_867.bed
+  34 data/gtex_eqtl/snp_gtex_Muscle_Skeletal_2062.bed
+  35 data/gtex_eqtl/snp_gtex_Nerve_Tibial_2750.bed
+  36 data/gtex_eqtl/snp_gtex_Ovary_1092.bed
+  37 data/gtex_eqtl/snp_gtex_Pancreas_1958.bed
+  38 data/gtex_eqtl/snp_gtex_Pituitary_1839.bed
+  39 data/gtex_eqtl/snp_gtex_Prostate_1339.bed
+  40 data/gtex_eqtl/snp_gtex_Skin_Not_Sun_Exposed_Suprapubic_2301.bed
+  41 data/gtex_eqtl/snp_gtex_Skin_Sun_Exposed_Lower_leg_2487.bed
+  42 data/gtex_eqtl/snp_gtex_Small_Intestine_Terminal_Ileum_1399.bed
+  43 data/gtex_eqtl/snp_gtex_Spleen_1866.bed
+  44 data/gtex_eqtl/snp_gtex_Stomach_1660.bed
+  45 data/gtex_eqtl/snp_gtex_Testis_2408.bed
+  46 data/gtex_eqtl/snp_gtex_Thyroid_2546.bed
+  47 data/gtex_eqtl/snp_gtex_Uterus_792.bed
+  48 data/gtex_eqtl/snp_gtex_Vagina_925.bed
+  49 data/gtex_eqtl/snp_gtex_Whole_Blood_2327.bed
+  50 data/gtex_eqtl/snp_union_gtex_eqtl_4092.bed
+  51 data/summary/snp_encode_tfbs_1538.bed
+  52 data/summary/snp_lncrnasnp_314.bed
+  53 data/summary/snp_regulome2b_348.bed
+  54 data/summary/snp_roadmap_enh_merge_2234.bed
+  55 data/summary/snp_ucsc_cds_163.bed
+  56 data/summary/snp_ucsc_proximalPromoter_923.bed
+  57 data/summary/snp_ucsc_wholeGene_3544.bed
+  58 data/summary/snp_union_roadmap_over_2414.bed
+  59 data/summary/snp_union_roadmap_over_ADRENAL_283.bed
+  60 data/summary/snp_union_roadmap_over_BONE_encode_237.bed
+  61 data/summary/snp_union_roadmap_over_BRAIN_443.bed
+  62 data/summary/snp_union_roadmap_over_BRAIN_encode_221.bed
+  63 data/summary/snp_union_roadmap_over_BREAST_396.bed
+  64 data/summary/snp_union_roadmap_over_BREAST_encode_239.bed
+  65 data/summary/snp_union_roadmap_over_Blood_B-cell_CD19p_1030.bed
+  66 data/summary/snp_union_roadmap_over_Blood_HSC_CD34p_838.bed
+  67 data/summary/snp_union_roadmap_over_Blood_Leukemia_encode_825.bed
+  68 data/summary/snp_union_roadmap_over_Blood_Lymphoblastoid_encode_854.bed
+  69 data/summary/snp_union_roadmap_over_Blood_Monocytes_CD14_609.bed
+  70 data/summary/snp_union_roadmap_over_Blood_Monocytes_CD14_encode_656.bed
+  71 data/summary/snp_union_roadmap_over_Blood_Mononuclear_cell_681.bed
+  72 data/summary/snp_union_roadmap_over_Blood_NK_cell_CD56_689.bed
+  73 data/summary/snp_union_roadmap_over_Blood_Neutrophils_CD15_752.bed
+  74 data/summary/snp_union_roadmap_over_Blood_T-cell_CD3_1005.bed
+  75 data/summary/snp_union_roadmap_over_Blood_T-cell_CD8_785.bed
+  76 data/summary/snp_union_roadmap_over_Blood_Th17_PMA-I_stim_CD4p_CD25m_IL17p_609.bed
+  77 data/summary/snp_union_roadmap_over_Blood_Th_CD4_751.bed
+  78 data/summary/snp_union_roadmap_over_Blood_Th_CD4p_CD25m_655.bed
+  79 data/summary/snp_union_roadmap_over_Blood_Th_PMA-I_stim_CD4p_CD25m_IL17m_653.bed
+  80 data/summary/snp_union_roadmap_over_Blood_Th_memory_CD4p_CD25m_637.bed
+  81 data/summary/snp_union_roadmap_over_Blood_Th_naive_CD4p_CD25m_604.bed
+  82 data/summary/snp_union_roadmap_over_Blood_Tmem_CD4p_CD25int_CD127p_669.bed
+  83 data/summary/snp_union_roadmap_over_Blood_Treg_CD4p_CD25p_654.bed
+  84 data/summary/snp_union_roadmap_over_CERVIX_encode_262.bed
+  85 data/summary/snp_union_roadmap_over_ESC_2262.bed
+  86 data/summary/snp_union_roadmap_over_ESC_DERIVED_575.bed
+  87 data/summary/snp_union_roadmap_over_FAT_495.bed
+  88 data/summary/snp_union_roadmap_over_GI_COLON_553.bed
+  89 data/summary/snp_union_roadmap_over_GI_DUODENUM_466.bed
+  90 data/summary/snp_union_roadmap_over_GI_ESOPHAGUS_261.bed
+  91 data/summary/snp_union_roadmap_over_GI_INTESTINE_475.bed
+  92 data/summary/snp_union_roadmap_over_GI_RECTUM_524.bed
+  93 data/summary/snp_union_roadmap_over_GI_STOMACH_588.bed
+  94 data/summary/snp_union_roadmap_over_HEART_377.bed
+  95 data/summary/snp_union_roadmap_over_IPSC_310.bed
+  96 data/summary/snp_union_roadmap_over_KIDNEY_237.bed
+  97 data/summary/snp_union_roadmap_over_LIVER_352.bed
+  98 data/summary/snp_union_roadmap_over_LIVER_encode_275.bed
+  99 data/summary/snp_union_roadmap_over_LUNG_476.bed
+  100 data/summary/snp_union_roadmap_over_LUNG_encode_331.bed
+  101 data/summary/snp_union_roadmap_over_MUSCLE_515.bed
+  102 data/summary/snp_union_roadmap_over_MUSCLE_LEG_212.bed
+  103 data/summary/snp_union_roadmap_over_MUSCLE_encode_270.bed
+  104 data/summary/snp_union_roadmap_over_OVARY_183.bed
+  105 data/summary/snp_union_roadmap_over_PANCREAS_235.bed
+  106 data/summary/snp_union_roadmap_over_PANCREAS_Islets_193.bed
+  107 data/summary/snp_union_roadmap_over_PLACENTA_426.bed
+  108 data/summary/snp_union_roadmap_over_SKIN_436.bed
+  109 data/summary/snp_union_roadmap_over_SKIN_encode_333.bed
+  110 data/summary/snp_union_roadmap_over_SPLEEN_454.bed
+  111 data/summary/snp_union_roadmap_over_STROMAL_CONNECTIVE_253.bed
+  112 data/summary/snp_union_roadmap_over_THYMUS_793.bed
+  113 data/summary/snp_union_roadmap_over_VASCULAR_162.bed
+  114 data/summary/snp_union_roadmap_over_VASCULAR_encode_180.bed
+Total 114 file(s) is/are input.
 
 ** Run function: db_venn.r/venn_bed...
-  Read 204 files
+  Read 114 files
 
 ** Back to function: db_venn.r/summ...
-  Returned union list dim = [1] 5688  208
+  Returned union list dim = [1] 5688  118
   [PASS] uni_save = FALSE
 
   Nearest gene dim = [1] 6520    9
   Search biomaRt... 425.. parsing.. 408.. done
   Sub-merge = [1] 6520    5
   Extract snp-gene pair = [1] 5892    2
-  Merge dim = [1] 6520  209
+  Merge dim = [1] 6520  119
   Write a TSV file: data/summary_nearest.tsv
 
   GTEx dim = [1] 271952      7
@@ -229,7 +139,7 @@ Total 204 file(s) is/are input.
   Write a TSV file: data/summary_gtex.tsv
 
   GWAS dim = [1] 5892    8
-  Merge dim = [1] 5892  214
+  Merge dim = [1] 5892  124
   Write a TSV file: data/summary_gwas.tsv
 
-Job done: 2021-02-06 23:34:16 for 43.1 sec
+Job done: 2021-02-03 21:29:15 for 36.6 sec
