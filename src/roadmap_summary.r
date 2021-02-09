@@ -267,7 +267,7 @@ heatmap = function(
     paste0('* Draw heatmap ') %>% cat
     m = nrow(summ_mat)
     if(m>200) {
-        wh=c(22,20); show_row_names = FALSE
+        wh=c(22,25); show_row_names = FALSE
     } else { 
         wh=c(22,m*0.11+9); show_row_names = TRUE
     }

@@ -1,13 +1,12 @@
 ## Change log ##
 # Written by Seungsoo Kim, PhD
-# 01/26/2021-debug
-# 
+# debug01 21.01.26
 
 ## Parsing Arguments ##
 suppressMessages(library(argparser))
 p = arg_parser("Function for enrichment analysis (Fisher/Permutation)")
 
-### Command examples
+### Examples
 p = add_argument(p, '--example',flag=T,
     help="See command examples by functions.")
 example_msg = '
