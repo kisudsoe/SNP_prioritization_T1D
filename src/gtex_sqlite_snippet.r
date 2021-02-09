@@ -11,7 +11,6 @@ gct   = readRDS(path1); dim(gct)
 pair  = readRDS(path2); dim(pair)
 colnames(pair) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
 pair$Ensgid = sapply(pair$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
-pair = pair %>% as.data.frame
 
 conn = dbConnect(RSQLite::SQLite(),f_db)
 dbWriteTable(conn, db_name, pair)
