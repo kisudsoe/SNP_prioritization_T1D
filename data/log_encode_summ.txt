@@ -1,6 +1,6 @@
 
 * Read file: data/genome_dist/encode_tfbs.tsv = 12126 -> Dist=0; [1] 7757   11
 * Summary: 1538 [..........] = [1] 1538    5
-* Write file: data/summary_encode.tsv
+* Write file: data/summary_encode_1538.tsv
 
 Job done: 2021-02-03 21:51:34 for 1.5 sec

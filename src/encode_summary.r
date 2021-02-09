@@ -63,7 +63,7 @@ summ_df = data.table::rbindlist(summ_li)
 paste0('] = ') %>% cat
 dim(summ_df) %>% print
 
-f_name = paste0(argv$out,'/summary_encode.tsv')
+f_name = paste0(argv$out,'/summary_encode_',n,'.tsv')
 write.table(summ_df,f_name,quote=F,row.names=F,sep='\t')
 paste0('* Write file: ',f_name,'\n') %>% cat
 
