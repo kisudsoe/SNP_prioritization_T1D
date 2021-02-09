@@ -138,8 +138,7 @@ heatmap = function(
     f_meta         = NULL,
     f_snps         = NULL,
     annot          = NULL,
-    file_ext       = NULL,
-    out            = NULL
+    file_ext       = NULL
 ) {
     paste0('\n** Run heatmap function in roadmap_summary.r **\n\n') %>% cat
     suppressMessages(library(ComplexHeatmap))
@@ -149,7 +148,7 @@ heatmap = function(
     summ = read.delim(f_roadmap_summ,stringsAsFactors=F)
     dim(summ) %>% print
 
-    if(!is.na(f_snp_filt)) {
+    if(!is.null(f_snp_filt)) {
         paste0('  [Option] Filt SNPs by ',f_snp_filt,' = ') %>% cat
         snp_filt = read.delim(f_snp_filt,header=F,stringsAsFactors=F)
         rsids = snp_filt[,4]
@@ -254,8 +253,8 @@ heatmap = function(
     })
     paste0('] Annotation merge ') %>% cat
     snps_df = Reduce(function(x,y) merge(x=x,y=y,by='Rsid',all=T), snps_li)
-    snps_merge = merge(data.frame(Rsid=summ[,1]),snps_df,by='Rsid',all=T) %>% unique
-    if(!is.na(f_snp_filt)) {
+    snps_merge = merge(data.frame(Rsid=summ[,1]),snps_df,by='Rsid',all=T)
+    if(!is.null(f_snp_filt)) {
         paste0('-> [Option] Filt by ',length(rsids),' snps ') %>% cat
         snps_merge = subset(snps_merge,Rsid %in% rsids)
     }
@@ -326,8 +325,7 @@ if(argv$example) {
         f_meta         = argv$f_meta,
         annot          = argv$annot,
         f_snps         = argv$f_snps,
-        file_ext       = argv$file_ext,
-        out            = argv$out
+        file_ext       = argv$file_ext
     )
 }
 
