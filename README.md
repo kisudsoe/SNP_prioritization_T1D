@@ -1534,67 +1534,6 @@ Rscript src/enrich.r --gtex_perm \
 
 
 
-## Schmiedel-DICE data - immune cell eQTLs
-
-### Convert data to db
-
-Run below code to convert DICE eQTL VCF data to DB format.
-
-```bash
-Rscript src/enrich.r --conv_dicevcf2db \
-    --dice_vcf "db/Schmiedel-DICE" \
-    --pval 5e-8 \
-    --out enrich
-```
-
-> ** Run conv_dicevcf2db function in enrich.r **
->
-> * 15 VCF files found in db/Schmiedel-DICE;
->   db/Schmiedel-DICE/B cell, naive.vcf = 305710; compile INFO -> preparing -> filtering = [1] 238217      6
->   db/Schmiedel-DICE/Monocyte, classical.vcf = 317721; compile INFO -> preparing -> filtering = [1] 245895      6
->   db/Schmiedel-DICE/Monocyte, non-classical.vcf = 284025; compile INFO -> preparing -> filtering = [1] 214249      6
->   db/Schmiedel-DICE/NK cell, CD56dim CD16+.vcf = 238011; compile INFO -> preparing -> filtering = [1] 178634      6
->   db/Schmiedel-DICE/T cell, CD4, TFH.vcf = 348119; compile INFO -> preparing -> filtering = [1] 272197      6
->   db/Schmiedel-DICE/T cell, CD4, TH1.17.vcf = 304777; compile INFO -> preparing -> filtering = [1] 229833      6
->   db/Schmiedel-DICE/T cell, CD4, TH1.vcf = 250464; compile INFO -> preparing -> filtering = [1] 185178      6
->   db/Schmiedel-DICE/T cell, CD4, TH17.vcf = 359195; compile INFO -> preparing -> filtering = [1] 268495      6
->   db/Schmiedel-DICE/T cell, CD4, TH2.vcf = 339160; compile INFO -> preparing -> filtering = [1] 257097      6
->   db/Schmiedel-DICE/T cell, CD4, memory TREG.vcf = 338083; compile INFO -> preparing -> filtering = [1] 255790      6
->   db/Schmiedel-DICE/T cell, CD4, naive TREG.vcf = 355560; compile INFO -> preparing -> filtering = [1] 264315      6
->   db/Schmiedel-DICE/T cell, CD4, naive [activated].vcf = 228171; compile INFO -> preparing -> filtering = [1] 172414      
-> 6
->   db/Schmiedel-DICE/T cell, CD4, naive.vcf = 347035; compile INFO -> preparing -> filtering = [1] 267604      6
->   db/Schmiedel-DICE/T cell, CD8, naive.vcf = 365996; compile INFO -> preparing -> filtering = [1] 276193      6
->   db/Schmiedel-DICE/T_CD8_NAIVE-activated.vcf = 238300; compile INFO -> preparing -> filtering = [1] 178880      6
-> * Read done = [1] 4620327       6
->
-> Write db file: db/dice_eqtl_5e-08.db
-
-
-
-### Run permutation test
-
-Run below code for T1D candidate 1817 SNPs:
-
-```bash
-f=(seedSNP_1817_bm.bed gwas_5e-08_129_hg19.bed snp_364_encode_dist.bed snp_484_roadmap_dist.bed snp_745_gtex.bed)
-
-for i in {0..4}
-do
-Rscript src/enrich.r --gtex_perm \
-	--gwas_snp data/${f[i]} \
-    --gtex_base db/dice_eqtl_5e-08.db \
-    --gtex_median_tpm db/dice-mean_tpm_merged.rds \
-    --perm_n 5000 \
-    --out enrich \
-    > enrich/log_dice-${f[i]}.txt
-done
-```
-
-> 
-
-
-
 # *Obsolete codes
 
 ## Prepare Roadmap enhancers

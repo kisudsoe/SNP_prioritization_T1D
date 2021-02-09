@@ -4,7 +4,7 @@ suppressMessages(library(argparser))
 p = arg_parser("Function for enrichment analysis (Fisher/Permutation)")
 
 ### Examples
-p = add_argument(p, '--example', help="See command examples by functions.", flag=T)
+p = add_argument(p, '--example', help="See examples to run this tool.", flag=T)
 example_msg = '
 Rscript src/enrich.r --splittfbs \
     --tfbs db/wgEncodeRegTfbsClusteredWithCellsV3.bed \
@@ -15,17 +15,24 @@ Rscript src/enrich.r --splitgtex \
     --out db/gtex_tsv
 
 Rscript src/enrich.r --permu \
-    --gwas_snp data/seedSNP_1817_bm.bed \
-    --chr_status db/roadmap_bed \
-    --db_source roadmap_bed \
+    --gwassnp data/seedSNP_1817_bm.bed \
+    --chrstatus db/roadmap_bed \
+    --dbsource roadmap_bed \
     --permn 1000 \
     --out enrich
 
-Rscript src/enrich.r --gtex_perm \
-    --gwas_snp data/seedSNP_1817_bm.bed \
-    --gtex_base db/gtex_signif_5e-8.db \
-    --gtex_median_tpm db/gtex_analysis_v8_rnaseq_gene_median_tpm_ensgid.gct.rds
-    --permn 1000 \
+Rscript src/enrich.r --permu \
+    --gwassnp data/gwas_5e-08_129_hg19.bed \
+    --chrstatus db/encode_bed \
+    --dbsource encode_bed \
+    --permn 100 \
+    --out enrich
+
+Rscript src/enrich.r --gtexperm \
+    --gtex_base data/gtex_5e-08_745.tsv \
+    --snp_filt db/gtex_tsv \
+    --gtex_median_tpm db/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_median_tpm.gct
+    --permn 100 \
     --out enrich
 
 Rscript src/enrich.r --heatmap \
@@ -35,40 +42,16 @@ Rscript src/enrich.r --heatmap \
     --range -3,3 \
     --annot BLOOD,PANCREAS,THYMUS \
     --fileext png
-
-Rscript src/enrich.r --conv_dicevcf2db \
-    --dice_vcf "db/Schmiedel-DICE" \
-    --pval 5e-8 \
-    --out db
-
-Rscript src/enrich.r --gtex_perm \
-	--gwas_snp data/seedSNP_1817_bm.bed \
-    --gtex_base db/dice_eqtl_5e-08.db \
-    --gtex_median_tpm db/dice-mean_tpm_merged.rds \
-    --perm_n 1000 \
-    --out enrich
-
-Rscript src/enrich.r --eqtl_enrich enrichr \
-    --gwas_snp data/seedSNP_1817_bm.bed \
-    --eqtl_db db/dice_eqtl_5e-08.db \
-    --out enrich
-
-Rscript src/enrich.r --eqtl_enrich gsea \
-    --gwas_snp data/seedSNP_1817_bm.bed \
-    --eqtl_db db/dice_eqtl_5e-08.db \
-    --gene_median_tpm db/dice-mean_tpm_merged.rds \
-    --perm_n 1000 \
-    --out enrich
 '
 
 ### Shared Arguments
 p = add_argument(p,'--gwas_snp',
-    help="[Path] GWAS SNP list BED file. Columns: <Chr> <Start> <End> <Rsid> <...>")
+    help="[Path] GWAS list BED file. Columns: <Chr> <Start> <End> <Rsid>")
 p = add_argument(p,'--out',
     help="[Path] Target directory for output files.")
 p = add_argument(p,'--verbose',flag=T,
     help="[Flag] Show detailed process.")
-p = add_argument(p,'--perm_n',default=1000,type="numeric",
+p = add_argument(p,'--perm_n',default=1000, type="numeric",
     help="[Number] Set permutation number. Default=1000")
 
 ### Arguments for perm_test function
@@ -109,9 +92,9 @@ p = add_argument(p,'--gtex',
 p = add_argument(p,'--gtex_perm',flag=T,
     help="[Flag] Run permutation test for GTEx eQTL data.")
 p = add_argument(p,'--gtex_base',
-    help="[Path] GTEx eQTL DB file.")
+    help="[Path] GTEx overlapped TSV file.")
 p = add_argument(p,'--gtex_median_tpm',
-    help="[Path] GTEx gene median tpm GCT RDS file.")
+    help="[Path] GTEx gene median tpm GCT file.")
 
 ### Arguments for gtex_pm_plot function
 p = add_argument(p,'--gtex_pm_plot',flag=T,
@@ -119,24 +102,8 @@ p = add_argument(p,'--gtex_pm_plot',flag=T,
 p = add_argument(p,'--fgsea_rds',
     help="[Path] RDS file for GTEx permutation test result.")
 
-### Arguments for conv_Dicevcf2db function
-p = add_argument(p,'--conv_dicevcf2db',flag=T,
-    help="[Flag] Convert the DICE eQTL VCF files to database for GSEA.")
-p = add_argument(p,'--dice_vcf',
-    help="[Path] DICE eQTL VCF file or parent directory.")
-p = add_argument(p,'--pval',default="5e-8",
-    help="[5e-8] DICE eQTL VCF file or parent directory.")
-
-### Arguments for conv_Dicevcf2db function
-p = add_argument(p,'--eqtl_enrich',
-    help="[Flag] Run eqtl_enrich function for enrichment test. Choose function between 'enrichr' or 'gsea'.")
-p = add_argument(p,'--eqtl_db',
-    help="[Path] eQTL DB file.")
-p = add_argument(p,'--gene_median_tpm',
-    help="[Path] Gene median tpm RDS file.")
 
 argv = parse_args(p)
-eqtl_enrich_n = length(argv$eqtl_enrich)
 
 ## Load Common Libraries ##
 
@@ -144,75 +111,6 @@ suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
 
 ## Functions ##
-read_dicevcf = function(
-    f_dicevcf = NULL,
-    pval      = 5e-8
-) {
-    # Read file
-    paste0('  ',f_dicevcf,' = ') %>% cat
-    dicevcf = read.delim(f_dicevcf,comment.char="#",header=F,stringsAsFactors=F)
-    colnames(dicevcf) = c("CHROM","POS","ID","REF","ALT","QUAL","FILTER","INFO")
-    nrow(dicevcf) %>% cat
-
-    # Split and compile the SNP & INFO data
-    paste0('; compile INFO ') %>% cat
-    dice_info_li = lapply(dicevcf$INFO, function(x) {
-        info_split = strsplit(x,"\\;")[[1]]
-        info_split_li = strsplit(info_split,"\\=")
-        info_df = data.frame(
-            info_split_li[[1]][2],
-            info_split_li[[2]][2],
-            info_split_li[[3]][2],
-            info_split_li[[4]][2])
-        colnames(info_df) = c(
-            info_split_li[[1]][1],
-            info_split_li[[2]][1],
-            info_split_li[[3]][1],
-            info_split_li[[4]][1])
-        return(info_df)
-    })
-    dice_info_df = data.table::rbindlist(dice_info_li)
-    paste0('-> preparing ') %>% cat
-    file_base = basename(f_dicevcf)
-    f_base = tools::file_path_sans_ext(file_base)
-    dice_merge = data.frame(Rsid=dicevcf$ID,dice_info_df,Cell=f_base)
-    paste0('-> filtering = ') %>% cat
-    dice_sub = subset(dice_merge, Pvalue<pval)
-    dim(dice_sub) %>% print
-
-    return(dice_merge)
-}
-
-
-conv_dicevcf2db = function(
-    f_dicevcf = NULL,
-    pval      = 5e-8,
-    out       = NULL
-) {
-    paste0('\n** Run conv_dicevcf2db function in enrich.r **\n\n') %>% cat
-    suppressMessages(library(RSQLite))
-    ifelse(!dir.exists(out), dir.create(out), "")
-
-    # Read file/directory
-    dicevcf_files = list.files(f_dicevcf, pattern="\\.vcf$", full.names=T)
-    f_num = length(dicevcf_files)
-    if(f_num==0) {
-        dicevcf_files = f_dicevcf
-        #paste0('[Error] There is no file! Check the target directory again.\n') %>% cat
-    }
-    paste0('* ',f_num,' VCF files found in ',f_dicevcf,';\n') %>% cat
-    dice_li = lapply(dicevcf_files, function(x) read_dicevcf(x, pval))
-    dice_df = data.table::rbindlist(dice_li)
-    paste0('* Read done = ') %>% cat; dim(dice_df) %>% print
-
-    # Convert dice table to db format
-    f_db = paste0(out,'/dice_eqtl_',pval,'.db')
-    conn = dbConnect(RSQLite::SQLite(),f_db)
-    dbWriteTable(conn, "dice_eqtl", dice_df)
-    paste0('\nWrite db file: ',f_db,'\n') %>% cat
-}
-
-
 split_gtex = function(
     f_gtex = NULL,
     out    = NULL
@@ -417,65 +315,55 @@ draw_heatmap = function(
 }
 
 
-read_files_enrich = function(
+gtex_perm_test = function(
     f_gwas_snp  = NULL,
-    eqtl_db = NULL,
-    gene_median_tpm = NULL
+    f_gtex_base = NULL,
+    f_gtex_median_tpm = NULL,
+    out         = 'enrich',
+    perm_n      = 1000
 ) {
+    paste0('\n** Run gtex_perm_test function in enrich.r **\n\n') %>% cat
+    suppressMessages(library(fgsea))
     suppressMessages(library(data.table))
     suppressMessages(library(tidyr))
     suppressMessages(library(RSQLite))
+    ifelse(!dir.exists(out), dir.create(out), "")
 
+    # Read files
     paste0('* Input SNPs = ') %>% cat
     snps = read.delim(f_gwas_snp, header=F, stringsAsFactors=F)
     colnames(snps) = c('Chr','Start','End','Rsid')
     dim(snps) %>% print
 
     #paste0('* GTEx eQTL pairs = ') %>% cat
-    #eqtl_pairs = readRDS(eqtl_db)
-    #colnames(eqtl_pairs) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
-    #eqtl_pairs$Ensgid = sapply(eqtl_pairs$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
-    #dim(eqtl_pairs) %>% print
+    #gtex_pairs = readRDS(f_gtex_base)
+    #colnames(gtex_pairs) = c('Variant_id','Gene_id','Pval','Slope','Slope_se','Tissue','Chr','Pos','Rsid')
+    #gtex_pairs$Ensgid = sapply(gtex_pairs$Gene_id,function(x) strsplit(x,'\\.')[[1]][1])
+    #dim(gtex_pairs) %>% print
+    paste0('* ',f_gtex_base,', Ensgid = ') %>% cat
+    conn = dbConnect(RSQLite::SQLite(),f_gtex_base)
+    gtex_pairs = dbGetQuery(conn,"SELECT Ensgid, Tissue, Rsid FROM gtex") %>% unique
+    eqtl_genes = gtex_pairs$Ensgid %>% unlist %>% unique
+    length(eqtl_genes) %>% print
 
-    paste0('* ',eqtl_db,', Ensgid = ') %>% cat
-    conn = dbConnect(RSQLite::SQLite(),eqtl_db)
-    db_name = basename(eqtl_db)
-    if(db_name=='gtex_signif_5e-8.db') {
-        eqtl_pairs = dbGetQuery(conn,"SELECT Ensgid, Tissue, Rsid FROM gtex") %>% unique
-        eqtl_genes = eqtl_pairs$Ensgid %>% unlist %>% unique
-        length(eqtl_genes) %>% print
-
-        if(!is.null(gene_median_tpm)) {
-            paste0('* GTEx gene median tpm GCT = ') %>% cat
-            gct = readRDS(gene_median_tpm)
-            nrow(gct) %>% cat
-            gct_gather = gct %>% gather("Tissue","TPM",-Ensgid,-Description)
-        } else gct_gather = NULL
-    } else if(db_name=='dice_eqtl_5e-08.db') {
-        eqtl_pairs = dbGetQuery(conn,"SELECT Gene, Cell, Rsid FROM dice_eqtl") %>% unique
-        colnames(eqtl_pairs) = c("Ensgid","Tissue","Rsid")
-        eqtl_genes = eqtl_pairs$Ensgid %>% unlist %>% unique
-        length(eqtl_genes) %>% print
-
-        if(!is.null(gene_median_tpm)) {
-            paste0('* DICE gene mean tpm merged = ') %>% cat
-            gct = readRDS(gene_median_tpm)
-            nrow(gct) %>% cat
-            gct_gather = gct %>% gather("Tissue","TPM",-Ensgid)
-        } else gct_gather = NULL
-    } else {
-        paste0('\n[Error] Database file have to be input: "gtex_signif_5e-8.db" or "dice_eqtl_5e-08.db".\n') %>% cat
-    }
+    paste0('* GTEx gene median tpm GCT = ') %>% cat
+    gct = readRDS(f_gtex_median_tpm)
+    nrow(gct) %>% cat
+    #gct_negate = data.frame(gct[,1:2],-gct[,3:ncol(gct)])
+    #' -> negate ' %>% cat
+    gct_gather = gct %>% gather("Tissue","TPM",-Ensgid,-Description)
     ' -> transform ' %>% cat
+    #eqtl_genes = gtex_pairs$Gene_id %>% unique
     gct_filt_gene = subset(gct_gather, Ensgid %in% eqtl_genes)$Ensgid %>% unique
     paste0('-> Filt gene = ',length(gct_filt_gene),'\n') %>% cat
 
     # Filter SNP eQTL genes and their tissues
     paste0('* Filtering eQTLs by SNP: ') %>% cat
-    eqtl_pairs_sub = subset(eqtl_pairs,Rsid %in% snps$Rsid)
-    eqtl_genes_sub = eqtl_pairs_sub$Ensgid %>% unique
-    paste0('genes = ',length(eqtl_genes_sub)) %>% cat
-    eqtl_tissue = eqtl_pairs_sub$Tissue %>% unique %>% sort
+    gtex_pairs_sub = subset(gtex_pairs,Rsid %in% snps$Rsid)
+    gene_eqtl = gtex_pairs_sub$Ensgid %>% unique
+    paste0('genes = ',length(gene_eqtl)) %>% cat
+    #eqtl_tissue = gtex_pairs_sub$Tissue %>% unique %>% sort
+    eqtl_tissue = gtex_pairs_sub$Tissue %>% unique %>% sort
     n = length(eqtl_tissue)
     paste0(', tissues = ',n) %>% cat
     
@@ -483,67 +371,17 @@ read_files_enrich = function(
     ' [' %>% cat
     geneset_li = lapply(c(1:n),function(i) {
         if(i%%5==0) '.' %>% cat
-        subset(eqtl_pairs_sub,Tissue==eqtl_tissue[i])$Ensgid %>% unique
+        subset(gtex_pairs_sub,Tissue==eqtl_tissue[i])$Ensgid %>% unique
     })
     names(geneset_li) = eqtl_tissue
-    '] done\n\n' %>% cat
+    '] done.\n\n' %>% cat
 
-    return(list(eqtl_pairs,eqtl_tissue,gct_gather,geneset_li))
-}
-
-
-eqtl_enrich = function(
-    eqtl_enrich      = NULL,
-    gwas_snp         = NULL,
-    eqtl_db          = NULL,
-    gene_median_tpm  = NULL,
-    perm_n           = 1000,
-    out              = 'enrich'
-) {
-    paste0('\n** Run gtex_perm_test function in enrich.r **\n\n') %>% cat
-    suppressMessages(library(clusterProfiler))
-    ifelse(!dir.exists(out), dir.create(out), "")
-
-    # Read files
-    data_li = read_files_enrich(gwas_snp,eqtl_db,gene_median_tpm)
-    eqtl_pairs  = data_li[[1]]
-    eqtl_tissue = data_li[[2]]
-    gct_gather  = data_li[[3]]
-    geneset_li  = data_li[[4]]
-
-    # Run by tissue
-    n = length(eqtl_tissue)
-    for(i in 1:n) {
-        # Prepare data
-        paste0(i,' ',eqtl_tissue[i],': ') %>% cat
-    }
-}
-
-
-gtex_perm_test = function(
-    f_gwas_snp        = NULL,
-    f_gtex_base       = NULL,
-    f_gtex_median_tpm = NULL,
-    out               = 'enrich',
-    perm_n            = 1000
-) {
-    paste0('\n** Run gtex_perm_test function in enrich.r **\n\n') %>% cat
-    suppressMessages(library(fgsea))
-    ifelse(!dir.exists(out), dir.create(out), "")
-
-    # Read files
-    data_li = read_files_enrich(f_gwas_snp,f_gtex_base,f_gtex_median_tpm)
-    gtex_pairs  = data_li[[1]]
-    eqtl_tissue = data_li[[2]]
-    gct_gather  = data_li[[3]]
-    geneset_li  = data_li[[4]]
-
-    # Run by tissue
+    # Run by each tissue
     fgseaRes_li = list()
-    n = length(eqtl_tissue)
     for(i in 1:n) {
-        # Prepare data
         paste0(i,' ',eqtl_tissue[i],': ') %>% cat
+
+        # Prepare data
         eqtlgene_tissue_all = subset(gtex_pairs,Tissue==eqtl_tissue[i])$Ensgid %>% unique
         gene_n = length(geneset_li[[i]])
         paste0('genes = ',gene_n,' / ',length(eqtlgene_tissue_all),', ') %>% cat
@@ -575,18 +413,11 @@ gtex_perm_test = function(
     # Save result as a file
     f_base = basename(f_gwas_snp)
     file_base = tools::file_path_sans_ext(f_base)
-    db_name = basename(f_gtex_base)
-    if(db_name=='gtex_signif_5e-8.db') {
-        f_name1 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.tsv')
-        f_name2 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.rds')
-    } else if(db_name=='dice_eqtl_5e-08.db') {
-        f_name1 = paste0(out,'/dice-',file_base,'-permn_',perm_n,'.tsv')
-        f_name2 = paste0(out,'/dice-',file_base,'-permn_',perm_n,'.rds')
-    }
-    
+    f_name1 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.tsv')
     write.table(fgseaRes[order(fgseaRes$pval), ],f_name1,sep='\t',row.names=F)
     paste0('\nWrite file: ',f_name1,'\n') %>% cat
 
+    f_name2 = paste0(out,'/gtex-',file_base,'-permn_',perm_n,'.rds')
     fgseaRes_li = list(
         geneset_li = geneset_li,
         ranked     = ranked,
@@ -819,22 +650,6 @@ if(argv$example) {
     gtex_pm_plot(
         f_fgsea_rds = argv$fgsea_rds,
         out         = argv$out
-    )
-} else if(argv$conv_dicevcf2db) {
-    pval = argv$pval %>% as.numeric
-    conv_dicevcf2db(
-        f_dicevcf = argv$dice_vcf,
-        out       = argv$out,
-        pval      = pval
-    )
-} else if(eqtl_enrich_n > 0) {
-    eqtl_enrich(
-        cluster_profiler = argv$cluster_profiler,
-        gwas_snp         = argv$gwas_snp,
-        eqtl_db          = argv$eqtl_db,
-        gene_median_tpm  = argv$gene_median_tpm,
-        perm_n           = argv$perm_n,
-        out              = argv$out
     )
 }
 
