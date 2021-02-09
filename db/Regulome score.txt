@@ -1,0 +1,18 @@
+What does the RegulomeDB score represent?
+The scoring scheme refers to the following available datatypes for a single coordinate.
+
+Score	Supporting data
+1a	eQTL + TF binding + matched TF motif + matched DNase Footprint + DNase peak
+1b	eQTL + TF binding + any motif + DNase Footprint + DNase peak
+1c	eQTL + TF binding + matched TF motif + DNase peak
+1d	eQTL + TF binding + any motif + DNase peak
+1e	eQTL + TF binding + matched TF motif
+1f	eQTL + TF binding / DNase peak
+2a	TF binding + matched TF motif + matched DNase Footprint + DNase peak
+2b	TF binding + any motif + DNase Footprint + DNase peak
+2c	TF binding + matched TF motif + DNase peak
+3a	TF binding + any motif + DNase peak
+3b	TF binding + matched TF motif
+4	TF binding + DNase peak
+5	TF binding or DNase peak
+6	other
