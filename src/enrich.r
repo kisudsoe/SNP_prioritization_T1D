@@ -260,7 +260,7 @@ perm_test_calc = function(
     #suppressMessages(library(regioneR))
 
     # Calculate permTest to get z-scores and p-values by chromosome status
-    paste0('permTest - ') %>% cat
+    paste0('permTest for ') %>% cat
     status_ann = status$Ann %>% unique %>% sort
     paste0(length(status_ann),' annots = [') %>% cat
     status_all_bed = toGRanges(status[,1:4],format="BED")
