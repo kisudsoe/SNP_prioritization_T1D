@@ -799,6 +799,12 @@ Rscript src/enrich.r --permu \
     --dbsource roadmap_bed \
     --permn 100 \
     --out enrich
+Rscript src/enrich.r --permu \
+    --gwassnp data/seedSNP_1817_bm.bed \
+    --chrstatus db/roadmap_bed \
+    --dbsource roadmap_bed \
+    --permn 10 \
+    --out enrich
 ```
 
 > ** Run perm_test function in enrich.r **
@@ -914,29 +920,6 @@ Rscript src/enrich.r --permu \
     --out enrich
 ```
 
-> ** Run perm_test function in enrich.r **
->
-> * Gwas snp = [1] 484   4
-> * 127 files were found from db/roadmap_bed.
->
-> 1 Load E001: roadmap_bed = 933206; permTest for 25 annots = [.........................] done. Job process: 1.3 min
-> 2 Load E002: roadmap_bed = 837982; permTest for 25 annots = [.........................] done. Job process: 1.4 min
-> ...
-> 126 Load E128: roadmap_bed = 835642; permTest for 25 annots = [.........................] done. Job process: 1.5 min
-> 127 Load E129: roadmap_bed = 912567; permTest for 25 annots = [.........................] done. Job process: 1.4 min
->
-> * Write file: enrich/roadmap_bed-snp_484_roadmap_dist-permn_100-zscore.tsv
-> * Write file: enrich/roadmap_bed-snp_484_roadmap_dist-permn_100-pval.tsv
-
-```bash
-Rscript src/enrich.r --permu \
-    --gwassnp data/snp_484_roadmap_dist.bed \
-    --chrstatus db/roadmap_bed \
-    --dbsource roadmap_bed \
-    --permn 1000 \
-    --out enrich
-```
-
 
 
 
@@ -962,7 +945,7 @@ Rscript src/enrich.r --heatmap \
 
 ```bash
 Rscript src/enrich.r --heatmap \
-    --pmdata enrich/roadmap_bed-seedSNP_1817_bm-permn1000-zscore.tsv \
+    --pmdata roadmap_bed-seedSNP_1817_bm-permn1000-zscore.tsv \
     --meta db/roadmap_meta.tsv \
     --out enrich \
     --annot BLOOD,PANCREAS,THYMUS \
@@ -980,7 +963,7 @@ Rscript src/enrich.r --heatmap \
 
 ```bash
 Rscript src/enrich.r --heatmap \
-    --pmdata enrich/roadmap_bed-gwas_5e-08_129_hg19-permn100-zscore.tsv \
+    --pmdata roadmap_bed-gwas_5e-08_129_hg19-permn100-zscore.tsv \
     --meta db/roadmap_meta.tsv \
     --out enrich \
     --annot BLOOD,PANCREAS,THYMUS \
@@ -998,102 +981,16 @@ Rscript src/enrich.r --heatmap \
 
 
 
-Draw heatmap for 484 roadmap enhancer SNPs.
-
-```bash
-Rscript src/enrich.r --heatmap \
-    --pmdata enrich/roadmap_bed-snp_484_roadmap_dist-permn_100-zscore.tsv \
-    --meta db/roadmap_meta.tsv \
-    --out enrich \
-    --range -2,2 \
-    --annot BLOOD,PANCREAS,THYMUS \
-    --fileext png
-```
-
-> ** Run draw_heatmap function in enrich.r **
->
-> * Permutation result table = [1]  25 128
-> * [Optional] Add meta-info. table = [1] 127   9
->
-> Save as enrich/roadmap_bed-snp_484_roadmap_dist-permn_100-zscore.png
->
-> Job done: 2021-01-09 21:37:26 for 3.4 sec
-
-
-
-
-
 ## ENCODE Analysis Data
 
 Data browse and download: http://genome.ucsc.edu/ENCODE/downloads.html
 
 * [wgEncodeRegTfbsClusteredWithCellsV3.bed](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredWithCellsV3.bed.gz): TFBS clusters together with input cell sources (BED 5+1 format: standard 5 fields of BED followed by comma-separated list of cell types)
-* `encode_meta.tsv`: Cell line or tissue used as the source of experimental material [[ref](https://genome.ucsc.edu/ENCODE/cellTypes.html)].
-
-To split ENCODE TFBS file by cell types, run below code:
 
 ```bash
 Rscript src/enrich.r --splittfbs \
     --tfbs db/wgEncodeRegTfbsClusteredWithCellsV3.bed \
-    --out db/encode_cell
-```
-
-> ** Run split_tfbs function in enrich.r **
->
-> * ENCODE TFBS table = [1] 4380443       6
-> * 91 unique cell types are found.
->
-> 1 A549: 380569 regions, filtering [..........] row = 380569, TFs = 24. Save: db/tfbs_cell/A549.bed; Job process: 2.7 min
-> 2 AG04449:      49378 regions, filtering [..........] row = 49378, TFs = 1. Save: db/tfbs_cell/AG04449.bed; Job process: 23.2 sec
-> 3 AG04450:      46148 regions, filtering [..........] row = 46148, TFs = 1. Save: db/tfbs_cell/AG04450.bed; Job process: 22.9 sec
-> 4 AG09309:      43614 regions, filtering [..........] row = 43614, TFs = 1. Save: db/tfbs_cell/AG09309.bed; Job process: 21.2 sec
-> 5 AG09319:      49235 regions, filtering [..........] row = 49235, TFs = 1. Save: db/tfbs_cell/AG09319.bed; Job process: 23.5 sec
-> 6 AG10803:      47269 regions, filtering [..........] row = 47269, TFs = 1. Save: db/tfbs_cell/AG10803.bed; Job process: 23.2 sec
-> 7 AoAF: 45395 regions, filtering [..........] row = 45395, TFs = 1. Save: db/tfbs_cell/AoAF.bed; Job process: 21.8 sec
-> 8 BE2_C:        54249 regions, filtering [..........] row = 54249, TFs = 1. Save: db/tfbs_cell/BE2_C.bed; Job process: 25 sec
-> 9 BJ:   44331 regions, filtering [..........] row = 44331, TFs = 1. Save: db/tfbs_cell/BJ.bed; Job process: 19.7 sec
-> 10 Caco-2:      46436 regions, filtering [..........] row = 46436, TFs = 1. Save: db/tfbs_cell/Caco-2.bed; Job process: 21.2 sec
-> 11 Dnd41:       51005 regions, filtering [..........] row = 51005, TFs = 2. Save: db/tfbs_cell/Dnd41.bed; Job process: 23.6 sec
-> 12 ECC-1:       70393 regions, filtering [..........] row = 70393, TFs = 5. Save: db/tfbs_cell/ECC-1.bed; Job process: 31.4 sec
-> 13 Fibrobl:     45188 regions, filtering [..........] row = 45188, TFs = 1. Save: db/tfbs_cell/Fibrobl.bed; Job process: 21 sec
-> 14 GM06990:     45215 regions, filtering [..........] row = 45215, TFs = 1. Save: db/tfbs_cell/GM06990.bed; Job process: 22.3 sec
-> 15 GM08714:     441 regions, filtering [..........] row = 441, TFs = 1. Save: db/tfbs_cell/GM08714.bed; Job process: 1.3 sec
-> 16 GM10847:     17131 regions, filtering [..........] row = 17131, TFs = 2. Save: db/tfbs_cell/GM10847.bed; Job process: 8.5 sec
-> 17 GM12801:     2882 regions, filtering [..........] row = 2882, TFs = 1. Save: db/tfbs_cell/GM12801.bed; Job process: 2.5 sec
-> 18 GM12864:     46474 regions, filtering [..........] row = 46474, TFs = 1. Save: db/tfbs_cell/GM12864.bed; Job process: 25.8 sec
-> 19 GM12865:     43737 regions, filtering [..........] row = 43737, TFs = 1. Save: db/tfbs_cell/GM12865.bed; Job process: 21.9 sec
-> 20 GM12872:     46803 regions, filtering [..........] row = 46803, TFs = 1. Save: db/tfbs_cell/GM12872.bed; Job process: 23.5 sec
-> 21 GM12873:     50614 regions, filtering [..........] row = 50614, TFs = 1. Save: db/tfbs_cell/GM12873.bed; Job process: 25.7 sec
-> 22 GM12874:     37269 regions, filtering [..........] row = 37269, TFs = 1. Save: db/tfbs_cell/GM12874.bed; Job process: 19.5 sec
-> 23 GM12875:     38921 regions, filtering [..........] row = 38921, TFs = 1. Save: db/tfbs_cell/GM12875.bed; Job process: 20.9 sec
-> 24 GM12878:     1061985 regions, filtering [..........] row = 1061985, TFs = 76. Save: db/tfbs_cell/GM12878.bed; Job process: 8 min25 GM12891:     179010 regions, filtering [..........] row = 179010, TFs = 8. Save: db/tfbs_cell/GM12891.bed; Job process: 1.3 min
-> 26 GM12892:     109701 regions, filtering [..........] row = 109701, TFs = 6. Save: db/tfbs_cell/GM12892.bed; Job process: 45.6 sec27 GM15510:     25455 regions, filtering [..........] row = 25455, TFs = 2. Save: db/tfbs_cell/GM15510.bed; Job process: 11.5 sec
-> 28 GM18505:     23947 regions, filtering [..........] row = 23947, TFs = 2. Save: db/tfbs_cell/GM18505.bed; Job process: 10.9 sec
-> 29 GM18526:     15322 regions, filtering [..........] row = 15322, TFs = 2. Save: db/tfbs_cell/GM18526.bed; Job process: 7.4 sec
-> 30 GM18951:     28090 regions, filtering [..........] row = 28090, TFs = 2. Save: db/tfbs_cell/GM18951.bed; Job process: 12.9 sec
-> 31 GM19099:     23281 regions, filtering [..........] row = 23281, TFs = 2. Save: db/tfbs_cell/GM19099.bed; Job process: 10.9 sec
-> 32 GM19193:     20116 regions, filtering [..........] row = 20116, TFs = 2. Save: db/tfbs_cell/GM19193.bed; Job process: 9.5 sec
-> 33 GM19238:     48654 regions, filtering [..........] row = 48654, TFs = 1. Save: db/tfbs_cell/GM19238.bed; Job process: 22.2 sec
-> 34 GM19239:     40161 regions, filtering [..........] row = 40161, TFs = 1. Save: db/tfbs_cell/GM19239.bed; Job process: 18.8 sec
-> 35 GM19240:     44690 regions, filtering [..........] row = 44690, TFs = 1. Save: db/tfbs_cell/GM19240.bed; Job process: 21.1 sec
-> 36 Gliobla:     75041 regions, filtering [..........] row = 75041, TFs = 2. Save: db/tfbs_cell/Gliobla.bed; Job process: 35 sec
-> 37 H1-hESC:     579539 regions, filtering [..........] row = 579539, TFs = 50. Save: db/tfbs_cell/H1-hESC.bed; Job process: 4.2 min38 HA-sp:       46196 regions, filtering [..........] row = 46196, TFs = 1. Save: db/tfbs_cell/HA-sp.bed; Job process: 22 sec
-> 39 HAc: 45162 regions, filtering [..........] row = 45162, TFs = 1. Save: db/tfbs_cell/HAc.bed; Job process: 22.1 sec
-> 40 HBMEC:       57865 regions, filtering [..........] row = 57865, TFs = 1. Save: db/tfbs_cell/HBMEC.bed; Job process: 27.1 sec
-> 41 HCFaa:       41307 regions, filtering [..........] row = 41307, TFs = 1. Save: db/tfbs_cell/HCFaa.bed; Job process: 19.6 sec
-> 42 HCM: 49849 regions, filtering [..........] row = 49849, TFs = 1. Save: db/tfbs_cell/HCM.bed; Job process: 23.3 sec
-> 43 HCPEpiC:     60523 regions, filtering [..........] row = 60523, TFs = 1. Save: db/tfbs_cell/HCPEpiC.bed; Job process: 28.1 sec
-> 44 HCT-116:     108478 regions, filtering [..........] row = 108478, TFs = 5. Save: db/tfbs_cell/HCT-116.bed; Job process: 47.9 sec
-> 45 HEEpiC:      45911 regions, filtering [..........] row = 45911, TFs = 1. Save: db/tfbs_cell/HEEpiC.bed; Job process: 21.2 sec
->
-> 
-
-
-
-Run below code for `perm_test` function:
-
-```bash
-
+    --out db/tfbs_cell
 ```
 
 
