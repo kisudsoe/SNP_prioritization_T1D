@@ -51,7 +51,7 @@ cat(paste0('Functional motifs (1f_only-2b) = ',nrow(reg_2b)-nrow(reg_1f_only),'\
 snpids.1f_only = subset(reg_1f_only,rsid%in%snpids)
 snpids.2b      = subset(reg_2b,     rsid%in%snpids)
 cat(paste0('  Regulome >=2b SNPs = ',nrow(snpids.2b),'\n'))
-cat(paste0('  SNPs with functional motifs (1f_only-2b) = ',
+cat(paste0('  SNPs with functional motifs (2b-1f_only) = ',
                 nrow(snpids.2b)-nrow(snpids.1f_only),'\n'))
 f.name1 = paste0(dir,'regulome_',nrow(snpids.2b),'.tsv')
 write.table(snpids.2b,f.name1,row.names=F,col.names=T,quote=T,sep='\t')
