@@ -101,7 +101,7 @@ Rscript src/biomart_snp.r ^
 
 
 
-## 2. Roadmap data download and filter
+## 2. RoadMap data download and filter
 
 The [RoadMAP project](https://egg2.wustl.edu/roadmap/web_portal/imputed.html) provides epigenome annotations such as [12-mark/127-reference epigenome/25-state Imputation Based Chromatin State Model](https://egg2.wustl.edu/roadmap/data/byFileType/chromhmmSegmentations/ChmmModels/imputed12marks/jointModel/final/) by using ChromHMM algorithm (Ernst and Kellis, 2012, Nature Methods, pmid 22373907). We downloaded the 127 files by their [cell types](https://github.com/mdozmorov/genomerunner_web/wiki/Roadmap-cell-types) (e.g., `E001_25_imputed12marks_dense.bed.gz` and etc) using R code (`T1D_roadmap.r`). And then we filtered the data by [annotation code](https://egg2.wustl.edu/roadmap/web_portal/imputed.html) (see db/[roadmap] ) including 13_EnhA1, 14_EnhA2, 15_EnhAF, 16_EnhW1, 17_EnhW2, 18_EnhAc.
 
@@ -776,65 +776,4 @@ Rscript src/venn.r ^
 > Job done for 0.1 sec
 
 - `venn.tsv` -> `summary.tsv` : Summary file for this analysis.
-
-
-
-# *Enrichment analysis
-
-## Downloading 1KG DB
-
-
-
-
-
-## Prepare GWAS SNPs with LD ($r^2$>0.6 & d' = 1)
-
-Below description is referred from `2020-05 Senescent cell enhancer/Enrichment analysis.md` log file, Section 3: Calculate LD $r^2$ values.
-
-* LDs of SNPs were calculated by using --r2 function in plink1.9 linux version with options: `inter-chr` to get a table format report, `yes-really` to get unfiltered raw results, `--exclude` for removing duplicated variants, -`-ld-snp-list` 
-
-
-
-## Prepare Roadmap enhancers
-
-SNP residing on regulatory elements in Roadmap data: Run below command function at bash
-
-Run a bash file `db/roadmap_dist.sh`:
-
-```bash
-sortBed -i db/roadmap/E001_25_imputed12marks_dense.bed | closestBed -d -a data/seedSNP_1817_bm.bed -b stdin > db/roadmap_dist/E001_snp_dist.tsv
-...
-sortBed -i db/roadmap/E129_25_imputed12marks_dense.bed | closestBed -d -a data/seedSNP_1817_bm.bed -b stdin > db/roadmap_dist/E129_snp_dist.tsv
-```
-
-```bash
-bash roadmap_dist.sh
-```
-
-* Result files are stored at `db/roadmap_dist` folder.
-
-
-
-Filtering by dist 0 and merge results from cell types
-
-```bash
-Rscript src/enrich.r --roadmap --dir db/roadmap_dist --out db
-```
-
-> ** Run roadmap_merge function in enrich.r **
->
-> Read roadmap dist files... 127.. [1] 230759      7
-> Write TSV file: dbroadmap_merge.tsv
->
-> Job done: 2021-01-06 22:12:10 for 3.1 sec
-
-
-
-## 
-
-
-
-```shell
-Rscript src/enrich.r --fisher --gwassnp ? --enhsnp ? --age ? --out ?
-```
 
