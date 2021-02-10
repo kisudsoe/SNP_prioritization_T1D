@@ -804,6 +804,12 @@ Rscript src/enrich.r --permu \
     --dbsource roadmap_bed \
     --permn 100 \
     --out enrich
+Rscript src/enrich.r --permu \
+    --gwassnp data/seedSNP_1817_bm.bed \
+    --chrstatus db/roadmap_bed \
+    --dbsource roadmap_bed \
+    --permn 1000 \
+    --out enrich
 ```
 
 > ** Run perm_test function in enrich.r **
@@ -831,36 +837,6 @@ Rscript src/enrich.r --permu \
 >
 > Job done: 2021-01-07 21:12:50 for 2.8 hr
 
-```bash
-Rscript src/enrich.r --permu \
-    --gwassnp data/seedSNP_1817_bm.bed \
-    --chrstatus db/roadmap_bed \
-    --dbsource roadmap_bed \
-    --permn 1000 \
-    --out enrich
-```
-
-> ** Run perm_test function in enrich.r **
->
-> * Gwas snp = [1] 1817    4
-> * 127 files were found from db/roadmap_bed.
->
-> 1 Load E001: roadmap_bed = [1] 933206      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 8.3 min
-> 2 Load E002: roadmap_bed = [1] 837982      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 8.3 min
-> ...
-> 126 Load E128: roadmap_bed = [1] 835642      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 7.7 min
-> 127 Load E129: roadmap_bed = [1] 912567      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 9.6 min
->
-> * Write file: enrich/roadmap_bed-seedSNP_1817_bm-zscore.tsv
-> * Write file: enrich/roadmap_bed-seedSNP_1817_bm-pval.tsv
-> There were 50 or more warnings (use warnings() to see the first 50)
->
-> Job done: 2021-01-08 15:59:44 for 17.1 hr
-
 
 
 Run this function for 129 seed gwas SNPs.
@@ -874,83 +850,7 @@ Rscript src/enrich.r --permu \
     --out enrich
 ```
 
-> ** Run perm_test function in enrich.r **
->
-> * Gwas snp = [1] 129   4
-> * 127 files were found from db/roadmap_bed.
->
-> 1 Load E001: roadmap_bed = [1] 933206      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 55.6 sec
-> 2 Load E002: roadmap_bed = [1] 837982      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 53.7 sec
-> ...
-> 126 Load E128: roadmap_bed = [1] 835642      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 57.2 sec
-> 127 Load E129: roadmap_bed = [1] 912567      4
->   Run permTest: 25 annotations, [.........................] done. Job process: 58.2 sec
->
-> * Write file: enrich/roadmap_bed-gwas_5e-08_129_hg19-zscore.tsv
-> * Write file: enrich/roadmap_bed-gwas_5e-08_129_hg19-pval.tsv
-> There were 50 or more warnings (use warnings() to see the first 50)
->
-> Job done: 2021-01-08 06:00:11 for 1.9 hr
-
-
-
-## Draw heatmap
-
-To draw heatmap by using the z-scores calculated from the permutation test, run below command function at `bash`.
-
-```bash
-Rscript src/enrich.r --heatmap \
-    --pmdata roadmap_bed-seedSNP_1817_bm-permn100-zscore.tsv \
-    --out enrich
-```
-
-> ** Run draw_heatmap function in enrich.r **
->
-> * Permutation result table = [1]  25 128
-> * Prepare table... done
->
-> Save as enrich/roadmap_bed-seedSNP_1817_bm-zscore2.png
->
-> Job done: 2021-01-08 21:04:41 for 2.4 sec
-
-```bash
-Rscript src/enrich.r --heatmap \
-    --pmdata roadmap_bed-seedSNP_1817_bm-permn1000-zscore.tsv \
-    --meta db/roadmap_meta.tsv \
-    --out enrich \
-    --annot BLOOD,PANCREAS,THYMUS \
-    --fileext png
-```
-
-> ** Run draw_heatmap function in enrich.r **
->
-> * Permutation result table = [1]  25 128
-> * Prepare table... done
->
-> Save as enrich/roadmap_bed-seedSNP_1817_bm-zscore.png
->
-> Job done: 2021-01-08 21:05:43 for 1.6 sec
-
-```bash
-Rscript src/enrich.r --heatmap \
-    --pmdata roadmap_bed-gwas_5e-08_129_hg19-permn100-zscore.tsv \
-    --meta db/roadmap_meta.tsv \
-    --out enrich \
-    --annot BLOOD,PANCREAS,THYMUS \
-    --fileext png
-```
-
-> ** Run draw_heatmap function in enrich.r **
->
-> * Permutation result table = [1]  25 128
-> * Prepare table... done
->
-> Save as enrich/roadmap_bed-gwas_5e-08_129_hg19-zscore.png
->
-> Job done: 2021-01-08 21:06:40 for 1.7 sec
+> 
 
 
 
