@@ -26,10 +26,6 @@ Rscript src/enrich.r --heatmap \
     --out enrich \
     --annot BLOOD,PANCREAS,THYMUS \
     --fileext png
-
-Rscript src/enrich.r --splittfbs \
-    --tfbs db/wgEncodeRegTfbsClusteredWithCellsV3.bed \
-    --out db/tfbs_cell
 '
 
 ### Shared Arguments
@@ -47,14 +43,8 @@ p = add_argument(p, '--permn',     help="[Number] Set permutation number. Defaul
 p = add_argument(p, '--heatmap',   help="[Flag] Draw a heatmap from permu results.", flag=T)
 p = add_argument(p, '--pmdata',    help="[Path] Z-score table file.")
 p = add_argument(p, '--meta',      help="[Path] Add roadmap meta-info file for heatmap annotation.")
-p = add_argument(p, '--range',     help="[-4,4] Set coloring Z-score range to display.", default="-4,4")
 p = add_argument(p, '--annot',     help="[BLOOD,PANCREAS,THYMUS ...] Choose ANATOMYs of roadmap meta-info to annotate heatmap.")
 p = add_argument(p, '--fileext',   help="[png/sgv] Choose output figure format.")
-
-### Arguments for split_tfbs function
-p = add_argument(p, '--splittfbs', help="[Flag] Split ENCODE TFBS BED file by cell types.", flag=T)
-p = add_argument(p, '--tfbs',      help="[Path] ENCODE TFBS BED file.")
-
 
 argv = parse_args(p)
 
@@ -64,29 +54,9 @@ suppressMessages(library(dplyr))
 suppressMessages(library(tidyr))
 
 ## Functions ##
-split_tfbs = function(
-    f_tfbs = NULL,
-    out    = NULL
-) {
-    paste0('\n** Run split_tfbs function in enrich.r **\n\n') %>% cat
-    ifelse(!dir.exists(out), dir.create(out), "")
-
-    # Read file
-    paste0('* Permutation result table = ') %>% cat
-    tfbs = read.delim(f_tfbs, stringsAsFactors=F)
-    colnames(tfbs) = c('Chr','Start','End','TF','nada','Cells')
-    dim(tfbs) %>% print
-    head(tfbs) %>% print
-
-    # Find unique cell types
-    cell_types = tfbs$Cells %>% unique
-}
-
-
 draw_heatmap = function(
     f_pmdata = NULL,
     f_meta   = NULL,
-    range    = NULL,
     out      = 'enrich',
     annot    = NULL,
     fileext  = 'png'
@@ -188,7 +158,7 @@ perm_test = function(
     n = length(f_status_paths)
     if(n==0) { f_status_paths = f_status; n=1 }
     paste0('* ',n,' files were found from ',f_status,'.\n\n') %>% cat
-    cell_types=NULL; zscore_li=list(); pval_li=list(); overlap_li=list()
+    cell_types=NULL; zscore_li=list(); pval_li=list()
     source('src/pdtime.r')
     for(i in 1:n) {
         t1=Sys.time()
@@ -203,20 +173,17 @@ perm_test = function(
 
         ## Run perm_test
         pt_df = perm_test_calc(gwas_snp_bed,status,perm_n,verbose)
-        zscore_li[[i]]  = data.frame(Status=pt_df$Status, Zscore =pt_df$Zscore)
-        pval_li[[i]]    = data.frame(Status=pt_df$Status, Pval   =pt_df$Pval)
-        overlap_li[[i]] = data.frame(Status=pt_df$Status, Overlap=pt_df$Overlap)
+        zscore_li[[i]] = data.frame(Status=pt_df$Status, Zscore=pt_df$Zscore)
+        pval_li[[i]]   = data.frame(Status=pt_df$Status, Pval  =pt_df$Pval)
         paste0(pdtime(t1,2),'\n') %>% cat
     }
     pm_merge = function(x,y) {
         merge(x=x,y=y,by='Status',all=T)
     }
-    zscore_df  = Reduce(pm_merge, zscore_li)
-    pval_df    = Reduce(pm_merge, pval_li)
-    overlap_df = Reduce(pm_merge, overlap_li)
-    colnames(zscore_df)  = c('Status',cell_types)
-    colnames(pval_df)    = c('Status',cell_types)
-    colnames(overlap_df) = c('Status',cell_types)
+    zscore_df = Reduce(pm_merge, zscore_li)
+    pval_df   = Reduce(pm_merge, pval_li)
+    colnames(zscore_df) = c('Status',cell_types)
+    colnames(pval_df)   = c('Status',cell_types)
     
     # Write result as files
     gwas_base = basename(f_gwas_snp)
@@ -226,13 +193,9 @@ perm_test = function(
     write.table(zscore_df,f_name1,sep='\t',row.names=F,quote=F)
     paste0('\n* Write file: ',f_name1,'\n') %>% cat
     
-    f_name2 = paste0(out,'/',db_src,'-',gwas_f_name,'-permn_',perm_n,'-pval.tsv')
+    f_name2 = paste0(out,'/',db_src,'-',gwas_f_name,'-pval.tsv')
     write.table(pval_df,f_name2,sep='\t',row.names=F,quote=F)
     paste0('* Write file: ',f_name2,'\n') %>% cat
-
-    f_name3 = paste0(out,'/',db_src,'-',gwas_f_name,'-permn_',perm_n,'-overlap.tsv')
-    write.table(overlap_df,f_name3,sep='\t',row.names=F,quote=F)
-    paste0('* Write file: ',f_name3,'\n') %>% cat
 }
 
 read_status_file = function(path,db_src) {
@@ -260,9 +223,9 @@ perm_test_calc = function(
     #suppressMessages(library(regioneR))
 
     # Calculate permTest to get z-scores and p-values by chromosome status
-    paste0('permTest for ') %>% cat
+    paste0(' permTest for') %>% cat
     status_ann = status$Ann %>% unique %>% sort
-    paste0(length(status_ann),' annots = [') %>% cat
+    paste0(length(status_ann),' annotations, [') %>% cat
     status_all_bed = toGRanges(status[,1:4],format="BED")
     pt_li = lapply(status_ann,function(x) {
         '.' %>% cat
@@ -280,12 +243,8 @@ perm_test_calc = function(
             force.parallel     = T,
             verbose            = verbose
         )
-        pt_df = data.frame(
-            Status  = x,
-            Zscore  = pt$numOverlaps$zscore,
-            Pval    = pt$numOverlaps$pval,
-            Overlap = pt$numOverlaps$observed
-        )
+        #pt$numOverlaps$pval
+        pt_df = data.frame(Status=x,Zscore=pt$numOverlaps$zscore,Pval=pt$numOverlaps$pval)
         return(pt_df)
     })
     paste0('] done. ') %>% cat
@@ -314,15 +273,9 @@ if(argv$example) {
     draw_heatmap(
         f_pmdata = argv$pmdata,
         f_meta   = argv$meta,
-        range    = argv$range,
         out      = argv$out,
         annot    = argv$annot,
         fileext  = argv$fileext
-    )
-} else if(argv$splittfbs) {
-    split_tfbs(
-        f_tfbs = argv$tfbs,
-        out    = argv$out
     )
 }
 paste0('\n',pdtime(t0,1),'\n') %>% cat

@@ -781,11 +781,16 @@ Rscript src/venn.r ^
 
 # *Enrichment analysis
 
+Contingency table by cell types
+
+|                    | Roadmap enhancer | Other Chr status |
+| ------------------ | ---------------- | ---------------- |
+| T1D candidate SNPs | k (SNP number)   | n                |
+| Others?            | m                | l                |
 
 
-## Roadmap ChromHMM data
 
-### Run permutation test
+## Run permutation test
 
 To calculate enrichment, run below command function at `bash`.
 
@@ -798,12 +803,6 @@ Rscript src/enrich.r --permu \
     --chrstatus db/roadmap_bed \
     --dbsource roadmap_bed \
     --permn 100 \
-    --out enrich
-Rscript src/enrich.r --permu \
-    --gwassnp data/seedSNP_1817_bm.bed \
-    --chrstatus db/roadmap_bed \
-    --dbsource roadmap_bed \
-    --permn 10 \
     --out enrich
 ```
 
@@ -896,35 +895,9 @@ Rscript src/enrich.r --permu \
 >
 > Job done: 2021-01-08 06:00:11 for 1.9 hr
 
-```bash
-Rscript src/enrich.r --permu \
-    --gwassnp data/gwas_5e-08_129_hg19.bed \
-    --chrstatus db/roadmap_bed \
-    --dbsource roadmap_bed \
-    --permn 1000 \
-    --out enrich
-```
-
-> 
 
 
-
-Run this function for 484 roadmap enhancer SNPs.
-
-```bash
-Rscript src/enrich.r --permu \
-    --gwassnp data/snp_484_roadmap_dist.bed \
-    --chrstatus db/roadmap_bed \
-    --dbsource roadmap_bed \
-    --permn 100 \
-    --out enrich
-```
-
-
-
-
-
-### Draw heatmap
+## Draw heatmap
 
 To draw heatmap by using the z-scores calculated from the permutation test, run below command function at `bash`.
 
@@ -978,22 +951,6 @@ Rscript src/enrich.r --heatmap \
 > Save as enrich/roadmap_bed-gwas_5e-08_129_hg19-zscore.png
 >
 > Job done: 2021-01-08 21:06:40 for 1.7 sec
-
-
-
-## ENCODE Analysis Data
-
-Data browse and download: http://genome.ucsc.edu/ENCODE/downloads.html
-
-* [wgEncodeRegTfbsClusteredWithCellsV3.bed](http://hgdownload.soe.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeRegTfbsClustered/wgEncodeRegTfbsClusteredWithCellsV3.bed.gz): TFBS clusters together with input cell sources (BED 5+1 format: standard 5 fields of BED followed by comma-separated list of cell types)
-
-```bash
-Rscript src/enrich.r --splittfbs \
-    --tfbs db/wgEncodeRegTfbsClusteredWithCellsV3.bed \
-    --out db/tfbs_cell
-```
-
-
 
 
 
