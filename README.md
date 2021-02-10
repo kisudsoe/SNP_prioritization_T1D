@@ -297,7 +297,7 @@ Rscript src/regulome.r ^
 > Job process: 5 sec
 >
 > Regulome score >=2b, SNPs = 430528
-> Functional motifs (2b-1f_only) = 395823
+> Functional motifs (1f_only-2b) = 395823
 >   Regulome >=2b SNPs = 94
 >   SNPs with functional motifs (1f_only-2b) = 45
 >
