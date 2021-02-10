@@ -100,7 +100,7 @@ split_tfbs = function(
 
     # Expand data by unique cell types
     source('src/pdtime.r')
-    o=lapply(c(1:n), function(i) {
+    o = lapply(c(1:n), function(i) {
         t1=Sys.time()
 
         # Subset ENCODE data by cell type
@@ -166,31 +166,21 @@ draw_heatmap = function(
         dim(meta) %>% print
 
         # Match meta-info. with original colnames
-        meta_db = tools::file_path_sans_ext(f_meta %>% basename)
-        if(meta_db=='roadmap_meta') {
-            pmdata_mat = pmdata_mat[,meta$EID]
-            pmdata_col = paste0(meta$EDACC_NAME," (",meta$EID,")")
-        } else if(meta_db=='encode_meta') {
-            #pmdata_mat = pmdata_mat[,meta$Cell_Name] # Error: undefined columns selected
-            pmdata_col = paste0(meta$Cell_Name," (",meta$Symbol,")")
-        }
+        pmdata_mat = pmdata_mat[,meta$EID]
+        pmdata_col = paste0(meta$EDACC_NAME," (",meta$EID,")")
         ha1 = HeatmapAnnotation(Name=anno_text(pmdata_col))
         show_column_names = FALSE
 
         # [Optional] Add column annotation to heatmap by ANATOMY
         if(length(f_meta)>0 & length(annot)>0) {
-            if(meta_db=='roadmap_meta') { anatomy = meta$ANATOMY
-            } else if(meta_db=='encode_meta') { anatomy = meta$Tissue }
             annots = strsplit(annot,',')[[1]]
+            anatomy = meta$ANATOMY
             `%notin%` = Negate(`%in%`) # define %notin% operator
             anatomy[meta$ANATOMY %notin% annots] = 'Other' # A bug to change as NA
             anatomy_uq = anatomy %>% unique %>% sort
-            ana_num = length(anatomy_uq)
-
-            if(ana_num<5) { ann_cols = terrain.colors(length(anatomy_uq))
-            } else ann_cols = rainbow(length(anatomy_uq))
 
             ## Set column annotation color
+            ann_cols = terrain.colors(length(anatomy_uq))
             names(ann_cols) = anatomy_uq
             ha2 = HeatmapAnnotation(
                 Anatomy=anatomy,
@@ -209,22 +199,13 @@ draw_heatmap = function(
     z_range = strsplit(range,',')[[1]] %>% as.numeric
     pmdata_mat = as.matrix(pmdata_mat)
     my_col = colorRamp2(c(z_range[1],0,z_range[2]),c("#2E86C1","#FEF9E7","#C0392B"))
-    if(meta_db=='roadmap_meta') {
-        cluster_rows = TRUE
-        cluster_columns = TRUE
-        wh = c(22,12)
-    } else if(meta_db=='encode_meta') {
-        cluster_rows = FALSE
-        cluster_columns = FALSE
-        wh = c(22,25)
-    }
 
     # Draw heatmap
     file_base = basename(f_pmdata)
     file_name = tools::file_path_sans_ext(file_base)
     f_name = paste0(out,'/',file_name,'.png')
 
-    if(fileext=='png') { png(f_name,width=wh[1],height=wh[2],units='in',res=300)
+    if(fileext=='png') { png(f_name,width=22,height=12,units='in',res=300)
     } else if(fileext=='svg') {}
     p=Heatmap(
         pmdata_mat,
@@ -236,9 +217,7 @@ draw_heatmap = function(
         column_names_max_height = unit(7,"in"),
         show_column_names = show_column_names,
         bottom_annotation = ha1,
-        top_annotation = ha2,
-        cluster_rows = cluster_rows,
-        cluster_columns = cluster_columns
+        top_annotation = ha2
     )
     print(p)
     dev.off()
@@ -275,11 +254,7 @@ perm_test = function(
     for(i in 1:n) {
         t1=Sys.time()
         file_name = basename(f_status_paths[i])
-        if(db_src=='roadmap_bed') {
-            cell_type = strsplit(file_name,'_')[[1]][1]
-        } else if(db_src=='encode_bed') {
-            cell_type = tools::file_path_sans_ext(file_name)
-        }
+        cell_type = strsplit(file_name,'_')[[1]][1] # Roadmap file-specific
         cell_types = c(cell_types,cell_type)
 
         ## Read file
@@ -288,7 +263,7 @@ perm_test = function(
         paste0(nrow(status),'; ') %>% cat
 
         ## Run perm_test
-        pt_df = perm_test_calc(gwas_snp_bed,status,db_src,perm_n,verbose)
+        pt_df = perm_test_calc(gwas_snp_bed,status,perm_n,verbose)
         zscore_li[[i]]  = data.frame(Status=pt_df$Status, Zscore =pt_df$Zscore)
         pval_li[[i]]    = data.frame(Status=pt_df$Status, Pval   =pt_df$Pval)
         overlap_li[[i]] = data.frame(Status=pt_df$Status, Overlap=pt_df$Overlap)
@@ -341,7 +316,6 @@ read_status_file = function(path,db_src) {
 perm_test_calc = function(
     gwas_snp_bed = NULL,
     status   = NULL,
-    db_src   = NULL,
     perm_n   = 5000,
     verbose  = FALSE
 ) {
@@ -352,21 +326,11 @@ perm_test_calc = function(
     paste0('permTest - ') %>% cat
     status_ann = status$Ann %>% unique %>% sort
     n = length(status_ann)
-    paste0(n,' annots [') %>% cat
-
-    # Set background status as universe
+    paste0(n,' annots = [') %>% cat
     status_all_bed = toGRanges(status[,1:4],format="BED")
-    # if(db_src=='roadmap_bed') {
-    #     status_all_bed = toGRanges(status[,1:4],format="BED")
-    # } else if (db_src=='encode_bed') {
-    #     encode_tfbs_v3 = readRDS('db/wgEncodeRegTfbsClusteredV3.bed.rds')
-    #     status_all_bed = toGRanges(encode_tfbs_v3[,1:4],format="BED")
-    # }
-    
-    progress = n%/%5
+    progress = n%/%10
     pt_li = lapply(c(1:n),function(i) {
-        if(n>=5 & i%%progress==0) { '.' %>% cat
-        } else '.' %>% cat
+        if(i%%progress==0) { '.' %>% cat }
         # Convert data.frame to GRanges format
         status_sub = subset(status,Ann==status_ann[i])
         status_sub_bed = toGRanges(status_sub,format="BED")
